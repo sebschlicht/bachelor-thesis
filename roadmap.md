@@ -3,8 +3,11 @@
 ## Performance differences
 
 The performance of the current setup is at least 50 times lower than in the Graphity evaluation:
-**evaluation performance**: at least 2.500 write requests / s
-**actual performance**: 50 write requests / s
+
+| Benchmark | Write requests per second |
+| --------- | ------------------------- |
+| evaluation | &ge; 2.500 write requests/s |
+| current setup | 50 write requests/s |
 
 Therefore I need to have a closer took at Titan and Neo4j and the setups I put the code in, to understand what I do measure and to make sure that this is what I actually want to measure.
 
