@@ -28,7 +28,7 @@ It would be possible to reduce the number of used transactions to simulate this 
 
 | Benchmark | Write requests per second |
 | --------- | ------------------------- |
-| evaluation | &ge; 2.500 write requests/s |
+| current setup (1 action / transaction) | 50 write requests/s |
 | current setup @ 100 actions / transaction | ? write requests/s |
 | current setup @ 1000 actions / transaction | ? write requests/s |
 
