@@ -9,9 +9,9 @@ The performance of the current setup is at least 50 times lower than in the Grap
 Therefore I need to have a closer took at Titan and Neo4j and the setups I put the code in, to understand what I do measure and to make sure that this is what I actually want to measure.
 
 ### Reasons expected to cause the differences (ordered by expected significance)
-# differences in transaction handling (single transaction vs. bulking)
-# IO time
-# HTTP latency
+1. differences in transaction handling (single transaction vs. bulking)
+2. IO time
+3. HTTP latency
 
 I have to profile the server to find out what causes the major differences.
 This will enable me to either adapt the setup or explain the differences.
