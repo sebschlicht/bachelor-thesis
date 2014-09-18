@@ -19,6 +19,11 @@ Therefore I need to have a closer took at Titan and Neo4j and the setups I put t
 I have to profile the server to find out what causes the major differences.
 This will enable me to either adapt the setup or explain the differences.
 
+#### differences in transaction handling
+In the [Graphity evaluation](https://github.com/renepickhardt/graphity-evaluation/blob/master/src/de/metalcon/neo/evaluation/GraphityBuilder.java) each Graphity request, such as "follow" and "post", did happen in a single transaction.
+Though the measurement did not cover the transaction handling: The watch did only measure the execution time of the Graphity algorithm, not the time to create or commit a transaction.
+The current setup does not allow to fully exclude the transaction handling time. It would be possible to reduce the number of used transactions to simulate this effect.
+
 ## Scalability
 
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
