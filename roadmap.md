@@ -51,3 +51,9 @@ This will also help me to explain the differences between Neo4j and Titan in the
 Multiple threads access exactly 2 objects of the plugin in Neo4j.
 The number of threads does not increase with every request, so threads seem to be reused.
 The total number of threads does increase when multiple request are fired concurrently or with a very short delay (RTT).
+
+questions: (Neo4j)
+* is the first object really used or is it just for initialization purpose?
+* can multiple threads write concurrently when they affect different parts of the graph?
+* is there a way to affect the thread pool size?
+* does Neo4j keep all threads alive? (just being curious)
