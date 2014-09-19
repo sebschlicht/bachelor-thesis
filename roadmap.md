@@ -54,6 +54,8 @@ The total number of threads does increase when multiple request are fired concur
 
 questions: (Neo4j)
 * is the first object really used or is it just for initialization purpose?
+  :The first object is just for initialization purpose and gets destroyed during the startup phase.
 * can multiple threads write concurrently when they affect different parts of the graph?
 * is there a way to affect the thread pool size?
 * does Neo4j keep all threads alive? (just being curious)
+  :No it doesn't, it uses up to three threads.
