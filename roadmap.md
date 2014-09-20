@@ -62,3 +62,23 @@ questions: (Neo4j)
 
 * does Neo4j keep all threads alive? (just being curious)  
   : No it doesn't, it uses up to three threads.
+
+#### Neo4j HA behaviour
+Resources:
+* [HA explanation](http://docs.neo4j.org/chunked/stable/ha-how.html)
+* [HA configuration](http://docs.neo4j.org/chunked/stable/ha-configuration.html)
+
+##### commits
+Does a commit apply the transaction to the whole cluster and trigger a network request?
+
+In short: It will not apply the transaction to the whole cluster but maybe to some slaves and can trigger multiple network requests if the write request targets a slave.
+
+The long version:  
+If a write request targets the master node, the commit will affect the master only. There is a configuration option (ha.tx_push_factor) to set the replication factor. Though the slaves will request a stream of occurred transactions in a fixed interval (ha.pull_interval) or if mandated (see below) to keep their data up-to-date.  
+If a write request targets a slave node, the commit
+1. forces the slave to synchronize the affected nodes with the master if behind master's branch
+2. lock the affected graph elements at master and slave
+3. apply to master at first
+4. apply to slave if successful
+
+Thus we can assume the write performance to drop down if we increase the cluster size and allow write requests to target any node, due to more frequent synchronization of the slave nodes.
