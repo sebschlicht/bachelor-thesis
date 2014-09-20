@@ -76,6 +76,7 @@ In short: It will not apply the transaction to the whole cluster but maybe to so
 The long version:  
 If a write request targets the master node, the commit will affect the master only. There is a configuration option (ha.tx_push_factor) to set the replication factor. Though the slaves will request a stream of occurred transactions in a fixed interval (ha.pull_interval) or if mandated (see below) to keep their data up-to-date.  
 If a write request targets a slave node, the commit
+
 1. forces the slave to synchronize the affected nodes with the master if behind master's branch
 2. lock the affected graph elements at master and slave
 3. apply to master at first
