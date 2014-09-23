@@ -46,6 +46,12 @@ Therefore I have to take a closer look at the technologies concerning:
 
 This will also help me to explain the differences between Neo4j and Titan in their ability to scale.
 
+**Resources**:
+
+| Neo4j | Titan |
+| ----- | ----- |
+|<ul><li>[HA explanation](http://docs.neo4j.org/chunked/stable/ha-how.html)</li><li>[HA configuration](http://docs.neo4j.org/chunked/stable/ha-configuration.html)</li></ul> | |
+
 ### Graph distribution
 The distribution of the graph can affect the cluster performance:  
 If the graph is splitted there may be additional requests necessary to delegate a request to the correct node.
@@ -78,8 +84,15 @@ If we understand when and how the data is kept (eventually-)consistent, we might
 
   | Neo4j | Titan |
   | ----- | ----- |
-  | The cluster's graph consistency is very simular to github repositories:  Commits are local, pushs are global. Slave nodes can pull committed transactions. | |
+  | Slave nodes can pull a stream of committed transactions. They do this in a fixed interval (ha.pull_interval) but also if mandated, due to a write request. In addition the master can be configured to push committed transactions to any number of slaves (ha.tx_push_factor).  | |
 * Can we make the data consitent ourselves? How can we reach that?
+
+  | Neo4j | Titan |
+  | ----- | ----- |
+  | Yes, we could configure the master to push committed transactions to as many slave nodes as the cluster contains. | |
+  
+**Note (Neo4j)**:
+We can assume the write performance to drop down if we increase the cluster size and allow write requests to target any node, due to the more frequent synchronization of slave nodes.
 
 ### API concurrency model
 The number of clients a node can handle depends on the concurrency model used in the database API.
@@ -112,24 +125,3 @@ The API may allow different threads to access/write to different parts of the gr
   | Neo4j | Titan |
   | ----- | ----- |
   | | |
-
-#### Neo4j HA behaviour
-Resources:
-* [HA explanation](http://docs.neo4j.org/chunked/stable/ha-how.html)
-* [HA configuration](http://docs.neo4j.org/chunked/stable/ha-configuration.html)
-
-##### commits
-Does a commit apply the transaction to the whole cluster and trigger a network request?
-
-In short: It will not apply the transaction to the whole cluster but maybe to some slaves and can trigger multiple network requests if the write request targets a slave.
-
-The long version:  
-Though the slaves will request a stream of occurred transactions in a fixed interval (ha.pull_interval) or if mandated (see below) to keep their data up-to-date.  
-If a write request targets a slave node, the commit
-
-1. forces the slave to synchronize the affected nodes with the master if behind master's branch
-2. lock the affected graph elements at master and slave
-3. apply to master at first
-4. apply to slave if successful
-
-Thus we can assume the write performance to drop down if we increase the cluster size and allow write requests to target any node, due to more frequent synchronization of the slave nodes.
