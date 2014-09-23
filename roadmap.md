@@ -36,7 +36,6 @@ This only seems to be valid if a single master handles all write requests in Neo
 The data in Titan is eventually consistent due to Cassandra, so there is no problem with such a transaction queue at first sight. I have to understand the concurrency handling first to make valid statements.
 
 ## Scalability
-
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
 Only if I know what is actually taking time in a Graphity request, I can identify the limiting resource (thread, core, hard drive etc.) and can add another unit of it.
 
@@ -47,21 +46,37 @@ Therefore I have to take a closer look at the technologies concerning:
 
 This will also help me to explain the differences between Neo4j and Titan in their ability to scale.
 
-#### API concurrency model
-Multiple threads access exactly 2 objects of the plugin in Neo4j.
-The number of threads does not increase with every request, so threads seem to be reused.
-The total number of threads does increase when multiple request are fired concurrently or with a very short delay (RTT).
+### API concurrency model
+The number of clients a node can handle depends on the concurrency model used in the database API.
+If a node can host multiple threads accessing the database, there might be performance gains by increasing the number of CPU cores:
+The API may allow different threads to access/write to different parts of the graph and operate concurrently. If not, there can still be performance gains by handling the HTTP requests in parallel.
 
-questions: (Neo4j)
-* is the first object really used or is it just for initialization purpose?  
-  : The first object is just for initialization purpose and gets destroyed during the startup phase.
-  
-* can multiple threads write concurrently when they affect different parts of the graph?
+**Questions**:
+* Does a node host multiple threads?
 
-* is there a way to affect the thread pool size?
+  | Neo4j | Titan |
+  | ----- | ----- |
+  | Yes it seems that a node hosts up to 3 threads to serve clients.  The number of threads increases when requests come in simultaneusly/with very short delay (RTT). Threads are reused but recycled from time to time. | |
+* Do these threads access the database theirselves or is this delegated to a single thread?
 
-* does Neo4j keep all threads alive? (just being curious)  
-  : No it doesn't, it uses up to three threads.
+  | Neo4j | Titan |
+  | ----- | ----- |
+  | The threads access the database theirselves. | |
+* If yes: Can different threads access/write to different graph areas?
+
+  | Neo4j | Titan |
+  | ----- | ----- |
+  | Yes they can access different graph areas, but it is not yet clear whether they can access it simulatenously or if they are synchronized internally. | |
+* Is the plugin object a singleton? (helps to improve implementation)
+
+  | Neo4j | Titan |
+  | ----- | ----- |
+  | Yes, but another instance is created (constructor called) and destroyed (`finalize` called) during startup. | |
+* What HTTP server is used? (-> configuration) / Can we increase the maximum thread pool size?
+
+  | Neo4j | Titan |
+  | ----- | ----- |
+  | | |
 
 #### Neo4j HA behaviour
 Resources:
