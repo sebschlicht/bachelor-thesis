@@ -59,9 +59,21 @@ These requests have to be considered if we examine the benchmark results.
 Depending on the cluster management we may not be able to affect this behaviour.
 
 **Questions**:
-* Is the graph splitted up? / Are additional requests necessary?
-* Should we reduce them by using a write master?
-* Can we reduce them by selecting the proper node?
+* Is the graph splitted up?
+
+| Neo4j | Titan |
+| ----- | ----- |
+| No. Each node holds a copy of the whole database, thus it **can not grow beyond the maximum database size of a single instance**: 34 billon nodes, 34 billion relationships, 68 billion properties in total. | |
+* When is request delegation necessary?
+
+| Neo4j | Titan |
+| ----- | ----- |
+| Requests of same users are routed to the same nodes (cache-based sharding). Additional request delegation does not seem to be necessary. | |
+* What graph elements are cached?
+
+| Neo4j | Titan |
+| ----- | ----- |
+| Each instance caches whatever fits into memory. Since the cluster performs cache-based sharding, a node is mainly targeted of requests where the same graph elements are involved. Thus some elements may be cached in multiple nodes. | |
 
 #### Consistency model
 There will be additional effort for the cluster to keep nodes up-to-date, if the data changes.
@@ -79,7 +91,7 @@ If we understand when and how the data is kept (eventually-)consistent, we might
   | request target | Neo4j | Titan |
   | -------------- | ----- | ----- |
   | master | The commit does pretty much the same if we would run a single Neo4j instance. The master generates a transaction identifier `txid` used in synchronization processes. In fact we can configure the master to push committed transactions to any number of slave nodes, which will trigger network request(s). | |
-  | slave | The commit forces the slave to be up-to-date. This may trigger a network request, to get the transaction stream. Once the slave is up-to-date it will send the transaction data to the master. The affected graph elements will get locked, both in master and slave. The master will then act as stated above. If the commit was successful, it will request the target slave to commit, too. | |
+  | slave | The commit forces the slave to be up-to-date. This may trigger a network request, to get the transaction stream. It is not clear if this covers the whole graph or only the graph elements involved. Once the slave is up-to-date it will send the transaction data to the master. The affected graph elements (if existing yet) will get locked, both in master and slave. The master will then act as stated above. If the commit was successful, it will request the target slave to commit, too. | |
 * How keeps the cluster its nodes up-to-date, then?
 
   | Neo4j | Titan |
