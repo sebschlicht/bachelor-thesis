@@ -46,6 +46,41 @@ Therefore I have to take a closer look at the technologies concerning:
 
 This will also help me to explain the differences between Neo4j and Titan in their ability to scale.
 
+### Graph distribution
+The distribution of the graph can affect the cluster performance:  
+If the graph is splitted there may be additional requests necessary to delegate a request to the correct node.
+These requests have to be considered if we examine the benchmark results.
+Depending on the cluster management we may not be able to affect this behaviour.
+
+**Questions**:
+* Is the graph splitted up? / Are additional requests necessary?
+* Should we reduce them by using a write master?
+* Can we reduce them by selecting the proper node?
+
+#### Consistency model
+There will be additional effort for the cluster to keep nodes up-to-date, if the data changes.
+If we understand when and how the data is kept (eventually-)consistent, we might be able to keep this effort as low as possible.
+
+**Questions**:
+* Which nodes are updated by a commit?
+
+  | request target | Neo4j | Titan |
+  | -------------- | ----- | ----- |
+  | master | The commit updates the master only. | |
+  | slave | The commits updates the slave and the master (see above). This request requires the slave to be up-to-date. | |
+* What does a commit actually do?
+
+  | request target | Neo4j | Titan |
+  | -------------- | ----- | ----- |
+  | master | The commit does pretty much the same if we would run a single Neo4j instance. The master generates a transaction identifier `txid` used in synchronization processes. In fact we can configure the master to push committed transactions to any number of slave nodes, which will trigger network request(s). | |
+  | slave | The commit forces the slave to be up-to-date. This may trigger a network request, to get the transaction stream. Once the slave is up-to-date it will send the transaction data to the master. The affected graph elements will get locked, both in master and slave. The master will then act as stated above. If the commit was successful, it will request the target slave to commit, too. | |
+* How keeps the cluster its nodes up-to-date, then?
+
+  | Neo4j | Titan |
+  | ----- | ----- |
+  | The cluster's graph consistency is very simular to github repositories:  Commits are local, pushs are global. Slave nodes can pull committed transactions. | |
+* Can we make the data consitent ourselves? How can we reach that?
+
 ### API concurrency model
 The number of clients a node can handle depends on the concurrency model used in the database API.
 If a node can host multiple threads accessing the database, there might be performance gains by increasing the number of CPU cores:
@@ -89,7 +124,7 @@ Does a commit apply the transaction to the whole cluster and trigger a network r
 In short: It will not apply the transaction to the whole cluster but maybe to some slaves and can trigger multiple network requests if the write request targets a slave.
 
 The long version:  
-If a write request targets the master node, the commit will affect the master only. There is a configuration option (ha.tx_push_factor) to set the replication factor. Though the slaves will request a stream of occurred transactions in a fixed interval (ha.pull_interval) or if mandated (see below) to keep their data up-to-date.  
+Though the slaves will request a stream of occurred transactions in a fixed interval (ha.pull_interval) or if mandated (see below) to keep their data up-to-date.  
 If a write request targets a slave node, the commit
 
 1. forces the slave to synchronize the affected nodes with the master if behind master's branch
