@@ -100,12 +100,14 @@ Tomcat: 1887b (=> 2 ethernet frames), Apache: 177b
 To have a comparable result I have to use the same content length in both pages.
 
 **comparison of standard HTTP services - same content length (VM vs. host)**
+
 | Service | VM (req/s) | Local (req/s) | Ratio |
 | ------- | ---------- | ------------- | ----- |
 | Apache2 | ~900 | ~2800 | 3.1 |
 | Tomcat7 | ~500 | ~4000 | 8 |
 
-Okay I'm out.
+The Tomcat content-length was authorative and therefore did not changed, while the Apache page was edited to be as large as the Tomcat page.
+The results do not show that the size was a problem.
 
 ## Scalability
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
