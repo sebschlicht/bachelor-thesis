@@ -83,6 +83,8 @@ The VirtualBox VM uses a host-only-adapter to make the VM accessible for the hos
 Maybe this method of networking causes the low performance.
 Therefore standard HTTP server instances were used together with a single standalone client, again, firing `POST` requests at the same way as in the tests before.
 
+**comparison of different services (VM vs. host)**
+
 | Service | VM (req/s) | Local (req/s) | Ratio |
 | ------- | ---------- | ------------- | ----- |
 | Neo4j Server | ~300 | - | - |
@@ -92,6 +94,18 @@ Therefore standard HTTP server instances were used together with a single standa
 What you can see is that the VM is indeed slower than the host, but there must be additional reasons:
 Tomcat is faster on host, but slower on the VM, whereas it is the other way round with Apache.
 This can not be just due to delays in VM networking.
+
+I noticed that the content length of the two start pages I used as endpoint differ by a magnitude.
+Tomcat: 1887b (=> 2 ethernet frames), Apache: 177b
+To have a comparable result I have to use the same content length in both pages.
+
+**comparison of standard HTTP services - same content length (VM vs. host)**
+| Service | VM (req/s) | Local (req/s) | Ratio |
+| ------- | ---------- | ------------- | ----- |
+| Apache2 | ~900 | ~2800 | 3.1 |
+| Tomcat7 | ~500 | ~4000 | 8 |
+
+Okay I'm out.
 
 ## Scalability
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
