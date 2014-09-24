@@ -41,8 +41,8 @@ The IO percentage according to `iotop` does not exceed ~33% during the short ben
 This does not seem to be the bottleneck here.
 
 #### HTTP latency
-The benchmark can not be expected to exceed `duration / RTT` requests per second, which is why  
-10000ms / 5ms = 2000 req/s  
+The benchmark can not be expected to exceed `1 / RTT` requests per second, which is why  
+1000ms / 5ms = 200 req/s  
 should be the upper limit of performance.
 
 | Description | req/s |
@@ -51,8 +51,8 @@ should be the upper limit of performance.
 | do not execute Graphity action | 147,6 |
 | do nothing | 162,6 |
 
-This is 10 times lower than what is expected to be the limit of the HTTP performance.
-Tests were repeated with a single standalone HTTP client do ensure my ZMQ cluster does not cause this low performance.
+This is a bit lower than what is expected to be the limit of the HTTP performance.
+Tests were repeated with a single standalone HTTP client do ensure my ZMQ cluster does not harm the performance.
 
 | Description | req/s |
 | ----------- | ----- |
@@ -61,9 +61,9 @@ Tests were repeated with a single standalone HTTP client do ensure my ZMQ cluste
 | do nothing | 297,1 |
 
 The ZMQ setup does clearly create an overhead which is up to twice as low as the standalone client.
-This might also be due to the missing concurrency, there is only one client firing requests rather than four in the ZMQ setup.  
+But this might also be due to the missing concurrency, there is only one client firing requests rather than four in the ZMQ setup, which could cause trouble in the Neo4j server.  
 **This setup will be used now to find this issue, since it is much easier to control.**  
-300 requests per second does still seem slow to me. Maybe this is an issue with the VM itself, since it uses a host-only-adapter. I do not know what are the impacts of this.
+300 requests per second seems fine if the server would run at a separate machine, but it seems quite slow for a local VM to me. I have in mind that we were at 10.000 req/s with a Tomcat server running locally.
 
 #### CPU power
 CPU: Intel(R) Core(TM) i5-4200U CPU @ 1.60GHz
@@ -83,6 +83,7 @@ The VM uses a host-only-adapter to make the VM accessible for the host.
 Maybe this method of networking causes the low performance.
 An Apache2 instance was therefore used together with a single standalone client, again, firing `POST` requests at the same way as in the tests before.  
 The performance raised to 923,4 requests/s. This is 3 times faster than the Neo4j server was.
+The same method repeated to a local Tomcat instance (running on the host machine) was able to handle 1013,7 requests/s and thus I can not assume the VM networking to be a bottleneck.
 
 ## Scalability
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
