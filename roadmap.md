@@ -79,11 +79,19 @@ The VM has currently 512MB RAM and the used memory does not increase significant
 The issue seems to be located somewhere else.
 
 #### VM networking
-The VM uses a host-only-adapter to make the VM accessible for the host.
+The VirtualBox VM uses a host-only-adapter to make the VM accessible for the host.
 Maybe this method of networking causes the low performance.
-An Apache2 instance was therefore used together with a single standalone client, again, firing `POST` requests at the same way as in the tests before.  
-The performance raised to 923,4 requests/s. This is 3 times faster than the Neo4j server was.
-The same method repeated to a local Tomcat instance (running on the host machine) was able to handle 1013,7 requests/s and thus I can not assume the VM networking to be a bottleneck.
+Therefore standard HTTP server instances were used together with a single standalone client, again, firing `POST` requests at the same way as in the tests before.
+
+| Service | VM (req/s) | Local (req/s) | Ratio |
+| ------- | ---------- | ------------- | ----- |
+| Neo4j Server | 60 | - | - |
+| Apache2 | ~900 | ~3400 | 3.8 |
+| Tomcat7 | ~500 | ~4000 | 8 |
+
+What you can see is that the VM is indeed slower than the host, but there must be additional reasons:
+Tomcat is faster on host, but slower on the VM, whereas it is the other way round with Apache.
+This can not be just due to delays in VM networking.
 
 ## Scalability
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
