@@ -2,7 +2,7 @@
 
 ## Performance differences
 
-The performance of the current setup is at least 50 times lower than in the Graphity evaluation:
+The performance of the current setup, performing the short benchmark (10 seconds <=> 420-520 Graphity actions), is at least 50 times lower than in the Graphity evaluation:
 
 | Benchmark | Write requests per second |
 | --------- | ------------------------- |
@@ -15,6 +15,7 @@ Therefore I need to have a closer took at Titan and Neo4j and the setups I put t
 1. differences in transaction handling (single transaction vs. bulking)
 2. IO time
 3. HTTP latency
+4. memory limit
 
 I have to profile the server to find out what causes the major differences.
 This will enable me to either adapt the setup or explain the differences.
@@ -34,6 +35,23 @@ It would be possible to reduce the number of used transactions to simulate this 
 
 This only seems to be valid if a single master handles all write requests in Neo4j. In case the cluster propagation is commit-triggered I would have to choose the queue size wisely or use an additional timer.
 The data in Titan is eventually consistent due to Cassandra, so there is no problem with such a transaction queue at first sight. I have to understand the concurrency handling first to make valid statements.
+
+#### IO time
+The IO percentage according to `iotop` does not exceed ~33% during the short benchmark in the local VM.
+This does not seem to be the bottleneck here.
+
+#### HTTP latency
+The benchmark can not be expected to exceed `duration / RTT` requests per second, which is why  
+10000ms / 5ms = 2000 req/s  
+should be the upper limit of performance.
+
+| Description | req/s |
+| ----------- | ----- |
+| execute Graphity action | 42-52 |
+| do not execute Graphity action | 147,6 |
+| do nothing | 162,6 |
+
+This is 10 times lower than what is expected to be the limit of the HTTP performance.
 
 ## Scalability
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
