@@ -62,8 +62,8 @@ Tests were repeated with a single standalone HTTP client do ensure my ZMQ cluste
 
 The ZMQ setup does clearly create an overhead which is up to twice as low as the standalone client.
 This might also be due to the missing concurrency, there is only one client firing requests rather than four in the ZMQ setup.  
-300 requests per second does still seem slow to me.
-Maybe this is an issue with the VM itself, since it uses a host-only-adapter. I do not know what are the impacts of this.
+**This setup will be used now to find this issue, since it is much easier to control.**  
+300 requests per second does still seem slow to me. Maybe this is an issue with the VM itself, since it uses a host-only-adapter. I do not know what are the impacts of this.
 
 #### CPU power
 CPU: Intel(R) Core(TM) i5-4200U CPU @ 1.60GHz
@@ -74,9 +74,15 @@ A second core reduced the utilization to 75% at maximum but did not increase the
 #### Memory
 Total Memory: 8GB
 
-The VM has currently 512MB RAM and the used memory does not increase significantly during the benchmark.
+The VM has currently 512MB RAM and the used memory does not increase significantly during the benchmark (again: just firing the HTTP requests, no Neo4j execution on the server). Maybe the VM is not able to use more memory due to the single core and not able to be faster with more cores, due to low memory. Lets combine:
 4GB RAM together with 3 cores did not increase the throughput rate.
 The issue seems to be located somewhere else.
+
+#### VM networking
+The VM uses a host-only-adapter to make the VM accessible for the host.
+Maybe this method of networking causes the low performance.
+An Apache2 instance was therefore used together with a single standalone client, again, firing `POST` requests at the same way as in the tests before.  
+The performance raised to 923,4 requests/s. This is 3 times faster than the Neo4j server was.
 
 ## Scalability
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
