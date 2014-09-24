@@ -47,11 +47,36 @@ should be the upper limit of performance.
 
 | Description | req/s |
 | ----------- | ----- |
-| execute Graphity action | 42-52 |
+| execute Graphity action (default) | 42-52 |
 | do not execute Graphity action | 147,6 |
 | do nothing | 162,6 |
 
 This is 10 times lower than what is expected to be the limit of the HTTP performance.
+Tests were repeated with a single standalone HTTP client do ensure my ZMQ cluster does not cause this low performance.
+
+| Description | req/s |
+| ----------- | ----- |
+| execute Graphity action (default) | 60,5 |
+| do not execute Graphity action | 296,6 |
+| do nothing | 297,1 |
+
+The ZMQ setup does clearly create an overhead which is up to twice as low as the standalone client.
+This might also be due to the missing concurrency, there is only one client firing requests rather than four in the ZMQ setup.  
+300 requests per second does still seem slow to me.
+Maybe this is an issue with the VM itself, since it uses a host-only-adapter. I do not know what are the impacts of this.
+
+#### CPU power
+CPU: Intel(R) Core(TM) i5-4200U CPU @ 1.60GHz
+
+The VM has currently one core and it is at 80-90% during the benchmark.
+A second core reduced the utilization to 75% at maximum but did not increase the throughput.
+
+#### Memory
+Total Memory: 8GB
+
+The VM has currently 512MB RAM and the used memory does not increase significantly during the benchmark.
+4GB RAM together with 3 cores did not increase the throughput rate.
+The issue seems to be located somewhere else.
 
 ## Scalability
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
