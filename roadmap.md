@@ -42,7 +42,7 @@ This does not seem to be the bottleneck here.
 
 #### HTTP latency
 The benchmark can not be expected to exceed `1 / RTT` requests per second, which is why  
-1000ms / 5ms = 200 req/s  
+1000ms / 5ms req/s = 200 req/s  
 should be the upper limit of performance.
 
 | Description | req/s |
@@ -85,7 +85,7 @@ Therefore standard HTTP server instances were used together with a single standa
 
 | Service | VM (req/s) | Local (req/s) | Ratio |
 | ------- | ---------- | ------------- | ----- |
-| Neo4j Server | 60 | - | - |
+| Neo4j Server | ~300 | - | - |
 | Apache2 | ~900 | ~3400 | 3.8 |
 | Tomcat7 | ~500 | ~4000 | 8 |
 
