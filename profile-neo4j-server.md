@@ -9,6 +9,7 @@ Note: This can not be compared to previous results, because the VM had 3 cores a
 # Results (CPU)
 
 | Method | Self time (%) | Selftime (ms) |
+| ------ | ------------- | ------------- |
 | org.eclipse.jetty.io.SelectorManager.ManagedSelector.select | 43.9 | 165107 |
 | org.neo4j.kernel.impl.nioneo.store.StoreFileChannel.force | 16.4 | 61806 |
 | org.apache.lucene.store.NIOFSDirectory.NIOFSIndexInput.readInteral | 4.6 | 17315 |
