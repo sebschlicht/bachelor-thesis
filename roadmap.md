@@ -40,6 +40,10 @@ The data in Titan is eventually consistent due to Cassandra, so there is no prob
 The IO percentage according to `iotop` does not exceed ~33% during the short benchmark in the local VM.
 This does not seem to be the bottleneck here.
 
+Even the longer benchmark (3 minutes)
+Moving the database to memory (`/tmp` tmpfs mounted) increased the performance from 100 req/s by 300 percent to 415 req/s. `iotop` did not show any IO utilization neither on the host machine nor the VM.
+
+
 #### HTTP latency
 The benchmark can not be expected to exceed `1 / RTT` requests per second, which is why  
 1000ms / 5ms req/s = 200 req/s  
@@ -106,8 +110,8 @@ To have a comparable result I have to use the same content length in both pages.
 | Apache2 | ~900 | ~2800 | 3.1 |
 | Tomcat7 | ~500 | ~4000 | 8 |
 
-The Tomcat content-length was authorative and therefore did not changed, while the Apache page was edited to be as large as the Tomcat page.
-The results do not show that the size was a problem.
+The Tomcat content-length was authorative and therefore was not changed, while the Apache page was edited to be as large as the Tomcat page.
+The results show that the size was not a problem on the VM, there must be another reason that slows it down to a maximum of 900 req/s.
 
 ## Scalability
 Secondly I have to increase the cluster size in order to analyze the scalability of Neo4j and Titan.
