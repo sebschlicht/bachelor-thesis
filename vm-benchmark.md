@@ -12,11 +12,10 @@ Note: The maximum number of requests/s for the Neo4j server is [at about 1350](/
 | Disc IO (host) | jumping extremely: 5-85%, ~7MB/s, 2-12 M/s |
 
 The throughput differs by nearly a magnitude.
-Though the results of `iotop` do not blame the IO to cause this performance drop I used a RAM disc to verify this.
-What `iotop` displays does not seem to be valid. 12 M/s is far too less to be 85% of the maximum write performance of my HDD.
 
 ### RAM disc
-With the graph mounted in memory using
+Though the results of `iotop` do not blame the IO to cause this performance drop I used a RAM disc to verify this.
+What `iotop` displays does not seem to be valid. 12 M/s is far too less to be 85% of the maximum write performance of my HDD. With the graph mounted in memory using
 
     sudo mount -t tmpfs -o size=1024M tmpfs /tmp/graph/
 
