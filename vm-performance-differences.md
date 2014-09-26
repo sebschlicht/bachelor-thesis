@@ -25,10 +25,11 @@ To get an idea of how many requests I could expect I configured my plugin to do 
 It still accepted requests but the requests were answered promptly.
 This way I would be able to see if my plugin contains (unwanted) bottlenecks in my code.
 
-
+| Key | Value |
+|:----|:----- |
 | Duration | 74305 ms |
 | Requests / s | 1345.8 |
-| CPU utilization | steady at [~70%|~50%] |
+| CPU utilization | steady at ~70%/~50% |
 | Memory utilization | steady at ~480 MB |
 | Disc IO | - |
 
