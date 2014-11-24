@@ -31,6 +31,13 @@ The configuration files can be found at `$NEO_HOME/conf` with `$NEO_HOME` being 
     # endpoint for synchronization with master
     ha.server=127.0.0.1:6001
 
+**conf/neo4j-server.properties**
+
+    org.neo4j.server.webserver.address=192.168.56.101
+    org.neo4j.server.webserver.port=7474
+    org.neo4j.server.webserver.https.port=7484
+    org.neo4j.server.database.mode=HA
+
 #### Slave #1
 **conf/neo4j.properties**
 
@@ -44,6 +51,13 @@ The configuration files can be found at `$NEO_HOME/conf` with `$NEO_HOME` being 
     ha.server=127.0.0.1:6002
     # node can not be elected to master node
     ha.slave_only=true
+    
+**conf/neo4j-server.properties**
+
+    org.neo4j.server.webserver.address=192.168.56.101
+    org.neo4j.server.webserver.port=7475
+    org.neo4j.server.webserver.https.port=7485
+    org.neo4j.server.database.mode=HA
 
 #### Shared configuration
 In addition several changes were made on each node.
