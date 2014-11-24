@@ -1,9 +1,13 @@
 # Neo4j
 
-## Node setup
+## Installation
+The Neo4j server can be [installed using your package manager](http://debian.neo4j.org/?_ga=1.174493282.1166350782.1407319663).
+
+## Node configuration
 
 ### Master
 This configuration is a result of the [performance guide](http://docs.neo4j.org/chunked/stable/performance-guide.html).
+Detailed information can be found in the [server configuration section](http://neo4j.com/docs/stable/server-configuration.html) of the documentation.
 
 | Configuration | Location | Command | Description |
 | ------------- | -------- | ------- | ----------- |
