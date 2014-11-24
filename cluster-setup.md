@@ -15,9 +15,9 @@ Changing `GraphDatabaseFactory` to `HighlyAvailableGraphDatabaseFactory` in the 
 
 ### Configuration
 This configuration is a result of the [HA setup tutorial](http://neo4j.com/docs/stable/ha-setup-tutorial.html) and the [performance guide](http://docs.neo4j.org/chunked/stable/performance-guide.html).
-Detailed information can be found in the [server configuration section](http://neo4j.com/docs/stable/server-configuration.html) of the documentation.
+Detailed information can be found in the [HA configuration section](http://neo4j.com/docs/stable/ha-configuration.html) and the [server configuration section](http://neo4j.com/docs/stable/server-configuration.html) of the documentation.
 
-** Aliases for configuration files**
+**Aliases for configuration files**
 
 | Key | File |
 | --- | ---- |
@@ -50,6 +50,7 @@ Detailed information can be found in the [server configuration section](http://n
 | -------- | ------- | ----------- |
 | neo4j    | ha.server_id = 2 | unique cluster instance identifier |
 ||           ha.server = `IP` | IP endpoint to listen at for transaction synchronization with master (default port: 6001), **must not** equal `ha.cluster_server` |
+||           ha.slave_only = true | can not be elected to master node |
 
 ### Startup
 Using the package manager Neo4j installs its service `neo4j-service` starting automatically at system startup.
