@@ -1,12 +1,20 @@
-# Neo4j
+# Setup a cluster
 
-## Installation
-The Neo4j server can be [installed using your package manager](http://debian.neo4j.org/?_ga=1.174493282.1166350782.1407319663).
+## Neo4j HA cluster
 
-## Node configuration
+### Overview
+The architecture of the Neo4j HA cluster can be found [in the documentation](http://neo4j.com/docs/stable/ha-architecture.html).
 
-### Master
-This configuration is a result of the [performance guide](http://docs.neo4j.org/chunked/stable/performance-guide.html).
+### Installation
+The Neo4j server can be [installed using your package manager](http://debian.neo4j.org/?_ga=1.174493282.1166350782.1407319663). In this bachelor thesis the Enterprise version of the Neo4j server is used. Some features are available in this version only and I remember it was something necessary but have not found it again yet.
+
+Using the package manager a user `neo4j` is created automatically. However, some I/O action seemed to be executed as root.
+
+### Code changes
+Changing `GraphDatabaseFactory` to `HighlyAvailableGraphDatabaseFactory` in the creation process of the `GraphDatabaseService` should be sufficient.
+
+### Configuration
+This configuration is a result of the [HA setup tutorial](http://neo4j.com/docs/stable/ha-setup-tutorial.html) and the [performance guide](http://docs.neo4j.org/chunked/stable/performance-guide.html).
 Detailed information can be found in the [server configuration section](http://neo4j.com/docs/stable/server-configuration.html) of the documentation.
 
 | Configuration | Location | Command | Description |
@@ -16,3 +24,11 @@ Detailed information can be found in the [server configuration section](http://n
 ||| Does not seems to work. ||
 | JVM | conf/neo4j-wrapper.conf | wrapper.java.additional=-server | Start JVM in server mode. |
 | | | wrapper.java.additional=-XX:+UseConcMarkSweepGC | Enable concurrent garbage collector. |
+
+#### Master
+#### Slave
+
+### Startup
+Using the package maneger Neo4j installs its service `neo4j-service` starting automatically at system startup.
+This behaviour can also be applied after a different installation method and switched on/off.
+Using the service mechanism the server can be started, stopped and restarted.
