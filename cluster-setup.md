@@ -24,6 +24,9 @@ Detailed information can be found in the [server configuration section](http://n
 | neo4j-server | conf/neo4j-server.properties |
 | neo4j-wrapper | conf/neo4j-wrapper.conf |
 
+`IP` is the IP address of the current node that all cluster nodes can access.
+`IP:M` is the IP address of the master node. `IP:SN` is the IP address of the n-th slave node.
+
 #### All cluster nodes
 | Location | Command | Description |
 | -------- | ------- | ----------- |
@@ -45,7 +48,7 @@ Detailed information can be found in the [server configuration section](http://n
 | Location | Command | Description |
 | -------- | ------- | ----------- |
 | neo4j    | ha.server_id = 2 | unique cluster instance identifier |
-||           ha.server = `IP:M` | IP endpoint to listen at for transaction synchronization with master (default port: 6001), **must not** equal `ha.cluster_server` |
+||           ha.server = `IP` | IP endpoint to listen at for transaction synchronization with master (default port: 6001), **must not** equal `ha.cluster_server` |
 
 ### Startup
 Using the package manager Neo4j installs its service `neo4j-service` starting automatically at system startup.
