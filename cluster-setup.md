@@ -18,6 +18,7 @@ This configuration is a result of the [HA setup tutorial](http://neo4j.com/docs/
 Detailed information can be found in the [server configuration section](http://neo4j.com/docs/stable/server-configuration.html) of the documentation.
 
 ** Aliases for configuration files**
+
 | Key | File |
 | --- | ---- |
 | neo4j | conf/neo4j.properties |
