@@ -97,10 +97,10 @@ This behaviour can also be applied after a different installation method and swi
 Using the service mechanism the server can be started, stopped and restarted.
 
 ### Access via Apache
-At the moment we have a cluster wity size 3. In mz setting only the master is accessible from outside the cluster.
+At the moment we have a cluster wity size 3. In my setting only the master is accessible from outside the cluster.
 In production you would want to have a single endpoint to use for requests that uses load balancing behind the scenes.
 Another aspect is that the REST endpoint should be accessible from outside the cluster but not the admin interface.
-Thus the Neo4j documentation suggests to use an Apache server to proxy the cluster. This allows load balancing, fine control of accessible endpoints and e.g. the usage of HTACCESS.
+Thus the Neo4j team suggests to use an Apache server to proxy the cluster in the [documentation's security section](http://neo4j.com/docs/stable/security-server.html). This allows load balancing, fine control of accessible endpoints and e.g. the usage of HTACCESS.
 
 We install an Apache2 server
 
@@ -116,7 +116,7 @@ We create a copy of the default page configuration
 
 and insert a load balancer for the REST endpoints of the cluster instances
 
-    <VirtualHost *:80>
+    <VirtualHost *:82>
       <Proxy balancer://neo4j>
       BalancerMember http://localhost:7474/db/data
       BalancerMember http://10.93.130.108:7474/db/data
@@ -131,5 +131,13 @@ and insert a load balancer for the REST endpoints of the cluster instances
       
       # logging configuration follows
     </VirtualHost>
+
+at port 82.
+
+
+**/etc/apache2/ports.conf**
+
+    NameVirtualHost *:82
+    Listen 82
 
 While the first endpoint balances all requests across the cluster, the second endpoint does not include any nodes other than the master. The intention is to have a separate endpoint for write requests. The cluster may perform better when using only the master node for writes: Slaves are forced to synchronize with the master in order to execute a write request.
