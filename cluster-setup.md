@@ -17,6 +17,7 @@ Changing `GraphDatabaseFactory` to `HighlyAvailableGraphDatabaseFactory` in the 
 This configuration is a result of the [HA setup tutorial](http://neo4j.com/docs/stable/ha-setup-tutorial.html) and the [performance guide](http://docs.neo4j.org/chunked/stable/performance-guide.html).
 Detailed information can be found in the [HA configuration section](http://neo4j.com/docs/stable/ha-configuration.html) and the [server configuration section](http://neo4j.com/docs/stable/server-configuration.html) of the documentation.
 
+Only changes in the configuration files are noted.
 The configuration files can be found at `$NEO_HOME/conf` with `$NEO_HOME` being `/var/lib/neo4j` when installed via package manager.
 
 #### Master (neoslave1)
@@ -33,9 +34,6 @@ The configuration files can be found at `$NEO_HOME/conf` with `$NEO_HOME` being 
 
 **conf/neo4j-server.properties**
 
-    org.neo4j.server.webserver.address=neoslave1
-    org.neo4j.server.webserver.port=7474
-    org.neo4j.server.webserver.https.port=7484
     org.neo4j.server.database.mode=HA
 
 #### Slave #1 (neoslave2)
@@ -54,9 +52,6 @@ The configuration files can be found at `$NEO_HOME/conf` with `$NEO_HOME` being 
     
 **conf/neo4j-server.properties**
 
-    org.neo4j.server.webserver.address=10.93.130.108
-    org.neo4j.server.webserver.port=7474
-    org.neo4j.server.webserver.https.port=7484
     org.neo4j.server.database.mode=HA
 
 #### Slave #2 (neoslave3)
@@ -75,9 +70,6 @@ The configuration files can be found at `$NEO_HOME/conf` with `$NEO_HOME` being 
     
 **conf/neo4j-server.properties**
 
-    org.neo4j.server.webserver.address=10.93.130.109
-    org.neo4j.server.webserver.port=7474
-    org.neo4j.server.webserver.https.port=7484
     org.neo4j.server.database.mode=HA
 
 #### Shared configuration
