@@ -95,3 +95,41 @@ In addition several changes were made on each node.
 Using the package manager Neo4j installs its service `neo4j-service` starting automatically at system startup.
 This behaviour can also be applied after a different installation method and switched on/off.
 Using the service mechanism the server can be started, stopped and restarted.
+
+### Access via Apache
+At the moment we have a cluster wity size 3. In mz setting only the master is accessible from outside the cluster.
+In production you would want to have a single endpoint to use for requests that uses load balancing behind the scenes.
+Another aspect is that the REST endpoint should be accessible from outside the cluster but not the admin interface.
+Thus the Neo4j documentation suggests to use an Apache server to proxy the cluster. This allows load balancing, fine control of accessible endpoints and e.g. the usage of HTACCESS.
+
+We install an Apache2 server
+
+    sudo apt-get install apache2
+    
+on the master node which will be accessible from anywhere and balance the load across the cluster.
+
+#### Configuration
+We create a copy of the default page configuration
+
+    cd /etc/apache2/sites/available
+    cp default neo4j
+
+and insert a load balancer for the REST endpoints of the cluster instances
+
+    <VirtualHost *:80>
+      <Proxy balancer://neo4j>
+      BalancerMember http://localhost:7474/db/data
+      BalancerMember http://10.93.130.108:7474/db/data
+      BalancerMember http://10.93.130.109:7474/db/data
+      </Proxy>
+      
+      ProxyPass /neo4j balancer://neo4j
+      ProxyPassReverse /neo4j balancer://neo4j
+      
+      ProxyPass /neo4j-write http://localhost:7474/db/data
+      ProxyPassReverse /neo4j-write http://localhost:7474/db/data
+      
+      # logging configuration follows
+    </VirtualHost>
+
+While the first endpoint balances all requests across the cluster, the second endpoint does not include any nodes other than the master. The intention is to have a separate endpoint for write requests. The cluster may perform better when using only the master node for writes: Slaves are forced to synchronize with the master in order to execute a write request.
