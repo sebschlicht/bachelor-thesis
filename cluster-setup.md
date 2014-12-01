@@ -19,44 +19,65 @@ Detailed information can be found in the [HA configuration section](http://neo4j
 
 The configuration files can be found at `$NEO_HOME/conf` with `$NEO_HOME` being `/var/lib/neo4j` when installed via package manager.
 
-#### Master
+#### Master (neoslave1)
 **conf/neo4j.properties**
 
     # unique cluster instance identifier
     ha.server_id=1
     # endpoint for cluster communication
-    ha.cluster_server=127.0.0.1:5001
+    ha.cluster_server=neoslave1:5001
     # initial cluster nodes
-    ha.initial_hosts=127.0.0.1:5001,127.0.0.1:5002
+    ha.initial_hosts=neoslave1:5001,10.93.130.108:5001,10.93.130.109:5001
     # endpoint for synchronization with master
-    ha.server=127.0.0.1:6001
+    ha.server=neoslave1:6001
 
 **conf/neo4j-server.properties**
 
-    org.neo4j.server.webserver.address=192.168.56.101
+    org.neo4j.server.webserver.address=neoslave1
     org.neo4j.server.webserver.port=7474
     org.neo4j.server.webserver.https.port=7484
     org.neo4j.server.database.mode=HA
 
-#### Slave #1
+#### Slave #1 (neoslave2)
 **conf/neo4j.properties**
 
     # unique cluster instance identifier
     ha.server_id=2
     # endpoint for cluster communication
-    ha.cluster_server=127.0.0.1:5002
+    ha.cluster_server=10.93.130.108:5001
     # initial cluster nodes
-    ha.initial_hosts=127.0.0.1:5001,127.0.0.1:5002
+    ha.initial_hosts=neoslave1:5001,10.93.130.108:5001,10.93.130.109:5001
     # endpoint for synchronization with master
-    ha.server=127.0.0.1:6002
+    ha.server=10.93.130.108:6001
     # node can not be elected to master node
     ha.slave_only=true
     
 **conf/neo4j-server.properties**
 
-    org.neo4j.server.webserver.address=192.168.56.101
-    org.neo4j.server.webserver.port=7475
-    org.neo4j.server.webserver.https.port=7485
+    org.neo4j.server.webserver.address=10.93.130.108
+    org.neo4j.server.webserver.port=7474
+    org.neo4j.server.webserver.https.port=7484
+    org.neo4j.server.database.mode=HA
+
+#### Slave #2 (neoslave3)
+**conf/neo4j.properties**
+
+    # unique cluster instance identifier
+    ha.server_id=3
+    # endpoint for cluster communication
+    ha.cluster_server=10.93.130.109:5001
+    # initial cluster nodes
+    ha.initial_hosts=neoslave1:5001,10.93.130.108:5001,10.93.130.109:5001
+    # endpoint for synchronization with master
+    ha.server=10.93.130.109:6001
+    # node can not be elected to master node
+    ha.slave_only=true
+    
+**conf/neo4j-server.properties**
+
+    org.neo4j.server.webserver.address=10.93.130.109
+    org.neo4j.server.webserver.port=7474
+    org.neo4j.server.webserver.https.port=7484
     org.neo4j.server.database.mode=HA
 
 #### Shared configuration
