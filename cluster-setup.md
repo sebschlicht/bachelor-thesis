@@ -25,7 +25,10 @@ Titan can be downloaded together will the storage and indexing backends and Rexs
     storage.backend=cassandra
     storage.hostname=<cassandra cluster ip>
     storage.port=<cassandra cluster port>
-    storage.cassandra.replication-factor=1
+    storage.cassandra.read-consistency-level=ONE
+    storage.cassandra.write-consistency-level=QUORUM
+    storage.cassandra.replication-factor=1 #fixed per keyspace, recom: 3
+    storage.cassandra.keyspace=mykeyspace
 
 #### Rexster
 
