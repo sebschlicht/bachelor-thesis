@@ -1,5 +1,58 @@
 # Setup a cluster
 
+## Titan cluster @ Cassandra
+
+### Overview
+The architecture of the setup can be found [in the Titan's Cassandra documentation](http://s3.thinkaurelius.com/docs/titan/current/cassandra.html) in section "15.3 Remote Server Mode with Rexster".
+This seems to be the setup used in the [Titan Twitter stress test](http://thinkaurelius.github.io/titan/doc/titan-stress-poster.pdf).
+
+### Installation
+Titan can be downloaded together will the storage and indexing backends and Rexster [from the Titan github page](https://github.com/thinkaurelius/titan/wiki/Downloads). The version in use is `0.5.2` with Hadoop 2.
+
+#### Plugin
+`$REXSTER_HOME/ext/titan`: Titan libraries
+`$REXSTER_HOME/ext`: Graphity extension
+
+### Code changes
+
+### Configuration
+#### Titan
+
+    cluster.max-partitions=<p = 2^x gt n>
+    cluster.partition=true
+    ids.flush=false
+    query.force-index=true
+    storage.backend=cassandra
+    storage.hostname=<cassandra cluster ip>
+    storage.port=<cassandra cluster port>
+    storage.cassandra.replication-factor=1
+
+#### Rexster
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <rexster>
+      ...
+      <graphs>
+        <graph>
+          <graph-name>titan</graph-name>
+          <graph-type>com.thinkaurelius.titan.tinkerpop.rexster.TitanGraphConfiguration</graph-type>
+          <graph-read-only>false</graph-read-only>
+          <properties>
+            # Titan config here
+          </properties>
+          <extensions>
+            # Graphity extension here
+          </extensions>
+        </graph>
+      </graphs>
+    </rexster>
+    
+### Startup
+
+    $ bin/titan.sh start|status|stop
+
+### Cluster access
+
 ## Neo4j HA cluster
 
 ### Overview
@@ -88,8 +141,8 @@ Using the package manager Neo4j installs its service `neo4j-service` starting au
 This behaviour can also be applied after a different installation method and switched on/off.
 Using the service mechanism the server can be started, stopped and restarted.
 
-### Access via Apache
-At the moment we have a cluster wity size 3. In my setting only the master is accessible from outside the cluster.
+### Cluster access
+At the moment we have a cluster with size 3. In my setting only the master is accessible from outside the cluster.
 In production you would want to have a single endpoint to use for requests that uses load balancing behind the scenes.
 Another aspect is that the REST endpoint should be accessible from outside the cluster but not the admin interface.
 Thus the Neo4j team suggests to use an Apache server to proxy the cluster in the [documentation's security section](http://neo4j.com/docs/stable/security-server.html). This allows load balancing, fine control of accessible endpoints and e.g. the usage of HTACCESS.
