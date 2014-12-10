@@ -7,29 +7,16 @@ The architecture of the setup can be found [in the Titan's Cassandra documentati
 This seems to be the setup used in the [Titan Twitter stress test](http://thinkaurelius.github.io/titan/doc/titan-stress-poster.pdf).
 
 ### Installation
-Titan can be downloaded together will the storage and indexing backends and Rexster [from the Titan github page](https://github.com/thinkaurelius/titan/wiki/Downloads). The version in use is `0.5.2` with Hadoop 2.
+Titan can be downloaded together with storage and indexing backends and Rexster [from the Titan github page](https://github.com/thinkaurelius/titan/wiki/Downloads). The version in use is Titan Server `0.5.2` with Hadoop 2 and version `2.0.8` of Cassandra.
+
+Unzip the archive file to a directory of your choice referred to as `$TITAN_SERVER_HOME`. Relative paths are always relative to this directory. The database will be stored in `db`.
 
 #### Plugin
-`$REXSTER_HOME/ext/titan`: Titan libraries
-`$REXSTER_HOME/ext`: Graphity extension
+`$TITAN_SERVER_HOME/ext`: Graphity extension
 
 ### Code changes
 
 ### Configuration
-#### Titan
-
-    cluster.max-partitions=<p = 2^x gt n>
-    cluster.partition=true
-    ids.flush=false
-    query.force-index=true
-    storage.backend=cassandra
-    storage.hostname=<cassandra cluster ip>
-    storage.port=<cassandra cluster port>
-    storage.cassandra.read-consistency-level=ONE
-    storage.cassandra.write-consistency-level=QUORUM
-    storage.cassandra.replication-factor=1 #fixed per keyspace, recom: 3
-    storage.cassandra.keyspace=mykeyspace
-
 #### Rexster
 
     <?xml version="1.0" encoding="UTF-8"?>
@@ -50,6 +37,29 @@ Titan can be downloaded together will the storage and indexing backends and Rexs
       </graphs>
     </rexster>
     
+#### Titan
+**conf/titan-cassandra.properties**:
+
+    cluster.max-partitions=<p = 2^x gt n>
+    query.force-index=true
+    storage.backend=cassandra
+    storage.conf-file=cassandra.yaml
+    storage.hostname=<cassandra cluster ip>
+    storage.port=9042
+    storage.cassandra.read-consistency-level=ONE
+    storage.cassandra.write-consistency-level=QUORUM
+    storage.cassandra.replication-factor=1 #fixed per keyspace, recom: 3
+    storage.cassandra.keyspace=mykeyspace
+    
+Consistency is provided:
+* write consistency level `W = (N + 1) / 2` (QUORUM)
+* read consistency level `R = 1` (ONE)
+* replication factor `N = 1`
+
+`W + R > N: (1 + 1) / 2 + 1 > 1` is true
+
+Explicit partitioning is recommended on 10s billion of edges which we do not reach with the Wikipedia dump.
+
 ### Startup
 
     $ bin/titan.sh start|status|stop
