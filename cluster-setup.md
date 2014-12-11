@@ -18,38 +18,36 @@ Unzip the archive file to a directory of your choice referred to as `$TITAN_SERV
 
 ### Configuration
 #### Rexster
+**conf/rexster-cassandra-cluster.xml** (derived from `conf/rexster-cassandra.xml`):
 
     <?xml version="1.0" encoding="UTF-8"?>
     <rexster>
       ...
       <graphs>
         <graph>
-          <graph-name>titan</graph-name>
+          <graph-name>graph</graph-name>
           <graph-type>com.thinkaurelius.titan.tinkerpop.rexster.TitanGraphConfiguration</graph-type>
           <graph-read-only>false</graph-read-only>
           <properties>
-            # Titan config here
+            # Titan configuration here
+            <cluster.max-partitions>128</cluster.max-partitions>
+            <query.force-index>true</query.force-index>
+            <storage.backend>cassandra</storage.backend>
+            <storage.hostname>127.0.0.1</storage>
+            <storage.cassandra.read-consistency-level>ONE</storage.cassandra.read-consistency-level>
+            <storage.cassandra.write-consistency-level>QUORUM</storage.cassandra.write-consistency-level>
+            <storage.cassandra.replication-factor>1</storage.cassandra.replication-factor>
+            <storage.cassandra.keyspace>test1</storage.cassandra.keyspace>
           </properties>
           <extensions>
-            # Graphity extension here
+            <allows>
+              # allow Graphity extension
+              <allow>*:*</allow>
+            </allows>
           </extensions>
         </graph>
       </graphs>
     </rexster>
-    
-#### Titan
-**conf/titan-cassandra.properties**:
-
-    cluster.max-partitions=<p = 2^x gt n>
-    query.force-index=true
-    storage.backend=cassandra
-    storage.conf-file=cassandra.yaml
-    storage.hostname=<cassandra cluster ip>
-    storage.port=9042
-    storage.cassandra.read-consistency-level=ONE
-    storage.cassandra.write-consistency-level=QUORUM
-    storage.cassandra.replication-factor=1 #fixed per keyspace, recom: 3
-    storage.cassandra.keyspace=mykeyspace
     
 Consistency is provided:
 * write consistency level `W = (N + 1) / 2` (QUORUM)
@@ -58,11 +56,21 @@ Consistency is provided:
 
 `W + R > N: (1 + 1) / 2 + 1 > 1` is true
 
+Thoug a replication factor of `3` is recommended in production systems. Its value is fixed for a keyspace.
 Explicit partitioning is recommended on 10s billion of edges which we do not reach with the Wikipedia dump.
 
-### Startup
+### Startup and Shutdown
+Titan has a startup script `bin/titan.sh` to start Rexster, Titan, Cassandra and ElasticSearch.
+Since I do not need ElasticSearch I made a copy of this script where ElasticSearch was removed.
+The startup scripts can start Rexster using a specific configuration file `conf/rexster-<appendix>` via
 
-    $ bin/titan.sh start|status|stop
+    $ bin/titan.sh -c <appendix> start
+
+where the default appendix is `cassandra-cluster` for my custom script `rexster-titan-cassandra.sh`.
+The scripts can watch the status and also stop the components using
+
+    $ bin/titan.sh status
+    $ bin/titan.sh stop
 
 ### Cluster access
 
