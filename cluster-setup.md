@@ -34,7 +34,6 @@ When using the Titan Server that bases upon Rexster, you have to configurate the
             <!-- Titan configuration -->
             <cluster.max-partitions>128</cluster.max-partitions>
             <storage.backend>cassandra</storage.backend>
-            <storage.conf-file>../conf/cassandra-cluster.yaml</storage.conf-file>
             <storage.hostname>127.0.0.1</storage>
             <storage.cassandra.read-consistency-level>ONE</storage.cassandra.read-consistency-level>
             <storage.cassandra.write-consistency-level>QUORUM</storage.cassandra.write-consistency-level>
@@ -63,7 +62,7 @@ Explicit partitioning is recommended when 10s billion of edges are expected, whi
 
 #### Cassandra
 Storage backend specific configuration has to be done in its own configuration file.
-Unfortunately Titan's `storage.conf-file` does not seem to work using Cassandra. The default configuration `conf/cassandra.yaml` is loaded no matter what. I created two copies of this file in order to have an editable and one default configuration
+Unfortunately Titan's `storage.conf-file` does not seem to work using Cassandra. The default Cassandra configuration `conf/cassandra.yaml` is loaded no matter what. I created two copies of this file in order to have an editable and a copy of the default configuration
 
     cd conf
     cp cassandra.yaml cassandra-default.yaml
@@ -74,19 +73,44 @@ Unfortunately Titan's `storage.conf-file` does not seem to work using Cassandra.
 and made a symbolic link in order to switch the config when needed.
 
 **conf/cassandra-cluster.yaml** (derived from `conf/cassandra.yaml`):
+##### Master
 
     num_tokens: 4
     seed_provider:
       - class_name: org.apache.cassandra.locator.SimpleSeedProvider
         parameters:
-          - seeds: "127.0.0.1"
+          - seeds: "neoslave1,10.93.130.108,10.93.130.109"
     concurrent_reads: 16
     concurrent_writes: 16
-    listen_address: localhost
+    listen_address: neoslave1
+    rpc_address: neoslave1
+    
+##### Slave 1
+
+    num_tokens: 4
+    seed_provider:
+      - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+        parameters:
+          - seeds: "neoslave1,10.93.130.108,10.93.130.109"
+    concurrent_reads: 16
+    concurrent_writes: 16
+    listen_address: 10.93.130.108
+    rpc_address: 10.93.130.108
+
+##### Slave 2
+
+    num_tokens: 4
+    seed_provider:
+      - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+        parameters:
+          - seeds: "neoslave1,10.93.130.108,10.93.130.109"
+    concurrent_reads: 16
+    concurrent_writes: 16
+    listen_address: 10.93.130.109
+    rpc_address: 10.93.130.109
 
 In production `num_tokens` should be higher, e.g. `256`.
 Concurrent reads is set to `16 * num_drives`, concurrent writes to `8 * num_cores`.
-Additional nodes may have to be added to the seeds and the listen addresses have to reachable endpoints. May also apply to RFC endpoints.
 
 data: `db/cassandra/data`  
 commit log: `db/cassandra/commitlog`
