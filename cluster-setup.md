@@ -18,6 +18,8 @@ Unzip the archive file to a directory of your choice referred to as `$TITAN_SERV
 
 ### Configuration
 #### Rexster
+When using the Titan Server that bases upon Rexster, you have to configurate the Rexster server at first.
+
 **conf/rexster-cassandra-cluster.xml** (derived from `conf/rexster-cassandra.xml`):
 
     <?xml version="1.0" encoding="UTF-8"?>
@@ -29,10 +31,10 @@ Unzip the archive file to a directory of your choice referred to as `$TITAN_SERV
           <graph-type>com.thinkaurelius.titan.tinkerpop.rexster.TitanGraphConfiguration</graph-type>
           <graph-read-only>false</graph-read-only>
           <properties>
-            # Titan configuration here
+            <!-- Titan configuration -->
             <cluster.max-partitions>128</cluster.max-partitions>
-            <query.force-index>true</query.force-index>
             <storage.backend>cassandra</storage.backend>
+            <storage.conf-file>../conf/cassandra-cluster.yaml</storage.conf-file>
             <storage.hostname>127.0.0.1</storage>
             <storage.cassandra.read-consistency-level>ONE</storage.cassandra.read-consistency-level>
             <storage.cassandra.write-consistency-level>QUORUM</storage.cassandra.write-consistency-level>
@@ -41,14 +43,14 @@ Unzip the archive file to a directory of your choice referred to as `$TITAN_SERV
           </properties>
           <extensions>
             <allows>
-              # allow Graphity extension
+              <!-- allow Graphity extension -->
               <allow>*:*</allow>
             </allows>
           </extensions>
         </graph>
       </graphs>
     </rexster>
-    
+
 Consistency is provided:
 * write consistency level `W = (N + 1) / 2` (QUORUM)
 * read consistency level `R = 1` (ONE)
@@ -56,8 +58,38 @@ Consistency is provided:
 
 `W + R > N: (1 + 1) / 2 + 1 > 1` is true
 
-Thoug a replication factor of `3` is recommended in production systems. Its value is fixed for a keyspace.
-Explicit partitioning is recommended on 10s billion of edges which we do not reach with the Wikipedia dump.
+Thoug a replication factor of `3` is recommended in production systems. Its value is fixed per keyspace.
+Explicit partitioning is recommended when 10s billion of edges are expected, which we do not reach using the Wikipedia dump.
+
+#### Cassandra
+Storage backend specific configuration has to be done in its own configuration file.
+Unfortunately Titan's `storage.conf-file` does not seem to work using Cassandra. The default configuration `conf/cassandra.yaml` is loaded no matter what. I created two copies of this file in order to have an editable and one default configuration
+
+    cd conf
+    cp cassandra.yaml cassandra-default.yaml
+    cp cassandra.yaml cassandra-cluster.yaml
+    rm cassandra.yaml
+    ln -s cassandra-cluster.yaml cassandra.yaml
+
+and made a symbolic link in order to switch the config when needed.
+
+**conf/cassandra-cluster.yaml** (derived from `conf/cassandra.yaml`):
+
+    num_tokens: 4
+    seed_provider:
+      - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+        parameters:
+          - seeds: "127.0.0.1"
+    concurrent_reads: 16
+    concurrent_writes: 16
+    listen_address: localhost
+
+In production `num_tokens` should be higher, e.g. `256`.
+Concurrent reads is set to `16 * num_drives`, concurrent writes to `8 * num_cores`.
+Additional nodes may have to be added to the seeds and the listen addresses have to reachable endpoints. May also apply to RFC endpoints.
+
+data: `db/cassandra/data`  
+commit log: `db/cassandra/commitlog`
 
 ### Startup and Shutdown
 Titan has a startup script `bin/titan.sh` to start Rexster, Titan, Cassandra and ElasticSearch.
@@ -67,7 +99,7 @@ The startup scripts can start Rexster using a specific configuration file `conf/
     $ bin/titan.sh -c <appendix> start
 
 where the default appendix is `cassandra-cluster` for my custom script `rexster-titan-cassandra.sh`.
-The scripts can watch the status and also stop the components using
+The scripts can watch the status and also stop the components via
 
     $ bin/titan.sh status
     $ bin/titan.sh stop
