@@ -21,6 +21,7 @@ Every client will be configured to contact this master first, thus its IP addres
 A client visiting this URL will be added to the client list.
 * URL: `/register`
 * Method: `GET`
+
 #### Deregister
 A client visting this URL will be removed from the client list.
 * URL: `/deregister`
