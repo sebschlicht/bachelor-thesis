@@ -6,12 +6,13 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
-import de.uniko.sebschlicht.graphity.benchmark.api.http.Urls;
+import de.uniko.sebschlicht.graphity.benchmark.api.http.Framework;
 
 public class ClientWrapper {
 
@@ -31,9 +32,11 @@ public class ClientWrapper {
             String address) {
         this.address = address;
         httpClient = Client.create();
-        resStart = httpClient.resource(address + Urls.Client.URL_START);
-        resStatus = httpClient.resource(address + Urls.Client.URL_STATUS);
-        resStop = httpClient.resource(address + Urls.Client.URL_STOP);
+        httpClient.setConnectTimeout(500);
+        httpClient.setReadTimeout(2000);
+        resStart = createResource(this, Framework.Client.URL_START);
+        resStatus = createResource(this, Framework.Client.URL_STATUS);
+        resStop = createResource(this, Framework.Client.URL_STOP);
     }
 
     public String getAddress() {
@@ -57,7 +60,11 @@ public class ClientWrapper {
             return (httpResponse.getStatus() == HttpStatus.OK_200);
         } catch (UniformInterfaceException e) {
             // HTTP status code >= 300
-            return false;
+            throw new IllegalStateException("client " + address
+                    + " send an unexpected result");
+        } catch (ClientHandlerException e) {
+            // connection failed
+            throw new IllegalStateException("failed to reach client " + address);
         }
     }
 
@@ -73,7 +80,11 @@ public class ClientWrapper {
             return httpResponse.getEntity(String.class);
         } catch (UniformInterfaceException e) {
             // HTTP status code >= 300
-            return null;
+            throw new IllegalStateException("client " + address
+                    + " send an unexpected result");
+        } catch (ClientHandlerException e) {
+            // connection failed
+            throw new IllegalStateException("failed to reach client " + address);
         }
     }
 
@@ -89,7 +100,11 @@ public class ClientWrapper {
             return httpResponse.getEntity(String.class);
         } catch (UniformInterfaceException e) {
             // HTTP status code >= 300
-            return null;
+            throw new IllegalStateException("client " + address
+                    + " send an unexpected result");
+        } catch (ClientHandlerException e) {
+            // connection failed
+            throw new IllegalStateException("failed to reach client " + address);
         }
     }
 
@@ -106,5 +121,12 @@ public class ClientWrapper {
         }
         ClientWrapper client = (ClientWrapper) c;
         return client.getAddress().equals(address);
+    }
+
+    private static WebResource createResource(
+            ClientWrapper client,
+            String relativeUrl) {
+        return client.httpClient.resource("http://" + client.address + ":"
+                + Framework.Client.PORT + relativeUrl);
     }
 }

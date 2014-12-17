@@ -21,7 +21,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.api.RequestComposition;
-import de.uniko.sebschlicht.graphity.benchmark.api.http.Urls;
+import de.uniko.sebschlicht.graphity.benchmark.api.http.Framework;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.DeregistrationServlet;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.RegistrationServlet;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.StartBenchmarkServlet;
@@ -57,7 +57,7 @@ public class Master implements MasterListener {
         }
 
         Master master = new Master();
-        Server server = new Server(8081);
+        Server server = new Server(Framework.Master.PORT);
 
         ServletContextHandler context =
                 new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -67,26 +67,26 @@ public class Master implements MasterListener {
         // start benchmark
         context.addServlet(
                 new ServletHolder(new StartBenchmarkServlet(master)),
-                Urls.Master.URL_START);
+                Framework.Master.URL_START);
         context.addFilter(new FilterHolder(new LocalityFilter()),
-                Urls.Master.URL_START,
+                Framework.Master.URL_START,
                 EnumSet.of(DispatcherType.INCLUDE, DispatcherType.REQUEST));
 
         // stop benchmark
         context.addServlet(new ServletHolder(new StopBenchmarkServlet(master)),
-                Urls.Master.URL_STOP);
+                Framework.Master.URL_STOP);
         context.addFilter(new FilterHolder(new LocalityFilter()),
-                Urls.Master.URL_STOP,
+                Framework.Master.URL_STOP,
                 EnumSet.of(DispatcherType.INCLUDE, DispatcherType.REQUEST));
 
         // register clients
         context.addServlet(new ServletHolder(new RegistrationServlet(master)),
-                Urls.Master.URL_REGISTER);
+                Framework.Master.URL_REGISTER);
 
         // deregister clients
         context.addServlet(
                 new ServletHolder(new DeregistrationServlet(master)),
-                Urls.Master.URL_DEREGISTER);
+                Framework.Master.URL_DEREGISTER);
 
         server.start();
         server.join();
@@ -119,6 +119,10 @@ public class Master implements MasterListener {
             return false;
         }
         int numClients = clients.size();
+        if (numClients == 0) {
+            return false;
+        }
+
         int numThreadsPerClient = config.numThreads / numClients;
         int numThreadsTotal = numThreadsPerClient * numClients;
         int maxThroughputPerClient = config.maxThroughput / numClients;
@@ -130,6 +134,7 @@ public class Master implements MasterListener {
         // create threadpool
         if (threadpool == null) {
             threadpool = Executors.newFixedThreadPool(numClients);
+            System.out.println("thread pool initialized");
         }
 
         List<Callable<Boolean>> tasksStart =
@@ -148,6 +153,7 @@ public class Master implements MasterListener {
                             config.targetAddress);
             tasksStart.add(new StartBenchmarkTask(client, clientConfig));
         }
+        System.out.println("starting " + tasksStart.size() + " clients...");
         try {
             List<Future<Boolean>> taskResults =
                     threadpool.invokeAll(tasksStart, timeout, timeUnit);
@@ -155,6 +161,7 @@ public class Master implements MasterListener {
                 try {
                     taskResult.get();
                 } catch (ExecutionException e) {
+                    e.getCause().printStackTrace();
                     return false;
                 }
             }

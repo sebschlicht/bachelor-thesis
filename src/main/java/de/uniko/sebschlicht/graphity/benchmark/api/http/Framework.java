@@ -1,8 +1,10 @@
 package de.uniko.sebschlicht.graphity.benchmark.api.http;
 
-public class Urls {
+public class Framework {
 
     public class Client {
+
+        public static final int PORT = 8082;
 
         public static final String URL_START = "/start";
 
@@ -12,6 +14,8 @@ public class Urls {
     }
 
     public class Master {
+
+        public static final int PORT = 8081;
 
         public static final String URL_DEREGISTER = "/deregister";
 
