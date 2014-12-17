@@ -2,7 +2,11 @@ package de.uniko.sebschlicht.graphity.benchmark.master;
 
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 
 import javax.servlet.DispatcherType;
 
@@ -16,6 +20,7 @@ import de.uniko.sebschlicht.graphity.benchmark.master.servlets.DeregistrationSer
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.RegistrationServlet;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.StartBenchmarkServlet;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.StopBenchmarkServlet;
+import de.uniko.sebschlicht.graphity.benchmark.master.tasks.StartBenchmarkTask;
 
 public class Master implements MasterListener {
 
@@ -23,6 +28,11 @@ public class Master implements MasterListener {
             "src/main/resources/config.properties";
 
     private Set<ClientWrapper> clients;
+
+    /**
+     * thread pool used for client communication
+     */
+    private ExecutorService threadpool;
 
     public Master() {
         clients = new LinkedHashSet<ClientWrapper>();
@@ -97,7 +107,16 @@ public class Master implements MasterListener {
         if (!config.isLoaded()) {
             return false;
         }
-        // TODO
+        int numClients = clients.size();
+        int numThreadsPerClient = config.numThreads / numClients;
+        int numThreadsTotal = numThreadsPerClient * numClients;
+
+        List<Callable<Boolean>> tasksStart =
+                new LinkedList<Callable<Boolean>>();
+        for (ClientWrapper client : clients) {
+            tasksStart.add(new StartBenchmarkTask(client));
+        }
+
         return false;
     }
 

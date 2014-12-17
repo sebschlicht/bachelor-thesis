@@ -33,6 +33,11 @@ public class ClientWrapper {
         return address;
     }
 
+    public boolean start() {
+        // TODO
+        return false;
+    }
+
     public String getStatus() {
         ClientResponse httpResponse = resStatus.get(ClientResponse.class);
         return httpResponse.getEntity(String.class);
