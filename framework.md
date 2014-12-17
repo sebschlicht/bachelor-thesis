@@ -44,13 +44,14 @@ The master visits this URL of every client in its client list in order to start 
 ##### Benchmark parameters (JSON)
 | Key | Type | Description |
 | --- | ---- | ----------- |
-| requests          | Object | Request composition
-| requests.feed     | Float  | Percentage of feed retrieval requests.
-| requests.follow   | Float  | Percentage of follow requests.
-| requests.unfollow | Float  | Percentage of unfollow requests.
-| requests.post     | Float  | Percentage of post requests.
-| maxThroughput | Integer | Maximum number of requests per second per client.
-| numThreads | Integer | Number of threads per client.
+| maxThroughput | Integer | maximum number of requests per second per client
+| numThreads | Integer | number of threads per client
+| requests          | Object | request composition
+| requests.feed     | Float  | percentage of feed retrieval requests
+| requests.follow   | Float  | percentage of follow requests
+| requests.unfollow | Float  | percentage of unfollow requests
+| requests.post     | Float  | percentage of post requests
+| **targetAddress** | String | IP address of the target cluster
 
 #### Status
 The master visits this URL of every client in its client list in a fixed interval (1 second) in order to retrieve a snapshot of the client's local benchmark result.
