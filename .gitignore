@@ -1,0 +1,23 @@
+# Maven output directory
+target/
+# Eclipse files
+.classpath
+.project
+# Eclipse directories
+.metadata/
+.settings/
+bin/
+
+# Java class files
+*.class
+
+# Package files #
+*.jar
+*.war
+*.ear
+
+# backup files
+*~
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
