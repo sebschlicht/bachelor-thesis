@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.DispatcherType;
 
@@ -110,9 +109,6 @@ public class Master implements MasterListener {
 
     @Override
     public boolean startBenchmark() {
-        long timeout = 3;
-        TimeUnit timeUnit = TimeUnit.SECONDS;
-
         // load master config and prepare client config
         MasterConfiguration config = new MasterConfiguration(PATH_CONFIG);
         if (!config.isLoaded()) {
@@ -156,7 +152,7 @@ public class Master implements MasterListener {
         System.out.println("starting " + tasksStart.size() + " clients...");
         try {
             List<Future<Boolean>> taskResults =
-                    threadpool.invokeAll(tasksStart, timeout, timeUnit);
+                    threadpool.invokeAll(tasksStart);
             for (Future<Boolean> taskResult : taskResults) {
                 try {
                     taskResult.get();
@@ -166,6 +162,7 @@ public class Master implements MasterListener {
                 }
             }
             // all clients reached
+            // TODO: start reporting status
             return true;
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -193,5 +190,6 @@ public class Master implements MasterListener {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        // TODO: stop reporting status
     }
 }
