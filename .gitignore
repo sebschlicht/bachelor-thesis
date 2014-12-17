@@ -11,10 +11,13 @@ bin/
 # Java class files
 *.class
 
-# Package files #
+# Package files
 *.jar
 *.war
 *.ear
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
 # backup files
 *~
