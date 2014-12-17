@@ -1,6 +1,6 @@
-package de.uniko.sebschlicht.graphity.benchmark.api;
+package de.uniko.sebschlicht.graphity.benchmark.api.http;
 
-public class FrameworkUrls {
+public class Urls {
 
     public class Client {
 

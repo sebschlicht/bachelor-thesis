@@ -3,12 +3,7 @@ package de.uniko.sebschlicht.graphity.benchmark.master;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import de.uniko.sebschlicht.graphity.benchmark.master.tasks.ResultCollectionTask;
 
 public class ResultCollector {
 
@@ -34,29 +29,8 @@ public class ResultCollector {
      *         timeout
      */
     public List<String> collectResults(long timeout, TimeUnit timeUnit) {
-        int numClients = master.getClients().size();
-        if (threadpool == null) {
-            threadpool = Executors.newFixedThreadPool(numClients);
-            for (ClientWrapper client : master.getClients()) {
-                tasks.add(new ResultCollectionTask(client));
-            }
-        }
-        try {
-            List<Future<String>> taskStack =
-                    threadpool.invokeAll(tasks, timeout, timeUnit);
-            List<String> results = new LinkedList<String>();
-            for (Future<String> taskResult : taskStack) {
-                try {
-                    results.add(taskResult.get());
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-            return results;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        // TODO
+        return null;
     }
 
     /**

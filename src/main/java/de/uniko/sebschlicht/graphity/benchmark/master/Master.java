@@ -6,7 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.DispatcherType;
 
@@ -15,12 +19,15 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-import de.uniko.sebschlicht.graphity.benchmark.api.FrameworkUrls;
+import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
+import de.uniko.sebschlicht.graphity.benchmark.api.RequestComposition;
+import de.uniko.sebschlicht.graphity.benchmark.api.http.Urls;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.DeregistrationServlet;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.RegistrationServlet;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.StartBenchmarkServlet;
 import de.uniko.sebschlicht.graphity.benchmark.master.servlets.StopBenchmarkServlet;
 import de.uniko.sebschlicht.graphity.benchmark.master.tasks.StartBenchmarkTask;
+import de.uniko.sebschlicht.graphity.benchmark.master.tasks.StopBenchmarkTask;
 
 public class Master implements MasterListener {
 
@@ -60,26 +67,26 @@ public class Master implements MasterListener {
         // start benchmark
         context.addServlet(
                 new ServletHolder(new StartBenchmarkServlet(master)),
-                FrameworkUrls.Master.URL_START);
+                Urls.Master.URL_START);
         context.addFilter(new FilterHolder(new LocalityFilter()),
-                FrameworkUrls.Master.URL_START,
+                Urls.Master.URL_START,
                 EnumSet.of(DispatcherType.INCLUDE, DispatcherType.REQUEST));
 
         // stop benchmark
         context.addServlet(new ServletHolder(new StopBenchmarkServlet(master)),
-                FrameworkUrls.Master.URL_STOP);
+                Urls.Master.URL_STOP);
         context.addFilter(new FilterHolder(new LocalityFilter()),
-                FrameworkUrls.Master.URL_STOP,
+                Urls.Master.URL_STOP,
                 EnumSet.of(DispatcherType.INCLUDE, DispatcherType.REQUEST));
 
         // register clients
         context.addServlet(new ServletHolder(new RegistrationServlet(master)),
-                FrameworkUrls.Master.URL_REGISTER);
+                Urls.Master.URL_REGISTER);
 
         // deregister clients
         context.addServlet(
                 new ServletHolder(new DeregistrationServlet(master)),
-                FrameworkUrls.Master.URL_DEREGISTER);
+                Urls.Master.URL_DEREGISTER);
 
         server.start();
         server.join();
@@ -103,6 +110,10 @@ public class Master implements MasterListener {
 
     @Override
     public boolean startBenchmark() {
+        long timeout = 3;
+        TimeUnit timeUnit = TimeUnit.SECONDS;
+
+        // load master config and prepare client config
         MasterConfiguration config = new MasterConfiguration(PATH_CONFIG);
         if (!config.isLoaded()) {
             return false;
@@ -110,18 +121,70 @@ public class Master implements MasterListener {
         int numClients = clients.size();
         int numThreadsPerClient = config.numThreads / numClients;
         int numThreadsTotal = numThreadsPerClient * numClients;
+        int maxThroughputPerClient = config.maxThroughput / numClients;
+        RequestComposition requestComposition =
+                new RequestComposition(config.request_feed,
+                        config.request_follow, config.request_unfollow,
+                        config.request_post);
+
+        // create threadpool
+        if (threadpool == null) {
+            threadpool = Executors.newFixedThreadPool(numClients);
+        }
 
         List<Callable<Boolean>> tasksStart =
                 new LinkedList<Callable<Boolean>>();
         for (ClientWrapper client : clients) {
-            tasksStart.add(new StartBenchmarkTask(client));
+            // fill up threads if necessary
+            int numThreadsOfClient = numThreadsPerClient;
+            if (numThreadsTotal < config.numThreads) {
+                numThreadsOfClient += 1;
+                numThreadsTotal += 1;
+            }
+            // create benchmark start task
+            ClientConfiguration clientConfig =
+                    new ClientConfiguration(maxThroughputPerClient,
+                            numThreadsOfClient, requestComposition,
+                            config.targetAddress);
+            tasksStart.add(new StartBenchmarkTask(client, clientConfig));
         }
-
-        return false;
+        try {
+            List<Future<Boolean>> taskResults =
+                    threadpool.invokeAll(tasksStart, timeout, timeUnit);
+            for (Future<Boolean> taskResult : taskResults) {
+                try {
+                    taskResult.get();
+                } catch (ExecutionException e) {
+                    return false;
+                }
+            }
+            // all clients reached
+            return true;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public void stopBenchmark() {
-        // TODO Auto-generated method stub
+        List<Callable<String>> tasksStop = new LinkedList<Callable<String>>();
+        for (ClientWrapper client : clients) {
+            tasksStop.add(new StopBenchmarkTask(client));
+        }
+        try {
+            List<Future<String>> taskResults = threadpool.invokeAll(tasksStop);
+            // collect client results
+            List<String> results = new LinkedList<String>();
+            for (Future<String> taskResult : taskResults) {
+                try {
+                    results.add(taskResult.get());
+                } catch (ExecutionException e) {
+                    e.getCause().printStackTrace();
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
