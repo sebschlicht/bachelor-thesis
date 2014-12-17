@@ -22,10 +22,10 @@ public class Master implements MasterListener {
     private static final String PATH_CONFIG =
             "src/main/resources/config.properties";
 
-    private Set<String> clients;
+    private Set<ClientWrapper> clients;
 
     public Master() {
-        clients = new LinkedHashSet<String>();
+        clients = new LinkedHashSet<ClientWrapper>();
     }
 
     public static void main(String[] args) throws Exception {
@@ -75,25 +75,29 @@ public class Master implements MasterListener {
         server.join();
     }
 
-    public Set<String> getClients() {
+    public Set<ClientWrapper> getClients() {
         return clients;
     }
 
     @Override
     public void registerClient(String clientAddress) {
-        clients.add(clientAddress);
+        clients.add(new ClientWrapper(clientAddress));
         System.out.println("client registered (" + clientAddress + ")");
     }
 
     @Override
     public void deregisterClient(String clientAddress) {
-        clients.remove(clientAddress);
+        clients.remove(new ClientWrapper(clientAddress));
         System.out.println("client deregistered (" + clientAddress + ")");
     }
 
     @Override
     public boolean startBenchmark() {
-        // TODO Auto-generated method stub
+        MasterConfiguration config = new MasterConfiguration(PATH_CONFIG);
+        if (!config.isLoaded()) {
+            return false;
+        }
+        // TODO
         return false;
     }
 

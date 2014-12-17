@@ -38,8 +38,8 @@ public class ResultCollector {
         int numClients = master.getClients().size();
         if (threadpool == null) {
             threadpool = Executors.newFixedThreadPool(numClients);
-            for (String clientAddress : master.getClients()) {
-                tasks.add(new ResultCollectionTask(clientAddress));
+            for (ClientWrapper client : master.getClients()) {
+                tasks.add(new ResultCollectionTask(client));
             }
         }
         try {
