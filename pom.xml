@@ -18,6 +18,7 @@
 
     <json.gson.version>2.3.1</json.gson.version>
     <jetty.version>9.2.6.v20141205</jetty.version>
+    <jersey.version>1.9</jersey.version>
   </properties>
 
   <dependencies>
@@ -36,7 +37,11 @@
       <artifactId>jetty-servlet</artifactId>
       <version>${jetty.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
