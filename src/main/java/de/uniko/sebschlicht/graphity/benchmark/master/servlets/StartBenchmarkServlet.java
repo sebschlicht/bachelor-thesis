@@ -1,5 +1,7 @@
 package de.uniko.sebschlicht.graphity.benchmark.master.servlets;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,7 +21,16 @@ public class StartBenchmarkServlet extends MasterServlet {
     protected void doGet(
             HttpServletRequest request,
             HttpServletResponse response) {
-        listener.startBenchmark();
+        try {
+            listener.startBenchmark();
+        } catch (IllegalStateException e) {
+            // is user message
+            try {
+                response.getOutputStream().print(e.getMessage());
+            } catch (IOException e1) {
+                // ignore
+            }
+        }
         // 200 OK.        
     }
 }

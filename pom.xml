@@ -16,17 +16,26 @@
     <!-- version of JavaDoc plugin -->
     <java.javaDoc-plugin.version>2.9.1</java.javaDoc-plugin.version>
 
+    <log4j.version>1.2.17</log4j.version>
     <json.gson.version>2.3.1</json.gson.version>
     <jetty.version>9.2.6.v20141205</jetty.version>
     <jersey.version>1.9</jersey.version>
   </properties>
 
   <dependencies>
+    <!-- logging tool -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <!-- JSON library -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>${json.gson.version}</version>
     </dependency>
+    <!-- HTTP server -->
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
@@ -37,6 +46,7 @@
       <artifactId>jetty-servlet</artifactId>
       <version>${jetty.version}</version>
     </dependency>
+    <!-- HTTP client -->
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>

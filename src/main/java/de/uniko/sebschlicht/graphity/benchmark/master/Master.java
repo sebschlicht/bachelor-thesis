@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 
 import javax.servlet.DispatcherType;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -32,6 +33,8 @@ public class Master implements MasterListener {
 
     private static final String PATH_CONFIG =
             "src/main/resources/config.properties";
+
+    protected static final Logger LOG = Logger.getLogger(Master.class);
 
     private Set<ClientWrapper> clients;
 
@@ -116,7 +119,7 @@ public class Master implements MasterListener {
         }
         int numClients = clients.size();
         if (numClients == 0) {
-            return false;
+            throw new IllegalStateException("no benchmark clients registered");
         }
 
         int numThreadsPerClient = config.numThreads / numClients;
@@ -130,7 +133,6 @@ public class Master implements MasterListener {
         // create threadpool
         if (threadpool == null) {
             threadpool = Executors.newFixedThreadPool(numClients);
-            System.out.println("thread pool initialized");
         }
 
         List<Callable<Boolean>> tasksStart =
@@ -149,7 +151,8 @@ public class Master implements MasterListener {
                             config.targetAddress);
             tasksStart.add(new StartBenchmarkTask(client, clientConfig));
         }
-        System.out.println("starting " + tasksStart.size() + " clients...");
+        LOG.debug("starting " + tasksStart.size() + " clients...");
+
         try {
             List<Future<Boolean>> taskResults =
                     threadpool.invokeAll(tasksStart);
@@ -187,6 +190,8 @@ public class Master implements MasterListener {
                     e.getCause().printStackTrace();
                 }
             }
+            // TODO: merge single client results
+            // TODO: log results
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
