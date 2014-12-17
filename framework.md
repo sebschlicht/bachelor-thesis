@@ -4,7 +4,8 @@ A benchmarking framework used to evaluate scaling thus has to take this into acc
 
 A very basic framework was developed, that uses a single master where clients register, can be controlled and where you can configure the maximum throughput. Each client chooses its next request according to the statistics in the dump of the german Wikipedia, as used in the Graphity paper.
 
-We consider 3 types of requests:
+We consider 4 types of requests:
+* feed: retrieve the news feed (aggregation of status updates of the users subscribed to)
 * follow: subscribe to a different user
 * unfollow: unsubscribe from a user
 * post: post a status update that would appear on the user wall/start pages of the followers
@@ -43,6 +44,13 @@ The master visits this URL of every client in its client list in order to start 
 ##### Benchmark parameters (JSON)
 | Key | Type | Description |
 | --- | ---- | ----------- |
+| requests          | Object | Request composition
+| requests.feed     | Float  | Percentage of feed retrieval requests.
+| requests.follow   | Float  | Percentage of follow requests.
+| requests.unfollow | Float  | Percentage of unfollow requests.
+| requests.post     | Float  | Percentage of post requests.
+| maxThroughput | Integer | Maximum number of requests per second per client.
+| numThreads | Integer | Number of threads per client.
 
 #### Status
 The master visits this URL of every client in its client list in a fixed interval (1 second) in order to retrieve a snapshot of the client's local benchmark result.
