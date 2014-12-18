@@ -1,6 +1,6 @@
 package de.uniko.sebschlicht.graphity.benchmark.api;
 
-public class ClientResults {
+public class BenchmarkResult {
 
     private long duration;
 
@@ -18,7 +18,7 @@ public class ClientResults {
      * @param avgRequestLatencies
      *            average request latency (per request type)
      */
-    public ClientResults(
+    public BenchmarkResult(
             long duration,
             RequestComposition numRequests,
             RequestComposition avgRequestLatencies) {
@@ -30,7 +30,7 @@ public class ClientResults {
     /**
      * empty constructor for deserialization
      */
-    public ClientResults() {
+    public BenchmarkResult() {
     }
 
     /**

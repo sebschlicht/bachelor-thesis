@@ -31,8 +31,7 @@ import de.uniko.sebschlicht.graphity.benchmark.master.tasks.StopBenchmarkTask;
 
 public class Master implements MasterListener {
 
-    private static final String PATH_CONFIG =
-            "src/main/resources/config.properties";
+    private static final String PATH_CONFIG = "master-config.properties";
 
     protected static final Logger LOG = Logger.getLogger(Master.class);
 

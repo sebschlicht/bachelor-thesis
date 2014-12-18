@@ -10,6 +10,8 @@ public class ClientConfiguration {
 
     private String targetAddress;
 
+    private TargetType targetType;
+
     /**
      * Creates a transferable benchmark client configuration.
      * 
@@ -65,5 +67,12 @@ public class ClientConfiguration {
      */
     public String getTargetAddress() {
         return targetAddress;
+    }
+
+    /**
+     * @return
+     */
+    public TargetType getTargetType() {
+        return targetType;
     }
 }
