@@ -43,7 +43,7 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
 
         while (!isStopped()) {
             request = client.nextRequest();
-            System.out.println(request.getType().toString());
+            SingleClient.LOG.info(request.getType());
             // TODO: start measurement
 
             switch (request.getType()) {

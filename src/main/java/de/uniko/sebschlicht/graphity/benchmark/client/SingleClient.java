@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 
@@ -35,6 +36,8 @@ import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
 import de.uniko.sebschlicht.graphity.benchmark.master.MasterConfiguration;
 
 public class SingleClient {
+
+    public static final Logger LOG = Logger.getLogger(SingleClient.class);
 
     private static final String PATH_CONFIG =
             "src/main/resources/client-config.properties";
@@ -122,12 +125,15 @@ public class SingleClient {
         threadHandler.start();
     }
 
-    public void stop() {
+    public boolean stop() {
         if (threadHandler != null) {
             threadHandler.stop();
             threadHandler = null;
             subscriptions.clear();
+            System.out.println("client stopped.");
+            return true;
         }
+        return false;
     }
 
     public Request nextRequest() {

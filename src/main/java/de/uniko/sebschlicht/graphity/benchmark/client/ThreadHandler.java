@@ -31,9 +31,13 @@ public class ThreadHandler implements Runnable {
 
     public boolean stop() {
         if (thread != null) {
-            threadpool.shutdownNow();
+            for (BenchmarkClientTask task : tasks) {
+                task.stop();
+            }
+            threadpool.shutdown();
             try {
                 thread.join();
+                thread = null;
                 return true;
             } catch (InterruptedException e) {
                 e.printStackTrace();
