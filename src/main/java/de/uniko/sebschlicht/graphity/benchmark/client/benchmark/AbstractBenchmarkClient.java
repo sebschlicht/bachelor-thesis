@@ -1,11 +1,14 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 
+import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 
 public abstract class AbstractBenchmarkClient implements BenchmarkClient {
+
+    protected static final Gson GSON = new Gson();
 
     protected ClientConfiguration config;
 
