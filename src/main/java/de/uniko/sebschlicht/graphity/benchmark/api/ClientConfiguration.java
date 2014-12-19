@@ -14,7 +14,7 @@ public class ClientConfiguration {
 
     private RequestComposition requests;
 
-    private String targetAddress;
+    private String targetEndpoint;
 
     private TargetType targetType;
 
@@ -27,8 +27,8 @@ public class ClientConfiguration {
      *            number of threads per client
      * @param requestComposition
      *            request composition
-     * @param targetAddress
-     *            IP address of the target cluster
+     * @param targetEndpoint
+     *            IP endpoint of the target cluster
      */
     public ClientConfiguration(
             long idStart,
@@ -37,7 +37,7 @@ public class ClientConfiguration {
             int maxThroughput,
             int numThreads,
             RequestComposition requestComposition,
-            String targetAddress,
+            String targetEndpoint,
             TargetType targetType) {
         this.idStart = idStart;
         this.idEnd = idEnd;
@@ -45,7 +45,7 @@ public class ClientConfiguration {
         this.maxThroughput = maxThroughput;
         this.numThreads = numThreads;
         requests = requestComposition;
-        this.targetAddress = targetAddress;
+        this.targetEndpoint = targetEndpoint;
         this.targetType = targetType;
     }
 
@@ -89,10 +89,10 @@ public class ClientConfiguration {
     }
 
     /**
-     * @return IP address of the target cluster
+     * @return IP endpoint of the target cluster
      */
-    public String getTargetAddress() {
-        return targetAddress;
+    public String getTargetEndpoint() {
+        return targetEndpoint;
     }
 
     public TargetType getTargetType() {

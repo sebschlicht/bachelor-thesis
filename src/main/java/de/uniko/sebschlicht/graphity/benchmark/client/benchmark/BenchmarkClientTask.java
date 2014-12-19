@@ -43,8 +43,8 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
 
         while (!isStopped()) {
             request = client.nextRequest();
-            SingleClient.LOG.info(request.getType());
             // TODO: start measurement
+            long msStart = System.currentTimeMillis();
 
             switch (request.getType()) {
                 case FEED:
@@ -71,6 +71,8 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
                             requestUnfollow.getIdFollowed());
                     break;
             }
+            long duration = System.currentTimeMillis() - msStart;
+            SingleClient.LOG.debug(request.getType() + ": " + duration);
 
             // TODO: stop and save measurement
         }

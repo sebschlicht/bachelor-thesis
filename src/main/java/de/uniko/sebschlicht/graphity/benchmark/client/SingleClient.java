@@ -113,9 +113,9 @@ public class SingleClient {
         for (int i = 0; i < config.getNumThreads(); ++i) {
             BenchmarkClient benchmarkClient;
             if (config.getTargetType() == TargetType.NEO4J) {
-                benchmarkClient = new Neo4jClient();
+                benchmarkClient = new Neo4jClient(config);
             } else {
-                benchmarkClient = new TitanClient();
+                benchmarkClient = new TitanClient(config);
             }
             threadTasks.add(new BenchmarkClientTask(this, benchmarkClient));
         }

@@ -8,7 +8,7 @@ import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.BenchmarkClientT
 
 public class ThreadHandler implements Runnable {
 
-    private final ExecutorService threadpool;
+    private ExecutorService threadpool;
 
     private Thread thread;
 
@@ -16,7 +16,6 @@ public class ThreadHandler implements Runnable {
 
     public ThreadHandler(
             Collection<BenchmarkClientTask> tasks) {
-        threadpool = Executors.newFixedThreadPool(tasks.size());
         this.tasks = tasks;
     }
 
@@ -34,10 +33,11 @@ public class ThreadHandler implements Runnable {
             for (BenchmarkClientTask task : tasks) {
                 task.stop();
             }
-            threadpool.shutdown();
             try {
                 thread.join();
                 thread = null;
+                threadpool.shutdownNow();
+                threadpool = null;
                 return true;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -49,8 +49,9 @@ public class ThreadHandler implements Runnable {
     @Override
     public void run() {
         try {
-            System.out.println("starting " + tasks.size()
+            SingleClient.LOG.info("starting " + tasks.size()
                     + " client threads...");
+            threadpool = Executors.newFixedThreadPool(tasks.size());
             threadpool.invokeAll(tasks);
         } catch (InterruptedException e) {
             e.printStackTrace();

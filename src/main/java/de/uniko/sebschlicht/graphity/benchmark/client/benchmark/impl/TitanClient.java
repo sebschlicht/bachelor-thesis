@@ -1,8 +1,14 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.impl;
 
+import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AbstractBenchmarkClient;
 
 public class TitanClient extends AbstractBenchmarkClient {
+
+    public TitanClient(
+            ClientConfiguration config) {
+        super(config);
+    }
 
     @Override
     public boolean retrieveNewsFeed(long id) {
