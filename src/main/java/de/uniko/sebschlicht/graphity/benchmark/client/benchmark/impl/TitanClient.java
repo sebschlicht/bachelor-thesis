@@ -8,7 +8,6 @@ import com.sun.jersey.api.client.ClientResponse;
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.client.SingleClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AbstractBenchmarkClient;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.impl.titan.ResponseFollow;
 
 public class TitanClient extends AbstractBenchmarkClient {
 
@@ -48,9 +47,9 @@ public class TitanClient extends AbstractBenchmarkClient {
                     resFollow.accept(MediaType.APPLICATION_JSON)
                             .type(MediaType.APPLICATION_JSON)
                             .entity(jsonString).post(ClientResponse.class);
-            ResponseFollow responseFollow =
+            ResponseBoolean responseFollow =
                     GSON.fromJson(response.getEntity(String.class),
-                            ResponseFollow.class);
+                            ResponseBoolean.class);
             return responseFollow.getResponseValue() || true;
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
@@ -71,8 +70,34 @@ public class TitanClient extends AbstractBenchmarkClient {
 
     @Override
     public boolean postStatusUpdate(long id, String message) {
-        // TODO Auto-generated method stub
-        return false;
+        ClientResponse response = null;
+        try {
+            String jsonString =
+                    "{\"author\":\"" + id + "\",\"message\":\"" + message
+                            + "\"}";
+            response =
+                    resPost.accept(MediaType.APPLICATION_JSON)
+                            .type(MediaType.APPLICATION_JSON)
+                            .entity(jsonString).post(ClientResponse.class);
+            ResponseLong responsePost =
+                    GSON.fromJson(response.getEntity(String.class),
+                            ResponseLong.class);
+            return responsePost.getResponseValue() != 0;
+        } catch (ClientHandlerException e) {// connection failed
+            SingleClient.LOG
+                    .error("POST: client thread failed due to HTTP issue");
+            throw new IllegalStateException(
+                    "POST: client thread failed due to HTTP issue");
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (ClientHandlerException e) {
+                // ignore
+            }
+        }
+        //return false;
     }
 
     @Override
@@ -86,9 +111,9 @@ public class TitanClient extends AbstractBenchmarkClient {
                     resUnfollow.accept(MediaType.APPLICATION_JSON)
                             .type(MediaType.APPLICATION_JSON)
                             .entity(jsonString).post(ClientResponse.class);
-            ResponseFollow responseUnfollow =
+            ResponseBoolean responseUnfollow =
                     GSON.fromJson(response.getEntity(String.class),
-                            ResponseFollow.class);
+                            ResponseBoolean.class);
             return responseUnfollow.getResponseValue() || true;
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG

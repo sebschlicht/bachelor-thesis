@@ -1,13 +1,13 @@
-package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.impl.titan;
+package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.impl;
 
-public class ResponseFollow {
+public class ResponseBoolean {
 
     private boolean responseValue;
 
     /**
      * Empty constructor for deserialization.
      */
-    public ResponseFollow() {
+    public ResponseBoolean() {
     }
 
     public boolean getResponseValue() {
