@@ -2,6 +2,12 @@ package de.uniko.sebschlicht.graphity.benchmark.api;
 
 public class ClientConfiguration {
 
+    private long idStart;
+
+    private long idEnd;
+
+    private int lengthFeed;
+
     private int maxThroughput;
 
     private int numThreads;
@@ -25,20 +31,40 @@ public class ClientConfiguration {
      *            IP address of the target cluster
      */
     public ClientConfiguration(
+            long idStart,
+            long idEnd,
+            int lengthFeed,
             int maxThroughput,
             int numThreads,
             RequestComposition requestComposition,
-            String targetAddress) {
+            String targetAddress,
+            TargetType targetType) {
+        this.idStart = idStart;
+        this.idEnd = idEnd;
+        this.lengthFeed = lengthFeed;
         this.maxThroughput = maxThroughput;
         this.numThreads = numThreads;
         requests = requestComposition;
         this.targetAddress = targetAddress;
+        this.targetType = targetType;
     }
 
     /**
      * empty constructor for deserialization
      */
     public ClientConfiguration() {
+    }
+
+    public long getIdEnd() {
+        return idEnd;
+    }
+
+    public long getIdStart() {
+        return idStart;
+    }
+
+    public int getFeedLength() {
+        return lengthFeed;
     }
 
     /**
@@ -69,9 +95,6 @@ public class ClientConfiguration {
         return targetAddress;
     }
 
-    /**
-     * @return
-     */
     public TargetType getTargetType() {
         return targetType;
     }

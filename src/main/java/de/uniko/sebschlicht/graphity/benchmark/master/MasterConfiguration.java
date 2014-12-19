@@ -1,6 +1,7 @@
 package de.uniko.sebschlicht.graphity.benchmark.master;
 
 import de.metalcon.utils.Config;
+import de.uniko.sebschlicht.graphity.benchmark.api.TargetType;
 
 public class MasterConfiguration extends Config {
 
@@ -19,6 +20,16 @@ public class MasterConfiguration extends Config {
     public int numThreads;
 
     public String targetAddress;
+
+    public String targetType;
+
+    private TargetType _targetType;
+
+    public long id_start;
+
+    public long id_end;
+
+    public int feed_length;
 
     public MasterConfiguration(
             String configPath) {
@@ -46,6 +57,15 @@ public class MasterConfiguration extends Config {
                 throw new IllegalArgumentException(
                         "target cluster address has to specified");
             }
+            _targetType = TargetType.fromString(targetType);
+            if (id_start > id_end) {
+                throw new IllegalArgumentException(
+                        "lower ID range border (start ID) is higher than upper ID range border (end ID)");
+            }
         }
+    }
+
+    public TargetType getTargetType() {
+        return _targetType;
     }
 }

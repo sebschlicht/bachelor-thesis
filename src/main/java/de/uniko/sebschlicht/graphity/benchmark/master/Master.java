@@ -121,8 +121,6 @@ public class Master implements MasterListener {
             throw new IllegalStateException("no benchmark clients registered");
         }
 
-        int numThreadsPerClient = config.numThreads / numClients;
-        int numThreadsTotal = numThreadsPerClient * numClients;
         int maxThroughputPerClient = config.maxThroughput / numClients;
         RequestComposition requestComposition =
                 new RequestComposition(config.request_feed,
@@ -137,17 +135,12 @@ public class Master implements MasterListener {
         List<Callable<Boolean>> tasksStart =
                 new LinkedList<Callable<Boolean>>();
         for (ClientWrapper client : clients) {
-            // fill up threads if necessary
-            int numThreadsOfClient = numThreadsPerClient;
-            if (numThreadsTotal < config.numThreads) {
-                numThreadsOfClient += 1;
-                numThreadsTotal += 1;
-            }
             // create benchmark start task
             ClientConfiguration clientConfig =
-                    new ClientConfiguration(maxThroughputPerClient,
-                            numThreadsOfClient, requestComposition,
-                            config.targetAddress);
+                    new ClientConfiguration(config.id_start, config.id_end,
+                            config.feed_length, maxThroughputPerClient,
+                            config.numThreads, requestComposition,
+                            config.targetAddress, config.getTargetType());
             tasksStart.add(new StartBenchmarkTask(client, clientConfig));
         }
         LOG.debug("starting " + tasksStart.size() + " clients...");

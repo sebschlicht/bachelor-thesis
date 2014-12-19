@@ -1,15 +1,16 @@
-package de.uniko.sebschlicht.graphity.benchmark.client;
+package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 
 import java.util.concurrent.Callable;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.BenchmarkResult;
+import de.uniko.sebschlicht.graphity.benchmark.client.SingleClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
 
-public abstract class BenchmarkClientTask implements Callable<BenchmarkResult> {
+public class BenchmarkClientTask implements Callable<BenchmarkResult> {
 
     private boolean isStopped;
 
@@ -42,6 +43,7 @@ public abstract class BenchmarkClientTask implements Callable<BenchmarkResult> {
 
         while (!isStopped()) {
             request = client.nextRequest();
+            System.out.println(request.getType().toString());
             // TODO: start measurement
 
             switch (request.getType()) {
@@ -72,5 +74,8 @@ public abstract class BenchmarkClientTask implements Callable<BenchmarkResult> {
 
             // TODO: stop and save measurement
         }
+
+        // TODO: merge measurements if still necessary
+        return null;
     }
 }

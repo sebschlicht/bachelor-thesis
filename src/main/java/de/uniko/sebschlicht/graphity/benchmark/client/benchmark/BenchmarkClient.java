@@ -1,4 +1,4 @@
-package de.uniko.sebschlicht.graphity.benchmark.client;
+package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 
 public interface BenchmarkClient {
 

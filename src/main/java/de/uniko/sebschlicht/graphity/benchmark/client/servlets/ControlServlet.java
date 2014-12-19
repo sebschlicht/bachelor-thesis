@@ -1,9 +1,11 @@
-package de.uniko.sebschlicht.graphity.benchmark.client;
+package de.uniko.sebschlicht.graphity.benchmark.client.servlets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+
+import de.uniko.sebschlicht.graphity.benchmark.client.ClientServlet;
 
 public class ControlServlet extends ClientServlet {
 

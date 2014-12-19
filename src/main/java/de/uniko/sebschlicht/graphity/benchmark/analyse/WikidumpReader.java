@@ -28,7 +28,7 @@ public class WikidumpReader extends CsvParser<WikidumpInfo> {
                 numPost += 1;
             } else if (entry.length == 4 && "A".equals(entry[1])) {
                 // add followship
-                long idFollowing = Long.valueOf(entry[2]);
+                //long idFollowing = Long.valueOf(entry[2]);
                 long idFollowed = Long.valueOf(entry[3]);
 
                 Integer numFollowing = numFollowers.get(idFollowed);
@@ -40,8 +40,8 @@ public class WikidumpReader extends CsvParser<WikidumpInfo> {
                 numFollow += 1;
             } else if (entry.length == 4 && "R".equals(entry[1])) {
                 // remove followship
-                long idFollowing = Long.valueOf(entry[2]);
-                long idFollowed = Long.valueOf(entry[3]);
+                //long idFollowing = Long.valueOf(entry[2]);
+                //long idFollowed = Long.valueOf(entry[3]);
 
                 numTotalWrites += 1;
                 numUnfollow += 1;
