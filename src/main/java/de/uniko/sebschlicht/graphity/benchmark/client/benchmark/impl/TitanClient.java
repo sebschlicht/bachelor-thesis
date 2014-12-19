@@ -77,7 +77,33 @@ public class TitanClient extends AbstractBenchmarkClient {
 
     @Override
     public boolean unsubscribe(long idSubscriber, long idFollowed) {
-        // TODO Auto-generated method stub
-        return false;
+        ClientResponse response = null;
+        try {
+            String jsonString =
+                    "{\"following\":\"" + idSubscriber + "\",\"followed\":\""
+                            + idFollowed + "\"}";
+            response =
+                    resUnfollow.accept(MediaType.APPLICATION_JSON)
+                            .type(MediaType.APPLICATION_JSON)
+                            .entity(jsonString).post(ClientResponse.class);
+            ResponseFollow responseUnfollow =
+                    GSON.fromJson(response.getEntity(String.class),
+                            ResponseFollow.class);
+            return responseUnfollow.getResponseValue() || true;
+        } catch (ClientHandlerException e) {// connection failed
+            SingleClient.LOG
+                    .error("UNFOLLOW: client thread failed due to HTTP issue");
+            throw new IllegalStateException(
+                    "UNFOLLOW: client thread failed due to HTTP issue");
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (ClientHandlerException e) {
+                // ignore
+            }
+        }
+        //return false;
     }
 }
