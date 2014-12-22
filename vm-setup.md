@@ -10,12 +10,12 @@ OS: `Debian Wheezy XFCE 7.7.0 amd64`
 * [Neo4j + Titan](cluster-setup.md)
 * (cluster control)
  * [circus](http://circus.readthedocs.org/en/0.11.1/) or
-   * control your cluster by sending [commands](http://circus.readthedocs.org/en/0.11.1/for-ops/commands/) using ZMQ: `start`, `stop`, `stats`
-   * allows multiple watchers (programs) and ordered startup
-     * Neo4j
-     * Titan
-     * Cassandra, ElasticSearch, ...
-   * allows to write own startup [hooks](http://circus.readthedocs.org/en/0.11.1/for-devs/writing-hooks/)
+    * control your cluster by sending [commands](http://circus.readthedocs.org/en/0.11.1/for-ops/commands/) using ZMQ: `start`, `stop`, `stats`
+    * allows multiple watchers (programs) and ordered startup
+      * Neo4j
+      * Titan
+      * Cassandra, ElasticSearch, ...
+    * allows to write own startup [hooks](http://circus.readthedocs.org/en/0.11.1/for-devs/writing-hooks/)
  * [pssh](http://www.theether.org/pssh/) or
  * [cssh](https://github.com/duncs/clusterssh)
 
@@ -42,7 +42,7 @@ OS: `Debian Wheezy XFCE 7.7.0 amd64`
     $ adduser <user> sudo
     $ exit
 
-and do a relog for <user>
+and do a relog for this user.
 
 ## SSH server
 A SSH server is installed in order to login to a cluster node remotely when problems occurr. If `circus` is not used multi-SSH tools like `pssh` could be an option to control the cluster, too.
