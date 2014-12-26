@@ -25,3 +25,7 @@ A simple Python script could do a IP range scan in order to retrieve a list of r
 This script can be executed whenever nodes were added or removed.
 There will be a [daemon](https://pypi.python.org/pypi/python-daemon/) running that updates its node list whenever this script was executed.
 The script uses the daemon to send commands to all nodes on request and automatically retrieves process statistics in a fixed interval.
+
+## Installation
+
+
