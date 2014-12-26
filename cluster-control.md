@@ -27,11 +27,16 @@ There will be a [daemon](https://pypi.python.org/pypi/python-daemon/) running th
 The script uses the daemon to send commands to all nodes on request and automatically retrieves process statistics in a fixed interval.
 
 ## Solution
-It seems to create a "service daemon" is more difficult than I thought.
-My current solution is a Python script that
+It seems to create a "service daemon" is [more difficult than I thought](http://stackoverflow.com/questions/27623916/create-a-service-process-using-python).
+My current solution is a [Python script](src/main/python/circusman.py) that
 * generates a file with IP addresses of the nodes that form the circus cluster (e.g. 192.168.0.1 to 192.168.0.32) on startup,
 * connects to the circus instances running on all these nodes and
 * generates a HTML document that is auto-refreshing every second, containing the nodes and their status.
+
+### Startup
+
+    $ cd src/main/python
+    $ python circusman.py
 
 ### Status
 If a node isn't reachable it is considered offline. If it is reachable there will be a list of running circus watchers shown.
