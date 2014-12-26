@@ -26,6 +26,23 @@ This script can be executed whenever nodes were added or removed.
 There will be a [daemon](https://pypi.python.org/pypi/python-daemon/) running that updates its node list whenever this script was executed.
 The script uses the daemon to send commands to all nodes on request and automatically retrieves process statistics in a fixed interval.
 
-## Installation
+## Solution
+It seems to create a "service daemon" is more difficult than I thought.
+My current solution is a Python script that
+* generates a file with IP addresses of the nodes that form the circus cluster (e.g. 192.168.0.1 to 192.168.0.32) on startup,
+* connects to the circus instances running on all these nodes and
+* generates a HTML document that is auto-refreshing every second, containing the nodes and their status.
 
+### Status
+If a node isn't reachable it is considered offline. If it is reachable there will be a list of running circus watchers shown.
+### Commands
+You can start and stop a watcher on all nodes simultaneously.
 
+    $ start myapp
+    $ stop myapp
+
+This is not a nice solution. The status is shown in the browser while commands are accepted by the terminal.
+It would be nice to have a webapp that supports to start/stop a certain/all watchers on a certain/all nodes and use circus' event subscription system to determine the watcher status while checking the circus instance status in a less frequent interval than I am doing now. One could also make the log files of each watcher readable or even downstream them to a local directory using a circus plugin.
+
+However for me it is acceptable, because a heartbeat of 1s is not too bad.
+Based on this script I could now collect statistics from each node.
