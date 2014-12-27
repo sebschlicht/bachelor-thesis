@@ -143,7 +143,6 @@ class CircusMan:
   def __init__(self, nodes):
     self.controller = CircusController()
     self.controller.setNodes(nodes)
-    self.stopUpdate = Event()
   
   def getController(self):
     numTries = 0
@@ -156,6 +155,7 @@ class CircusMan:
     return self.controller
   
   def start(self):
+    self.stopUpdate = Event()
     self.updateThread = UpdateThread(self.stopUpdate, self, INTERVAL_UPDATE)
     self.updateThread.start()
   
