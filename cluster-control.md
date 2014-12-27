@@ -24,13 +24,21 @@ Since the number of cluster nodes can vary between experiments and the node conf
 `circus` allows to define own commands and we will define a `configure` command that configures the two services. This command will contain the nodes's address along with the addresses of all the other cluster nodes.
 Whenever a nodes was added/removed we 
 * stop all nodes,
+
   `$>stop`
+
 * define the new IP address range,
+
   `$>cluster <network> <numNodes>`
+
 * re-configure all nodes using this custom command and
+
   `$>configure`
+
 * bring them up again
+
   `$>start`
+
 in the controller script console.
 
 WARNING: This is work in progress. At the moment the script does neither support to start/stop all watcher nor to define a new IP address range without restarting it. Feature issues have been created.
@@ -44,10 +52,15 @@ The watchers will be started by the cluster controller on request.
 This ensures that the services were configured properly before started.
 
     [circus]
+    TODO
     [watcher:titan]
+    TODO
     [watcher:neo4j]
+    TODO
 
 ### `circus` command (configure)
+
+    TODO
 
 ## [Circus](http://circus.readthedocs.org/en/0.11.1/)
 `circus` is Python software that uses ZMQ sockets to send/retrieve commands to a node running `circus`. [Commands](http://circus.readthedocs.org/en/0.11.1/for-ops/commands/) can start/stop both processes and scripts and retrieve statistics for a process.
