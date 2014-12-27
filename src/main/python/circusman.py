@@ -225,15 +225,10 @@ try:
         c.update()
       elif cmd == 'cluster':
         man.stop()
-        print 'update stopped'
         c.disconnect()
-        print 'disconnected'
         nodes = genNodes(args[0], args[1], PORT)
-        print 'cluster generated'
         c.setNodes(nodes)
-        print 'connected to cluster'
         man.start()
-        print 'success.'
 except KeyboardInterrupt:
   print 'shutting down...'
   man.close()
