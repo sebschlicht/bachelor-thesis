@@ -41,7 +41,7 @@ Whenever a nodes was added/removed we
 
 in the controller script console.
 
-WARNING: This is work in progress. At the moment the script does neither support to start/stop all watcher nor to define a new IP address range without restarting it. Feature issues have been created.
+WARNING: This is work in progress. At the moment the controller script does not support the `configure` command.
 
 ### `circus` configuration
 Two watchers are necessary to control the cluster:
