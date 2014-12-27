@@ -17,7 +17,7 @@ It would be great if we would not have to specify each cluster node on our own, 
 
 ## Solution
 There will be one cluster controller, maybe the benchmark client machine.
-While every cluster node running Neo4j/Titan will run a `circus` server that allows to start/stop and monitor defined applications ("watcher"), the controller runs a custom script that can send commands to the cluster nodes via ZMQ. This allows the controller to start/stop all cluster nodes simultaneously and retrieve statistics.
+While every cluster node running Neo4j/Titan will run a `circus` server that allows to start/stop and monitor defined applications ("watcher"), the controller runs a [controller script](src/main/python/circusman.py) (Python) that can send commands to the cluster nodes via ZMQ. This allows the controller to start/stop all cluster nodes simultaneously and retrieve statistics.
 The cluster is formed by an IP address range defined in the script. (default: 192.168.0.1 - 192.168.0.32)
 
 Since the number of cluster nodes can vary between experiments and the node configuration depends on the cluster nodes, a convenient method of configuring the nodes is necessary.
