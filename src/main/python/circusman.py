@@ -16,7 +16,7 @@ class CircusController:
     self.isBusy = False
     self.connected = False
     self.context = zmq.Context()
-    with open('../resources/tmpl_list.html', 'r') as templateFile:
+    with open(PATH_HTML_TMPL, 'r') as templateFile:
       self.template = Template(templateFile.read())
   
   def disconnect(self):
@@ -53,7 +53,7 @@ class CircusController:
     # build content object and fill template
     content = {'node_list': node_list}
     htmlContent = self.template.render(Context(content))
-    with open('/var/www/circusMan/index.html', 'w') as htmlFile:
+    with open(PATH_HTML, 'w') as htmlFile:
       htmlFile.write(htmlContent)
   
   def start(self, name):
@@ -192,6 +192,8 @@ def genNodes(network, numNodes, port):
 
 # config
 INTERVAL_UPDATE = 1
+PATH_HTML = '/var/www/circusMan/index.html'
+PATH_HTML_TMPL = '../resources/tmpl_list.html'
 PORT = 5555
 TIMEOUT_POLL = 200
 # initial cluster
