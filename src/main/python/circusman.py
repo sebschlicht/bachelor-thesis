@@ -114,20 +114,24 @@ class CircusNode:
       self.status = 'offline'
   
   def start(self, name):
-    self.sendJson({
-      'command': 'start',
-      'properties': {
+    cmdStart = {
+      'command': 'start'
+    }
+    if not name is None:
+      cmdStart['properties'] = {
         'name': name
       }
-    })
+    self.sendJson(cmdStart)
   
   def stop(self, name):
-    self.sendJson({
-      'command': 'stop',
-      'properties': {
+    cmdStop = {
+      'command': 'stop'
+    }
+    if not name is None:
+      cmdStart['properties'] = {
         'name': name
       }
-    })
+    self.sendJson(cmdStop)
 
 class CircusMan:
   def __init__(self, nodes):
@@ -195,9 +199,13 @@ try:
     c = man.getController()
     if not c is None:
       if cmd == 'start':
+        if len(args) == 0:
+          args.append(None)
         c.start(args[0])
         c.update()
       elif cmd == 'stop':
+        if len(args) == 0:
+          args.append(None)
         c.stop(args[0])
         c.update()
 except KeyboardInterrupt:
