@@ -14,20 +14,26 @@ class CircusController:
   def __init__(self):
     self.nodes = []
     self.isBusy = False
+    self.connected = False
     self.context = zmq.Context()
     with open('../resources/tmpl_list.html', 'r') as templateFile:
       self.template = Template(templateFile.read())
   
-  def close(self):
-    for node in self.nodes:
-      if node.sending:
+  def disconnect(self):
+    if self.connected:
+      for node in self.nodes:
         node.close()
+      self.connected = False
+  
+  def close(self):
+    self.disconnect()
     self.context.destroy()
   
   def setNodes(self, nodes):
     del self.nodes[:]
     for node in nodes:
       self.addNode(node)
+    self.connected = True
   
   def addNode(self, node):
     self.nodes.append(node)
@@ -138,8 +144,6 @@ class CircusMan:
     self.controller = CircusController()
     self.controller.setNodes(nodes)
     self.stopUpdate = Event()
-    self.updateThread = UpdateThread(self.stopUpdate, self, INTERVAL_UPDATE)
-    self.updateThread.start()
   
   def getController(self):
     numTries = 0
@@ -151,8 +155,16 @@ class CircusMan:
         return None
     return self.controller
   
-  def close(self):
+  def start(self):
+    self.updateThread = UpdateThread(self.stopUpdate, self, INTERVAL_UPDATE)
+    self.updateThread.start()
+  
+  def stop(self):
     self.stopUpdate.set()
+    self.updateThread = None
+  
+  def close(self):
+    self.stop()
     self.controller.close()
     
 class UpdateThread(Thread):
@@ -172,7 +184,7 @@ class UpdateThread(Thread):
 def genNodes(network, numNodes, port):
   i = 1
   nodes = []
-  while i <= numNodes:
+  while i <= int(numNodes):
     address = network + '.' + str(i)
     nodes.append(CircusNode(i, address, port))
     i = i+1
@@ -186,6 +198,7 @@ TIMEOUT_POLL = 200
 nodes = genNodes('127.0.0', 1, PORT)
 # init with auto-update
 man = CircusMan(nodes)
+man.start()
 
 try:
   print 'CircusMan console'
@@ -208,6 +221,17 @@ try:
           args.append(None)
         c.stop(args[0])
         c.update()
+      elif cmd == 'cluster':
+        man.stop()
+        print 'update stopped'
+        c.disconnect()
+        print 'disconnected'
+        nodes = genNodes(args[0], args[1], PORT)
+        print 'cluster generated'
+        c.setNodes(nodes)
+        print 'connected to cluster'
+        man.start()
+        print 'success.'
 except KeyboardInterrupt:
   print 'shutting down...'
   man.close()
