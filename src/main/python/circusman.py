@@ -24,7 +24,8 @@ class CircusController:
         node.close()
     self.context.destroy()
   
-  def addNodes(self, nodes):
+  def setNodes(self, nodes):
+    del self.nodes[:]
     for node in nodes:
       self.addNode(node)
   
@@ -128,21 +129,10 @@ class CircusNode:
       }
     })
 
-def loadNodes(f, p):
-  nodes = []
-  with open(PATH_NODES, 'r') as nodesFile:
-    lines = nodesFile.readlines()
-  i = 1
-  for line in lines:
-    nodes.append(CircusNode(i, line, p))
-    i = i+1
-  return nodes    
-
 class CircusMan:
-  def __init__(self, nodesPath, port):
+  def __init__(self, nodes):
     self.controller = CircusController()
-    nodes = loadNodes(nodesPath, port)
-    self.controller.addNodes(nodes)
+    self.controller.setNodes(nodes)
     self.stopUpdate = Event()
     self.updateThread = UpdateThread(self.stopUpdate, self, INTERVAL_UPDATE)
     self.updateThread.start()
@@ -175,21 +165,23 @@ class UpdateThread(Thread):
       if not c is None:
         c.update()
 
-def genNodes(network, numNodes):
+def genNodes(network, numNodes, port):
   i = 1
-  with open(PATH_NODES, 'w') as fileNodes:
-    fileNodes.write(network + str(i) + '\n')
+  nodes = []
+  while i <= numNodes:
+    address = network + '.' + str(i)
+    nodes.append(CircusNode(i, address, port))
     i = i+1
+  return nodes
 
 # config
 INTERVAL_UPDATE = 1
-PATH_NODES = '/tmp/nodes'
 PORT = 5555
 TIMEOUT_POLL = 200
-# cluster nodes
-genNodes('127.0.0.', 1)
+# initial cluster
+nodes = genNodes('127.0.0', 1, PORT)
 # init with auto-update
-man = CircusMan(PATH_NODES, PORT)
+man = CircusMan(nodes)
 
 try:
   print 'CircusMan console'
