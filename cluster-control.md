@@ -59,8 +59,13 @@ This ensures that the services were configured properly before started.
     TODO
 
 ### `circus` command (configure)
+To update the configuration of the cluster nodes we define a new `circus` command, the [configure command](src/main/python/CommandConfigure.py).
 
-    TODO
+Read the [command creation tutorial](../../wiki/HowTo:-Create-a-custom-circus-command) to see how it is deployed to `circus`. When deployed it can be called using the controller:
+
+    $>configure
+
+If necessary the command could be extended to submit the configuration file patterns rather than using template files existing on each node. This would enable us to change every configuration option simultaneously, in addition to the current use case.
 
 ## [Circus](http://circus.readthedocs.org/en/0.11.1/)
 `circus` is Python software that uses ZMQ sockets to send/retrieve commands to a node running `circus`. [Commands](http://circus.readthedocs.org/en/0.11.1/for-ops/commands/) can start/stop both processes and scripts and retrieve statistics for a process.
