@@ -68,6 +68,15 @@ class CircusController:
       node.stop(name)
     self.isBusy = False
 
+  def configure(self):
+    self.isBusy = True
+    cluster = []
+    for node in self.nodes:
+      cluster.append(node.address)
+    for node in self.nodes:
+      node.configure(cluster)
+    self.isBusy = False
+
 class CircusNode:
   def __init__(self, identifier, address, port):
     self.identifier = identifier
@@ -138,6 +147,16 @@ class CircusNode:
         'name': name
       }
     self.sendJson(cmdStop)
+  
+  def configure(self, cluster):
+    cmdConfigure = {
+      'command': 'configure',
+      'properties': {
+        'address': self.address,
+        'cluster': cluster
+      }
+    }
+    print self.sendJson(cmdConfigure)
 
 class CircusMan:
   def __init__(self, nodes):
@@ -229,6 +248,11 @@ try:
         nodes = genNodes(args[0], args[1], PORT)
         c.setNodes(nodes)
         man.start()
+      elif cmd == 'configure':
+        c.stop(None)
+        c.configure()
+        c.start(None)
+        c.update()
 except KeyboardInterrupt:
   print 'shutting down...'
   man.close()
