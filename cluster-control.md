@@ -41,8 +41,6 @@ Whenever a nodes was added/removed we
 
 in the controller script console.
 
-WARNING: This is work in progress. At the moment the controller script does not support the `configure` command.
-
 ### `circus` configuration
 Two watchers are necessary to control the cluster:
 * Neo4j
@@ -61,11 +59,24 @@ This ensures that the services were configured properly before started.
 ### `circus` command (configure)
 To update the configuration of the cluster nodes we define a new `circus` command, the [configure command](src/main/python/CommandConfigure.py).
 
-Read the [command creation tutorial](../../wiki/HowTo:-Create-a-custom-circus-command) to see how it is deployed to `circus`. When deployed it can be called using the controller:
+Read the [command creation tutorial](../../wiki/HowTo:-Create-a-custom-circus-command) to see how to deploy it to `circus`, it can be called using the controller afterwards:
 
     $>configure
 
-If necessary the command could be extended to submit the configuration file patterns rather than using template files existing on each node. This would enable us to change every configuration option simultaneously, in addition to the current use case.
+#### Configuration
+The command does a simple thing: It writes the configuration files of the services using templates.
+Therefore you need to tell it where the configuration files and the template file are located.
+At the moment this is hard-coded in the command:
+
+    # paths to configuration file templates
+    PATH_NEO4J_TEMPLATE_PROP = '/home/sebschlicht/git/sebschlicht/graphity-benchmark/src/main/resources/neo4j_prop.tmpl'
+    # paths to configuration files
+    #PATH_NEO4J_CONF = '/var/lib/neo4j/conf'
+    PATH_NEO4J_CONF = '/tmp'
+    PATH_NEO4J_CONF_PROP = PATH_NEO4J_CONF + '/neo4j.properties'
+
+If necessary the command could be extended to submit the configuration file patterns rather than using template files existing on each node. This would enable us to change every configuration option simultaneously, in addition to the current use case.  
+However, this is not going to be a feature: I will upload new template files using multi-scp to change configuration options globally instead.
 
 ## [Circus](http://circus.readthedocs.org/en/0.11.1/)
 `circus` is Python software that uses ZMQ sockets to send/retrieve commands to a node running `circus`. [Commands](http://circus.readthedocs.org/en/0.11.1/for-ops/commands/) can start/stop both processes and scripts and retrieve statistics for a process.
