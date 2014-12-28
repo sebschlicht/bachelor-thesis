@@ -7,11 +7,20 @@ OPT_ADDRESS = 'address'
 OPT_CLUSTER = 'cluster'
 
 # paths to configuration file templates
-PATH_NEO4J_TEMPLATE_PROP = '/home/sebschlicht/git/sebschlicht/graphity-benchmark/src/main/resources/neo4j_prop.tmpl'
+PATH_TMPL = '/home/sebschlicht/git/sebschlicht/graphity-benchmark/src/main/resources/'
+PATH_TMPL_NEO4J_PROP = PATH_TMPL + 'neo4j.properties.tmpl'
+PATH_TMPL_NEO4J_SERVER = PATH_TMPL + 'neo4j-server.properties.tmpl'
+PATH_TMPL_TITAN_CASSANDRA = PATH_TMPL + 'cassandra-cluster.yaml.tmpl'
+PATH_TMPL_TITAN_REXSTER = PATH_TMPL + 'rexster-cassandra-cluster.xml.tmpl'
 # paths to configuration files
-#PATH_NEO4J_CONF = '/var/lib/neo4j/conf'
-PATH_NEO4J_CONF = '/tmp'
-PATH_NEO4J_CONF_PROP = PATH_NEO4J_CONF + '/neo4j.properties'
+#PATH_CONF_NEO4J = '/var/lib/neo4j/conf/'
+PATH_CONF_NEO4J = '/tmp/neo4jc/'
+PATH_CONF_NEO4J_PROP = PATH_CONF_NEO4J + 'neo4j.properties'
+PATH_CONF_NEO4J_SERVER = PATH_CONF_NEO4J + 'neo4j-server.properties'
+#PATH_CONF_TITAN = '/etc/titan/'
+PATH_CONF_TITAN = '/tmp/titanc/'
+PATH_CONF_TITAN_CASSANDRA = PATH_CONF_TITAN + 'cassandra-cluster.yaml'
+PATH_CONF_TITAN_REXSTER = PATH_CONF_TITAN + 'rexster-cassandra-cluster.xml'
 
 class Configure(Command):
   """
@@ -65,12 +74,12 @@ class Configure(Command):
         fDestination.write(t.substitute(args).strip())
   
   def configureNeo4j(self, props):
-    #TODO: configure Neo4j
-    self.writeConfig(PATH_NEO4J_TEMPLATE_PROP, PATH_NEO4J_CONF_PROP, props)
+    self.writeConfig(PATH_TMPL_NEO4J_PROP, PATH_CONF_NEO4J_PROP, props)
+    self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, props)
   
   def configureTitan(self, props):
-    #TODO: configure Titan
-    PATH_TITAN_CONF = '/etc/titan'
+    self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, props)
+    self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, props)
 
 # testing separate from circus usage
 #print 'testing ConfigureCommand...'
