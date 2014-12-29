@@ -3,8 +3,7 @@ from string import Template
 from circus.commands.base import Command
 from circus.exc import ArgumentError, MessageError
 
-OPT_ADDRESS = 'address'
-OPT_CLUSTER = 'cluster'
+PORT_NEO4J = 5001
 
 # paths to configuration file templates
 PATH_TMPL = '/home/sebschlicht/git/sebschlicht/graphity-benchmark/src/main/resources/'
@@ -21,6 +20,9 @@ PATH_CONF_NEO4J_SERVER = PATH_CONF_NEO4J + 'neo4j-server.properties'
 PATH_CONF_TITAN = '/tmp/titanc/'
 PATH_CONF_TITAN_CASSANDRA = PATH_CONF_TITAN + 'cassandra-cluster.yaml'
 PATH_CONF_TITAN_REXSTER = PATH_CONF_TITAN + 'rexster-cassandra-cluster.xml'
+
+OPT_ADDRESS = 'address'
+OPT_CLUSTER = 'cluster'
 
 class Configure(Command):
   """
@@ -74,22 +76,31 @@ class Configure(Command):
         fDestination.write(t.substitute(args).strip())
   
   def configureNeo4j(self, props):
-    self.writeConfig(PATH_TMPL_NEO4J_PROP, PATH_CONF_NEO4J_PROP, props)
-    self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, props)
+    endpoints = []
+    for node in props[OPT_CLUSTER]:
+      endpoints.append(node + ':' + str(PORT_NEO4J))
+    endpoints = ','.join(endpoints)
+      
+    self.writeConfig(PATH_TMPL_NEO4J_PROP, PATH_CONF_NEO4J_PROP, {
+      'address': props[OPT_ADDRESS],
+      'endpoints': endpoints
+    })
+    #self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, props)
   
   def configureTitan(self, props):
-    self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, props)
-    self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, props)
+    #self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, props)
+    #self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, props)
+    foo = True
 
 # testing separate from circus usage
-#print 'testing ConfigureCommand...'
-#args = {
-#  'address': '127.0.0.1',
-#  'cluster': ['127.0.0.1', '127.0.0.2']
-#}
-#c = Configure()
-#c.validate(args)
-#c.execute(None, args)
-#print 'Neo4j config @ ' + PATH_NEO4J_CONF_PROP + ':'
-#with open(PATH_NEO4J_CONF_PROP, 'r') as f:
-#  print f.read()
+print 'testing ConfigureCommand...'
+args = {
+  'address': '127.0.0.1',
+  'cluster': ['127.0.0.1', '127.0.0.2']
+}
+c = Configure()
+c.validate(args)
+c.execute(None, args)
+print 'Neo4j config @ ' + PATH_CONF_NEO4J_PROP + ':'
+with open(PATH_CONF_NEO4J_PROP, 'r') as f:
+  print f.read()
