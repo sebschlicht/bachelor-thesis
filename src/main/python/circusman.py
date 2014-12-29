@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import os, time
+from os import listdir
+from os.path import isfile, join
 import json
 from threading import Event, Thread
 # pip install circus
@@ -82,8 +84,9 @@ class CircusController:
       ssh_pw = getpass.getpass('(optional) unlock your SSH key:')
       self.key = paramiko.RSAKey.from_private_key_file(PATH_SSH_KEY,password=ssh_pw)
     client = ParallelSSHClient(hosts=cluster, user=SSH_USER, pkey=self.key)
-    print 'copying files to ' + str(cluster) + ': ' + PATH_TMPL_CONF_LOCAL + '*' + ' -> ' + PATH_TMPL_CONF_REMOTE
-    client.copy_file(PATH_TMPL_CONF_LOCAL + '*', PATH_TMPL_CONF_REMOTE)
+    print 'copying files to ' + str(cluster) + '...'
+    for f in PATH_TMPL_CONF_FILES:
+      client.copy_file(PATH_TMPL_CONF_LOCAL + f, PATH_TMPL_CONF_REMOTE + f)
     client.pool.join()
     # write configuration files
     for node in self.nodes:
@@ -227,7 +230,10 @@ INTERVAL_UPDATE = 1
 PATH_HTML = '/var/www/circusMan/index.html'
 PATH_HTML_TMPL = '../resources/tmpl_list.html'
 PATH_SSH_KEY = os.path.expanduser('~') + '/.ssh/id_rsa'
+# path to config template directory
 PATH_TMPL_CONF_LOCAL = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/src/main/resources/config-templates/'
+# files in config template directory
+PATH_TMPL_CONF_FILES = [ f for f in listdir(PATH_TMPL_CONF_LOCAL) if isfile(join(PATH_TMPL_CONF_LOCAL,f)) ]
 PATH_TMPL_CONF_REMOTE = '/usr/local/etc/templates/'
 PORT = 5555
 SSH_USER = 'node'
