@@ -169,7 +169,8 @@ class CircusNode:
       'command': 'configure',
       'properties': {
         'address': self.address,
-        'cluster': cluster
+        'cluster': cluster,
+        'identifier': self.identifier
       }
     }
     print self.sendJson(cmdConfigure)

@@ -13,16 +13,17 @@ PATH_TMPL_TITAN_CASSANDRA = PATH_TMPL + 'cassandra-cluster.yaml.tmpl'
 PATH_TMPL_TITAN_REXSTER = PATH_TMPL + 'rexster-cassandra-cluster.xml.tmpl'
 # paths to configuration files
 #PATH_CONF_NEO4J = '/var/lib/neo4j/conf/'
-PATH_CONF_NEO4J = '/tmp/neo4jc/'
+PATH_CONF_NEO4J = '/tmp/'
 PATH_CONF_NEO4J_PROP = PATH_CONF_NEO4J + 'neo4j.properties'
 PATH_CONF_NEO4J_SERVER = PATH_CONF_NEO4J + 'neo4j-server.properties'
 #PATH_CONF_TITAN = '/etc/titan/'
-PATH_CONF_TITAN = '/tmp/titanc/'
+PATH_CONF_TITAN = '/tmp/'
 PATH_CONF_TITAN_CASSANDRA = PATH_CONF_TITAN + 'cassandra-cluster.yaml'
 PATH_CONF_TITAN_REXSTER = PATH_CONF_TITAN + 'rexster-cassandra-cluster.xml'
 
 OPT_ADDRESS = 'address'
 OPT_CLUSTER = 'cluster'
+OPT_IDENTIFIER = 'identifier'
 
 class Configure(Command):
   """
@@ -37,7 +38,8 @@ class Configure(Command):
   
   options = [
     ('', OPT_ADDRESS, None, 'IP address of the cluster node'),
-    ('', OPT_CLUSTER, None, 'IP addresses of all cluster nodes')
+    ('', OPT_CLUSTER, None, 'IP addresses of all cluster nodes'),
+    ('', OPT_IDENTIFIER, None, 'unique node identifier')
   ]
   
   def execute(self, arbiter, props):
@@ -58,14 +60,17 @@ class Configure(Command):
       raise MessageError('cluster malformed: list expected')
     elif len(props[OPT_CLUSTER]) == 0:
       raise MessageError('cluster is empty')
+    if not OPT_IDENTIFIER in props:
+      raise MessageError('identifier is missing')
 
   def message(self, *args, **opts):
-    numArgs = 2
+    numArgs = 3
     if len(args) < numArgs:
-      raise ArgumentError('Invalid number of arguments.')
+      raise ArgumentError('Invalid number of arguments. Usage: <identifier> <address> <cluster>')
     if len(args) == numArgs:
-      opts['address'] = args[0]
-      opts['cluster'] = args[1].split(',')
+      opts['identifier'] = args[0]
+      opts['address'] = args[1]
+      opts['cluster'] = args[2].split(',')
     return self.make_message(**opts)
   
   # write a config file using a template
@@ -83,14 +88,14 @@ class Configure(Command):
       
     self.writeConfig(PATH_TMPL_NEO4J_PROP, PATH_CONF_NEO4J_PROP, {
       'address': props[OPT_ADDRESS],
-      'endpoints': endpoints
+      'endpoints': endpoints,
+      'identifier': props[OPT_IDENTIFIER]
     })
-    #self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, props)
+    self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, props)
   
   def configureTitan(self, props):
-    #self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, props)
-    #self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, props)
-    foo = True
+    self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, props)
+    self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, props)
 
 # testing separate from circus usage
 """
