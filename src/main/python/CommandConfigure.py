@@ -93,6 +93,7 @@ class Configure(Command):
     foo = True
 
 # testing separate from circus usage
+"""
 print 'testing ConfigureCommand...'
 args = {
   'address': '127.0.0.1',
@@ -104,3 +105,4 @@ c.execute(None, args)
 print 'Neo4j config @ ' + PATH_CONF_NEO4J_PROP + ':'
 with open(PATH_CONF_NEO4J_PROP, 'r') as f:
   print f.read()
+#"""

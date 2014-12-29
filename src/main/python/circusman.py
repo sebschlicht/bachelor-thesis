@@ -2,13 +2,16 @@
 import os, time
 import json
 from threading import Event, Thread
-# apt-get install python-zmq
+# pip install circus
 import zmq
-from zmq.utils import jsonapi
 # apt-get install python-django
 from django.template import Template, Context
 from django.conf import settings
 settings.configure()
+# pip install parallel-ssh
+from pssh import ParallelSSHClient
+import paramiko
+import getpass
 
 class CircusController:
   def __init__(self):
@@ -16,6 +19,7 @@ class CircusController:
     self.isBusy = False
     self.connected = False
     self.context = zmq.Context()
+    self.key = None
     with open(PATH_HTML_TMPL, 'r') as templateFile:
       self.template = Template(templateFile.read())
   
@@ -73,6 +77,15 @@ class CircusController:
     cluster = []
     for node in self.nodes:
       cluster.append(node.address)
+    # update configuration file templates
+    if self.key is None:
+      ssh_pw = getpass.getpass('(optional) unlock your SSH key:')
+      self.key = paramiko.RSAKey.from_private_key_file(PATH_SSH_KEY,password=ssh_pw)
+    client = ParallelSSHClient(hosts=cluster, user=SSH_USER, pkey=self.key)
+    print 'copying files to ' + str(cluster) + ': ' + PATH_TMPL_CONF_LOCAL + '*' + ' -> ' + PATH_TMPL_CONF_REMOTE
+    client.copy_file(PATH_TMPL_CONF_LOCAL + '*', PATH_TMPL_CONF_REMOTE)
+    client.pool.join()
+    # write configuration files
     for node in self.nodes:
       node.configure(cluster)
     self.isBusy = False
@@ -213,10 +226,15 @@ def genNodes(network, numNodes, port):
 INTERVAL_UPDATE = 1
 PATH_HTML = '/var/www/circusMan/index.html'
 PATH_HTML_TMPL = '../resources/tmpl_list.html'
+PATH_SSH_KEY = os.path.expanduser('~') + '/.ssh/id_rsa'
+PATH_TMPL_CONF_LOCAL = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/src/main/resources/config-templates/'
+PATH_TMPL_CONF_REMOTE = '/usr/local/etc/templates/'
 PORT = 5555
+SSH_USER = 'node'
 TIMEOUT_POLL = 200
 # initial cluster
-nodes = genNodes('127.0.0', 1, PORT)
+#nodes = genNodes('127.0.0', 1, PORT)
+nodes = [ CircusNode(1, '192.168.56.101', PORT) ]
 # init with auto-update
 man = CircusMan(nodes)
 man.start()
@@ -249,10 +267,7 @@ try:
         c.setNodes(nodes)
         man.start()
       elif cmd == 'configure':
-        c.stop(None)
         c.configure()
-        c.start(None)
-        c.update()
 except KeyboardInterrupt:
   print 'shutting down...'
   man.close()
