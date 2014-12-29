@@ -68,12 +68,14 @@ The command does a simple thing: It writes the configuration files of the servic
 Therefore you need to tell it where the configuration files and the template file are located.
 At the moment this is hard-coded in the command:
 
+    ...
     # paths to configuration file templates
-    PATH_NEO4J_TEMPLATE_PROP = '/home/sebschlicht/git/sebschlicht/graphity-benchmark/src/main/resources/neo4j_prop.tmpl'
+    PATH_TMPL = '/home/sebschlicht/git/sebschlicht/graphity-benchmark/src/main/resources/'
+    ...
     # paths to configuration files
-    #PATH_NEO4J_CONF = '/var/lib/neo4j/conf'
-    PATH_NEO4J_CONF = '/tmp'
-    PATH_NEO4J_CONF_PROP = PATH_NEO4J_CONF + '/neo4j.properties'
+    PATH_CONF_NEO4J = '/var/lib/neo4j/conf/'
+    PATH_CONF_TITAN = '/etc/titan/'
+    ...
 
 If necessary the command could be extended to submit the configuration file patterns rather than using template files existing on each node. This would enable us to change every configuration option simultaneously, in addition to the current use case.  
 However, this is not going to be a feature: I will upload new template files using multi-scp to change configuration options globally instead.
