@@ -12,11 +12,14 @@ Titan can be downloaded together with storage and indexing backends and Rexster 
 Unzip the archive file to a directory of your choice referred to as `$TITAN_SERVER_HOME`. Relative paths are always relative to this directory. The database will be stored in `db`.
 
 #### Plugin
-`$TITAN_SERVER_HOME/ext`: Graphity extension
+`$TITAN_SERVER_HOME/ext`: Graphity extension using a Maven uber-`JAR` to provide the dependencies.
 
 ### Code changes
+The Graphity code has been ported to the blueprint API easily. However, some Titan functions exceed this API and in some cases casting `Graph` to `TitanGraph` was necessary.
 
 ### Configuration
+This configuration is a result of the [single DC intialization documentation](http://www.datastax.com/documentation/cassandra/2.1/cassandra/initialize/initializeSingleDS.html).
+
 #### Rexster
 When using the Titan Server that bases upon Rexster, you have to configurate the Rexster server at first.
 
@@ -73,44 +76,19 @@ Unfortunately Titan's `storage.conf-file` does not seem to work using Cassandra.
 and made a symbolic link in order to switch the config when needed.
 
 **conf/cassandra-cluster.yaml** (derived from `conf/cassandra.yaml`):
-##### Master
 
-    num_tokens: 4
+    num_tokens: 256
     seed_provider:
       - class_name: org.apache.cassandra.locator.SimpleSeedProvider
         parameters:
-          - seeds: "neoslave1,10.93.130.108,10.93.130.109"
-    concurrent_reads: 16
-    concurrent_writes: 16
-    listen_address: neoslave1
-    rpc_address: neoslave1
+          - seeds: "$seeds"
+    concurrent_reads: 32
+    concurrent_writes: 32
+    listen_address: #address
+    rpc_address: #address
+    endpoint_snitch: [GossipingPropertyFileSnitch](http://www.datastax.com/documentation/cassandra/2.1/cassandra/architecture/architectureSnitchGossipPF_c.html)
     
-##### Slave 1
-
-    num_tokens: 4
-    seed_provider:
-      - class_name: org.apache.cassandra.locator.SimpleSeedProvider
-        parameters:
-          - seeds: "neoslave1,10.93.130.108,10.93.130.109"
-    concurrent_reads: 16
-    concurrent_writes: 16
-    listen_address: 10.93.130.108
-    rpc_address: 10.93.130.108
-
-##### Slave 2
-
-    num_tokens: 4
-    seed_provider:
-      - class_name: org.apache.cassandra.locator.SimpleSeedProvider
-        parameters:
-          - seeds: "neoslave1,10.93.130.108,10.93.130.109"
-    concurrent_reads: 16
-    concurrent_writes: 16
-    listen_address: 10.93.130.109
-    rpc_address: 10.93.130.109
-
-In production `num_tokens` should be higher, e.g. `256`.
-Concurrent reads is set to `16 * num_drives`, concurrent writes to `8 * num_cores`.
+Concurrent reads is set to `16 * num_drives`, concurrent writes to `8 * num_cores`. `num_drives` is guessed to be `2` when using virtualization, I may have to experiment with its value.
 
 data: `db/cassandra/data`  
 commit log: `db/cassandra/commitlog`
@@ -125,7 +103,6 @@ The startup scripts can start Rexster using a specific configuration file `conf/
 where the default appendix is `cassandra-cluster` for my custom script `rexster-titan-cassandra.sh`.
 The scripts can watch the status and also stop the components via
 
-    $ bin/titan.sh status
     $ bin/titan.sh stop
 
 ### Cluster access
@@ -136,7 +113,7 @@ The scripts can watch the status and also stop the components via
 The architecture of the Neo4j HA cluster can be found [in the documentation](http://neo4j.com/docs/stable/ha-architecture.html).
 
 ### Installation
-The Neo4j server can be [installed using your package manager](http://debian.neo4j.org/?_ga=1.174493282.1166350782.1407319663). In this bachelor thesis the Enterprise version of the Neo4j server is used. Some features are available in this version only and I remember it was something necessary but have not found it again yet.
+The Neo4j server can be [installed using your package manager](http://debian.neo4j.org/?_ga=1.174493282.1166350782.1407319663). The enterprise version is the only one supporting HA mode and thus is necessary for this bachelor thesis.
 
 Using the package manager a user `neo4j` is created automatically. However, some I/O action seemed to be executed as root.
 
