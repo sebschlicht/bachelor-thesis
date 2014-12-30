@@ -95,8 +95,18 @@ class Configure(Command):
     })
   
   def configureTitan(self, props):
-    self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, props)
-    self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, props)
+    cluster = props[OPT_CLUSTER]
+    seeds = [ cluster[0] ]
+    if len(cluster) > 3:
+      seeds.append(cluster[-1])
+    seeds = ','.join(seeds)
+    
+    self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, {
+      'address': props[OPT_ADDRESS],
+      'seeds': seeds
+    })
+    self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, {
+    })
 
 # testing separate from circus usage
 """
