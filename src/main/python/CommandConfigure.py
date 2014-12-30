@@ -88,7 +88,7 @@ class Configure(Command):
       
     self.writeConfig(PATH_TMPL_NEO4J_PROP, PATH_CONF_NEO4J_PROP, {
       'address': props[OPT_ADDRESS],
-      'endpoints': endpoints,
+      'initial_hosts': endpoints,
       'identifier': props[OPT_IDENTIFIER]
     })
     self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, props)
