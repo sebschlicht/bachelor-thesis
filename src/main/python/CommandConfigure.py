@@ -88,10 +88,12 @@ class Configure(Command):
       
     self.writeConfig(PATH_TMPL_NEO4J_PROP, PATH_CONF_NEO4J_PROP, {
       'address': props[OPT_ADDRESS],
-      'initial_hosts': endpoints,
-      'identifier': props[OPT_IDENTIFIER]
+      'identifier': props[OPT_IDENTIFIER],
+      'initial_hosts': endpoints
     })
-    self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, props)
+    self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, {
+      
+    })
   
   def configureTitan(self, props):
     self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, props)
