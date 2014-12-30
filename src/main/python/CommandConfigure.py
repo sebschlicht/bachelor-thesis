@@ -92,7 +92,6 @@ class Configure(Command):
       'initial_hosts': endpoints
     })
     self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, {
-      
     })
   
   def configureTitan(self, props):
