@@ -67,11 +67,11 @@ Explicit partitioning is recommended when 10s billion of edges are expected, whi
 Storage backend specific configuration has to be done in its own configuration file.
 Unfortunately Titan's `storage.conf-file` does not seem to work using Cassandra. The default Cassandra configuration `conf/cassandra.yaml` is loaded no matter what. I created two copies of this file in order to have an editable and a copy of the default configuration
 
-    cd conf
-    cp cassandra.yaml cassandra-default.yaml
-    cp cassandra.yaml cassandra-cluster.yaml
-    rm cassandra.yaml
-    ln -s cassandra-cluster.yaml cassandra.yaml
+    $ cd conf
+    $ cp cassandra.yaml cassandra-default.yaml
+    $cp cassandra.yaml cassandra-cluster.yaml
+    $ rm cassandra.yaml
+    $ ln -s cassandra-cluster.yaml cassandra.yaml
 
 and made a symbolic link in order to switch the config when needed.
 
@@ -86,8 +86,15 @@ and made a symbolic link in order to switch the config when needed.
     concurrent_writes: 32
     listen_address: #address
     rpc_address: #address
-    endpoint_snitch: [GossipingPropertyFileSnitch](http://www.datastax.com/documentation/cassandra/2.1/cassandra/architecture/architectureSnitchGossipPF_c.html)
-    
+    endpoint_snitch: GossipingPropertyFileSnitch
+
+[GossipingPropertyFileSnitch](http://www.datastax.com/documentation/cassandra/2.1/cassandra/architecture/architectureSnitchGossipPF_c.html) uses a separate file to identify the node area:
+
+**conf/cassandra-rackdc.properties**:
+
+    dc=DC1
+    rack=RAC1
+
 Concurrent reads is set to `16 * num_drives`, concurrent writes to `8 * num_cores`. `num_drives` is guessed to be `2` when using virtualization, I may have to experiment with its value.
 
 data: `db/cassandra/data`  
@@ -104,8 +111,6 @@ where the default appendix is `cassandra-cluster` for my custom script `rexster-
 The scripts can watch the status and also stop the components via
 
     $ bin/titan.sh stop
-
-### Cluster access
 
 ## Neo4j HA cluster
 
@@ -127,66 +132,29 @@ Detailed information can be found in the [HA configuration section](http://neo4j
 Only changes in the configuration files are noted.
 The configuration files can be found at `$NEO_HOME/conf` with `$NEO_HOME` being `/var/lib/neo4j` when installed via package manager.
 
-#### Master (neoslave1)
 **conf/neo4j.properties**
 
     # unique cluster instance identifier
-    ha.server_id=1
+    ha.server_id=$identifier
     # endpoint for cluster communication
-    ha.cluster_server=neoslave1:5001
+    ha.cluster_server=$address:5001
     # initial cluster nodes
-    ha.initial_hosts=neoslave1:5001,10.93.130.108:5001,10.93.130.109:5001
+    ha.initial_hosts=$initial_hosts
     # endpoint for synchronization with master
-    ha.server=neoslave1:6001
-
-**conf/neo4j-server.properties**
-
-    org.neo4j.server.database.mode=HA
-
-#### Slave #1 (neoslave2)
-**conf/neo4j.properties**
-
-    # unique cluster instance identifier
-    ha.server_id=2
-    # endpoint for cluster communication
-    ha.cluster_server=10.93.130.108:5001
-    # initial cluster nodes
-    ha.initial_hosts=neoslave1:5001,10.93.130.108:5001,10.93.130.109:5001
-    # endpoint for synchronization with master
-    ha.server=10.93.130.108:6001
-    # node can not be elected to master node
+    ha.server=$address:6001
     ha.slave_only=true
-    
+
+Please note that the last line must not apply to the Neo4j master node.
+
 **conf/neo4j-server.properties**
 
     org.neo4j.server.database.mode=HA
 
-#### Slave #2 (neoslave3)
-**conf/neo4j.properties**
-
-    # unique cluster instance identifier
-    ha.server_id=3
-    # endpoint for cluster communication
-    ha.cluster_server=10.93.130.109:5001
-    # initial cluster nodes
-    ha.initial_hosts=neoslave1:5001,10.93.130.108:5001,10.93.130.109:5001
-    # endpoint for synchronization with master
-    ha.server=10.93.130.109:6001
-    # node can not be elected to master node
-    ha.slave_only=true
-    
-**conf/neo4j-server.properties**
-
-    org.neo4j.server.database.mode=HA
-
-#### Shared configuration
+#### Additional configuration
 In addition several changes were made on each node.
 
 | Location | Command | Description |
 | -------- | ------- | ----------- |
-| conf/neo4j-server.properties | org.neo4j.server.database.mode=HA | enable HA mode of the database |
-| conf/neo4j-wrapper.conf | wrapper.java.additional=-server | Start JVM in server mode. |
-||                          wrapper.java.additional=-XX:+UseConcMarkSweepGC | Enable concurrent garbage collector. |
 | /etc/security/limits.conf | neo4j  soft  nofile  40000<br>neo4j  hard  nofile  40000 | Increase maximum number of open files to 40.000. |
 | /etc/pam.d/su | session required pam_limits.so | see above |
 
@@ -195,7 +163,7 @@ Using the package manager Neo4j installs its service `neo4j-service` starting au
 This behaviour can also be applied after a different installation method and switched on/off.
 Using the service mechanism the server can be started, stopped and restarted.
 
-### Cluster access
+## Cluster access
 At the moment we have a cluster with size 3. In my setting only the master is accessible from outside the cluster.
 In production you would want to have a single endpoint to use for requests that uses load balancing behind the scenes.
 Another aspect is that the REST endpoint should be accessible from outside the cluster but not the admin interface.
@@ -203,17 +171,18 @@ Thus the Neo4j team suggests to use an Apache server to proxy the cluster in the
 
 We install an Apache2 server
 
-    sudo apt-get install apache2
+    $ apt-get install apache2
     
 on the master node which will be accessible from anywhere and balance the load across the cluster.
 
 #### Configuration
 We create a copy of the default page configuration
 
-    cd /etc/apache2/sites/available
-    cp default neo4j
+    $ cd /etc/apache2/sites/available
+    $ cp default neo4j
+    $ cp default titan
 
-and insert a load balancer for the REST endpoints of the cluster instances
+and insert a load balancer for the REST endpoints of the cluster instances at port 82 for Neo4j
 
     <VirtualHost *:82>
       <Proxy balancer://neo4j>
@@ -225,18 +194,33 @@ and insert a load balancer for the REST endpoints of the cluster instances
       ProxyPass /neo4j balancer://neo4j
       ProxyPassReverse /neo4j balancer://neo4j
       
+      # separate write load balancer
       ProxyPass /neo4j-write http://localhost:7474/db/data
       ProxyPassReverse /neo4j-write http://localhost:7474/db/data
       
       # logging configuration follows
     </VirtualHost>
 
-at port 82.
+and port 83 for Titan
 
+    <VirtualHost *:83>
+      <Proxy balancer://titan>
+      BalancerMember http://localhost:8182/
+      BalancerMember http://10.93.130.108:8182/
+      BalancerMember http://10.93.130.109:8182/
+      </Proxy>
+      
+      ProxyPass /titan balancer://titan
+      ProxyPassReverse /titan balancer://titan
+      
+      # logging configuration follows
+    </VirtualHost>
 
 **/etc/apache2/ports.conf**
 
     NameVirtualHost *:82
     Listen 82
+    NameVirtualHost *:83
+    Listen 83
 
-While the first endpoint balances all requests across the cluster, the second endpoint does not include any nodes other than the master. The intention is to have a separate endpoint for write requests. The cluster may perform better when using only the master node for writes: Slaves are forced to synchronize with the master in order to execute a write request.
+While the first endpoint balances all requests across the cluster, the second endpoint (Neo4j only) does not include any nodes other than the master. The intention is to have a separate endpoint for write requests. The cluster may perform better when using only the master node for writes: Slaves are forced to synchronize with the master in order to execute a write request.
