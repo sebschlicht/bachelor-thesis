@@ -99,6 +99,9 @@ class CircusNode:
     self.address = address
     self.port = int(port)
     self.sending = False
+    self.isMaster = False
+    if identifier == 1:
+      self.isMaster = True
     
   def getDict(self):
     return {
@@ -234,7 +237,12 @@ PATH_SSH_KEY = os.path.expanduser('~') + '/.ssh/id_rsa'
 # path to config template directory
 PATH_TMPL_CONF_LOCAL = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/src/main/resources/config-templates/'
 # files in config template directory
-PATH_TMPL_CONF_FILES = [ f for f in listdir(PATH_TMPL_CONF_LOCAL) if isfile(join(PATH_TMPL_CONF_LOCAL,f)) ]
+PATH_TMPL_CONF_FILES = [
+  'neo4j.properties.tmpl',
+  'neo4j-server.properties.tmpl',
+  'cassandra-cluster.yaml.tmpl',
+  'rexster-cassandra-cluster.xml.tmpl'
+]
 PATH_TMPL_CONF_REMOTE = '/usr/local/etc/templates/'
 PORT = 5555
 SSH_USER = 'node'

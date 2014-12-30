@@ -28,8 +28,8 @@ cluster_name: 'Titan Cassandra Cluster'
 # toy data.  However, increasing num_tokens is strongly recommended for
 # production Titan instances backed by Cassandra.  This low value is just
 # for development and testing.
-#num_tokens: 256 
-num_tokens: 4
+num_tokens: 256 
+#num_tokens: 4
 
 # initial_token allows you to specify tokens manually.  While you can use # it with
 # vnodes (num_tokens > 1, above) -- in which case you should provide a 
@@ -578,7 +578,7 @@ cross_node_timeout: false
 #
 # You can use a custom Snitch by setting this to the full class name
 # of the snitch, which will be assumed to be on your classpath.
-endpoint_snitch: SimpleSnitch
+endpoint_snitch: GossipingPropertyFileSnitch
 
 # controls how often to perform the more expensive part of host score
 # calculation

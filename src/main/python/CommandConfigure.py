@@ -12,7 +12,7 @@ PATH_TMPL_NEO4J_SERVER = PATH_TMPL + 'neo4j-server.properties.tmpl'
 PATH_TMPL_TITAN_CASSANDRA = PATH_TMPL + 'cassandra-cluster.yaml.tmpl'
 PATH_TMPL_TITAN_REXSTER = PATH_TMPL + 'rexster-cassandra-cluster.xml.tmpl'
 # paths to configuration files
-#PATH_CONF_NEO4J = '/var/lib/neo4j/conf/'
+#PATH_CONF_NEO4J = '/etc/neo4j/'
 PATH_CONF_NEO4J = '/tmp/'
 PATH_CONF_NEO4J_PROP = PATH_CONF_NEO4J + 'neo4j.properties'
 PATH_CONF_NEO4J_SERVER = PATH_CONF_NEO4J + 'neo4j-server.properties'
@@ -106,6 +106,7 @@ class Configure(Command):
       'seeds': seeds
     })
     self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, {
+      'address': props[OPT_ADDRESS]
     })
 
 # testing separate from circus usage
