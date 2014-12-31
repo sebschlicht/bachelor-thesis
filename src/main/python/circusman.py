@@ -3,6 +3,7 @@ import os, time
 from os import listdir
 from os.path import isfile, join
 import json
+import subprocess
 from threading import Event, Thread
 # pip install circus
 import zmq
@@ -15,9 +16,34 @@ from pssh import ParallelSSHClient
 import paramiko
 import getpass
 
+class SshClient:
+  def __init__(self):
+    self.username = SSH_USER
+    self.sshArgs = [
+      './sshpt.py',
+      '-u', self.username,
+      '-s',
+      '-U', self.username,
+      '-P', SSH_USER,
+      '-f', PATH_LOCAL_NODES,
+      '-o', PATH_LOCAL_SSH_RESULTS
+    ]
+  
+  def doSsh(self, args):
+    sshArgs = self.sshArgs + args
+    return subprocess.check_output(sshArgs)
+  
+  def doScp(self, pathLocal, pathRemote):
+    scpArgs = self.sshArgs + [
+      '-c', pathLocal,
+      '-D', pathRemote
+    ]
+    return subprocess.check_output(scpArgs)
+
 class CircusController:
   def __init__(self):
     self.nodes = []
+    self.nodeAddresses = []
     self.isBusy = False
     self.connected = False
     self.context = zmq.Context()
@@ -37,13 +63,60 @@ class CircusController:
   
   def setNodes(self, nodes):
     del self.nodes[:]
+    del self.nodeAddresses[:]
     for node in nodes:
       self.addNode(node)
     self.connected = True
+    with open(PATH_LOCAL_NODES, 'w') as fNodeAddresses:
+      for nodeAddress in self.nodeAddresses:
+        fNodeAddresses.write(nodeAddress + '\n')
   
   def addNode(self, node):
     self.nodes.append(node)
+    self.nodeAddresses.append(node.address)
     node.connect(self.context)
+  
+  def getSshKey(self):
+    if self.key is None:
+      ssh_pw = getpass.getpass('(optional) unlock your SSH key:')
+      self.key = paramiko.RSAKey.from_private_key_file(PATH_SSH_KEY,password=ssh_pw)
+    return self.key
+  
+  def getSshClient(self):
+    cluster = []
+    for node in self.nodes:
+      cluster.append(node.address)
+    return ParallelSSHClient(hosts=cluster, user=SSH_USER, pkey=self.getSshKey())
+  
+  def startCircus(self):
+    client = SshClient()
+    # upload configure command
+    client.doScp([
+      
+    ])
+    client.doSsh([
+      '/home/node/circus/start.sh'
+    ])
+    
+  def restartCircus(self):
+    #TODO stop and restart Circus via parallel SSH
+    return
+  
+  def upload(self):
+    # update configuration file templates via parallel SSH
+    client = SshClient()
+    for f in PATH_TMPL_CONF_FILES:
+      client.doScp(PATH_TMPL_CONF_LOCAL + f, PATH_TMPL_CONF_REMOTE)
+  
+  def configure(self):
+    self.isBusy = True
+    cluster = []
+    for node in self.nodes:
+      cluster.append(node.address)
+    # write configuration files
+    for node in self.nodes:
+      node.configure(cluster)
+    self.isBusy = False
   
   def getStats(self):
     self.isBusy = True
@@ -72,25 +145,6 @@ class CircusController:
     self.isBusy = True
     for node in self.nodes:
       node.stop(name)
-    self.isBusy = False
-
-  def configure(self):
-    self.isBusy = True
-    cluster = []
-    for node in self.nodes:
-      cluster.append(node.address)
-    # update configuration file templates
-    if self.key is None:
-      ssh_pw = getpass.getpass('(optional) unlock your SSH key:')
-      self.key = paramiko.RSAKey.from_private_key_file(PATH_SSH_KEY,password=ssh_pw)
-    client = ParallelSSHClient(hosts=cluster, user=SSH_USER, pkey=self.key)
-    print 'copying files to ' + str(cluster) + '...'
-    for f in PATH_TMPL_CONF_FILES:
-      client.copy_file(PATH_TMPL_CONF_LOCAL + f, PATH_TMPL_CONF_REMOTE + f)
-    client.pool.join()
-    # write configuration files
-    for node in self.nodes:
-      node.configure(cluster)
     self.isBusy = False
 
 class CircusNode:
@@ -234,6 +288,10 @@ INTERVAL_UPDATE = 1
 PATH_HTML = '/var/www/circusMan/index.html'
 PATH_HTML_TMPL = '../resources/tmpl_list.html'
 PATH_SSH_KEY = os.path.expanduser('~') + '/.ssh/id_rsa'
+
+PATH_LOCAL_NODES = 'hosts'
+PATH_LOCAL_SSH_RESULTS = 'ssh_results.txt'
+PATH_REMOTE_SCRIPT_CIRCUS = '/home/node/circus/start.sh'
 # path to config template directory
 PATH_TMPL_CONF_LOCAL = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/src/main/resources/config-templates/'
 # files in config template directory
@@ -249,7 +307,10 @@ SSH_USER = 'node'
 TIMEOUT_POLL = 200
 # initial cluster
 #nodes = genNodes('127.0.0', 1, PORT)
-nodes = [ CircusNode(1, '192.168.56.101', PORT) ]
+nodes = [ CircusNode(1, '192.168.56.101', PORT),
+CircusNode(2, '192.168.56.102', PORT),
+CircusNode(3, '192.168.56.103', PORT),
+CircusNode(4, '192.168.56.104', PORT) ]
 # init with auto-update
 man = CircusMan(nodes)
 man.start()
@@ -265,7 +326,11 @@ try:
     # handle command
     c = man.getController()
     if not c is None:
-      if cmd == 'start':
+      if cmd == 'upload':
+        c.upload()
+      elif cmd == 'init':
+        c.startCircus()
+      elif cmd == 'start':
         if len(args) == 0:
           args.append(None)
         c.start(args[0])
