@@ -11,10 +11,8 @@ import zmq
 from django.template import Template, Context
 from django.conf import settings
 settings.configure()
-# pip install parallel-ssh
-from pssh import ParallelSSHClient
-import paramiko
-import getpass
+import StringIO
+import csv
 
 class SshClient:
   def __init__(self):
@@ -38,8 +36,13 @@ class SshClient:
       '-c', pathLocal,
       '-D', pathRemote
     ]
-    return subprocess.check_output(scpArgs)
-
+    result = subprocess.check_output(scpArgs)
+    f = StringIO.StringIO(result)
+    reader = csv.reader(f, delimiter=',')
+    for row in reader:
+      if len(row) != 5 or row[1] != 'SUCCESS' or row[4].startswith('[Errno'):
+       print 'failed to copy "' + pathLocal + '" @ ' + row[0]
+       
 class CircusController:
   def __init__(self):
     self.nodes = []
@@ -76,24 +79,10 @@ class CircusController:
     self.nodeAddresses.append(node.address)
     node.connect(self.context)
   
-  def getSshKey(self):
-    if self.key is None:
-      ssh_pw = getpass.getpass('(optional) unlock your SSH key:')
-      self.key = paramiko.RSAKey.from_private_key_file(PATH_SSH_KEY,password=ssh_pw)
-    return self.key
-  
-  def getSshClient(self):
-    cluster = []
-    for node in self.nodes:
-      cluster.append(node.address)
-    return ParallelSSHClient(hosts=cluster, user=SSH_USER, pkey=self.getSshKey())
-  
   def startCircus(self):
     client = SshClient()
     # upload configure command
-    client.doScp([
-      
-    ])
+    client.doScp('configure.py', '/home/node/circus/')
     client.doSsh([
       '/home/node/circus/start.sh'
     ])
@@ -309,8 +298,7 @@ TIMEOUT_POLL = 200
 #nodes = genNodes('127.0.0', 1, PORT)
 nodes = [ CircusNode(1, '192.168.56.101', PORT),
 CircusNode(2, '192.168.56.102', PORT),
-CircusNode(3, '192.168.56.103', PORT),
-CircusNode(4, '192.168.56.104', PORT) ]
+CircusNode(3, '192.168.56.103', PORT) ]
 # init with auto-update
 man = CircusMan(nodes)
 man.start()
