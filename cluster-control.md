@@ -31,18 +31,23 @@ Circus allows to define own commands and we will define a `configure` command th
 will bring you into the controller console.
 
 #### Start Circus
-You can start a Circus node using the following command. It uploads the `configure` command and then executes the startup script located in `/home/node/circus/start.sh` via SSH.
+You can start a Circus node using the following command. It uploads the `configure` command and then executes the startup script located in `/home/node/circus/start.sh` via parallel SSH.
 
     $ >startCircus
 
 Please note that the command does not wait for Circus to start up. It returns immediately after executing the script. You can watch the status of the node in the status HTML file generated.
 
 #### Restart Circus
-You can restart a Circus node using the following command. It uploads the `configure` command and then executes the restart script located in `/home/node/circus/restart.sh` via SSH.
+You can restart a Circus node using the following command. It uploads the `configure` command and then executes the restart script located in `/home/node/circus/restart.sh` via parallel SSH.
 
     $ >restartCircus
 
 Please note that the command does not wait for Circus to shutdown or start up. It returns immediately after executing the script. You can watch the status of the node in the status HTML file generated.
+
+#### Upload configuration file templates
+If you made changes to the configuration file templates, e.g. updated a port that will effect all nodes, you can upload the templates again via parallel SSH.
+
+    $ >upload
 
 #### Start watchers
 
