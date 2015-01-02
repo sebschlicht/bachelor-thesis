@@ -53,7 +53,7 @@ class CircusController:
     self.connected = False
     self.context = zmq.Context()
     self.key = None
-    with open(PATH_HTML_TMPL, 'r') as templateFile:
+    with open(PATH_LOCAL_TMPL_HTML, 'r') as templateFile:
       self.template = Template(templateFile.read())
   
   def disconnect(self):
@@ -84,24 +84,24 @@ class CircusController:
   def startCircus(self):
     # upload configure command, start Circus
     client = SshClient()
-    client.doScp('configure.py', '/home/node/circus/')
+    client.doScp('configure.py', PATH_REMOTE_WORKING)
     client.doSsh([
-      '/home/node/circus/start.sh'
+      PATH_REMOTE_WORKING + 'start.sh'
     ])
   
   def restartCircus(self):
     # upload configure command, stop and restart Circus
     client = SshClient()
-    client.doScp('configure.py', '/home/node/circus/')
+    client.doScp('configure.py', PATH_REMOTE_WORKING)
     client.doSsh([
-      '/home/node/circus/restart.sh &'
+      PATH_REMOTE_WORKING + 'restart.sh &'
     ])
   
   def upload(self):
     # update configuration file templates via parallel SSH
     client = SshClient()
-    for f in PATH_TMPL_CONF_FILES:
-      client.doScp(PATH_TMPL_CONF_LOCAL + f, PATH_TMPL_CONF_REMOTE)
+    for f in FILENAME_CONF:
+      client.doScp(PATH_LOCAL_TMPL_CONF + f, PATH_REMOTE_TMPL_CONF)
   
   def configure(self):
     self.isBusy = True
@@ -127,7 +127,7 @@ class CircusController:
     # build content object and fill template
     content = {'node_list': node_list}
     htmlContent = self.template.render(Context(content))
-    with open(PATH_HTML, 'w') as htmlFile:
+    with open(PATH_LOCAL_HTML, 'w') as htmlFile:
       htmlFile.write(htmlContent)
   
   def start(self, name):
@@ -284,28 +284,33 @@ def genNodes(network, numNodes, port):
     i = i+1
   return nodes
 
-# config
+"""
+config section
+"""
 INTERVAL_UPDATE = 1
-PATH_HTML = '/var/www/circusMan/index.html'
-PATH_HTML_TMPL = '../resources/tmpl_list.html'
+PORT = 5555
+TIMEOUT_POLL = 200
+# HTML file paths (node status overview)
+PATH_LOCAL_HTML = '/var/www/circusMan/index.html'
+PATH_LOCAL_TMPL_HTML = '../resources/tmpl_list.html'
+# SSH options
 PATH_SSH_KEY = os.path.expanduser('~') + '/.ssh/id_rsa'
-
+SSH_USER = 'node'
 PATH_LOCAL_SSH_NODES = '/tmp/sshpt-hosts'
 PATH_LOCAL_SSH_RESULTS = 'ssh_results.txt'
-PATH_REMOTE_SCRIPT_CIRCUS = '/home/node/circus/start.sh'
-# path to config template directory
-PATH_TMPL_CONF_LOCAL = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/src/main/resources/config-templates/'
+# remote working directory containing command/scripts
+PATH_REMOTE_WORKING = '/home/' + SSH_USER + '/circus/'
+# path to config template directories
+PATH_LOCAL_TMPL_CONF = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/src/main/resources/config-templates/'
+PATH_REMOTE_TMPL_CONF = '/usr/local/etc/templates/'
 # files in config template directory
-PATH_TMPL_CONF_FILES = [
+FILENAME_CONF = [
   'neo4j.properties.tmpl',
   'neo4j-server.properties.tmpl',
   'cassandra-cluster.yaml.tmpl',
   'rexster-cassandra-cluster.xml.tmpl'
 ]
-PATH_TMPL_CONF_REMOTE = '/usr/local/etc/templates/'
-PORT = 5555
-SSH_USER = 'node'
-TIMEOUT_POLL = 200
+
 # initial cluster
 #nodes = genNodes('127.0.0', 1, PORT)
 nodes = [
