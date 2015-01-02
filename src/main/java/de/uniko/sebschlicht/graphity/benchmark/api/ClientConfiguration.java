@@ -14,13 +14,9 @@ public class ClientConfiguration {
 
     private RequestComposition requests;
 
-    private String targetAddress;
+    private String targetEndpoint;
 
     private TargetType targetType;
-
-    private int portNeo4j;
-
-    private int portTitan;
 
     /**
      * Creates a transferable benchmark client configuration.
@@ -31,12 +27,8 @@ public class ClientConfiguration {
      *            number of threads per client
      * @param requestComposition
      *            request composition
-     * @param targetAddress
-     *            IP address of the target cluster
-     * @param portNeo4j
-     *            HTTP port Neo4j web service is listening at
-     * @param portTitan
-     *            HTTP port Rexster is listening at
+     * @param targetEndpoint
+     *            endpoint of the target cluster
      */
     public ClientConfiguration(
             long idStart,
@@ -45,7 +37,7 @@ public class ClientConfiguration {
             int maxThroughput,
             int numThreads,
             RequestComposition requestComposition,
-            String targetAddress,
+            String targetEndpoint,
             TargetType targetType,
             int portNeo4j,
             int portTitan) {
@@ -55,10 +47,9 @@ public class ClientConfiguration {
         this.maxThroughput = maxThroughput;
         this.numThreads = numThreads;
         requests = requestComposition;
-        this.targetAddress = targetAddress;
         this.targetType = targetType;
-        this.portNeo4j = portNeo4j;
-        this.portTitan = portTitan;
+        int port = (targetType == TargetType.NEO4J) ? portNeo4j : portTitan;
+        this.targetEndpoint = targetEndpoint + ':' + port;
     }
 
     /**
@@ -101,21 +92,13 @@ public class ClientConfiguration {
     }
 
     /**
-     * @return IP address of the target cluster
+     * @return endpoint of the target cluster
      */
     public String getTargetEndpoint() {
-        return targetAddress;
+        return targetEndpoint;
     }
 
     public TargetType getTargetType() {
         return targetType;
-    }
-
-    public int getPortNeo4j() {
-        return portNeo4j;
-    }
-
-    public int getPortTitan() {
-        return portTitan;
     }
 }

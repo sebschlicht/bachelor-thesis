@@ -49,8 +49,9 @@ public class Neo4jClient extends AbstractBenchmarkClient {
                             .type(MediaType.APPLICATION_JSON)
                             .entity(jsonString).post(ClientResponse.class);
             String responseMessage = response.getEntity(String.class);
+            System.out.println(responseMessage);
             // TODO: handle result
-            return parseBoolean(responseMessage) || true;
+            return parseBoolean(responseMessage);
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
                     .error("FOLLOW: client thread failed due to HTTP issue:");
@@ -123,7 +124,7 @@ public class Neo4jClient extends AbstractBenchmarkClient {
                             .entity(jsonString).post(ClientResponse.class);
             String responseMessage = response.getEntity(String.class);
             // TODO: handle result
-            return parseBoolean(responseMessage) || true;
+            return parseBoolean(responseMessage);
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
                     .error("UNFOLLOW: client thread failed due to HTTP issue");
