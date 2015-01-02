@@ -42,6 +42,8 @@ class SshClient:
     for row in reader:
       if len(row) != 5 or row[1] != 'SUCCESS' or row[4].startswith('[Errno'):
        print 'failed to copy "' + pathLocal + '" @ ' + row[0]
+       return False
+    return True
        
 class CircusController:
   def __init__(self):
@@ -70,7 +72,7 @@ class CircusController:
     for node in nodes:
       self.addNode(node)
     self.connected = True
-    with open(PATH_LOCAL_NODES, 'w') as fNodeAddresses:
+    with open(PATH_LOCAL_SSH_NODES, 'w') as fNodeAddresses:
       for nodeAddress in self.nodeAddresses:
         fNodeAddresses.write(nodeAddress + '\n')
   
@@ -80,17 +82,13 @@ class CircusController:
     node.connect(self.context)
   
   def startCircus(self):
+    # upload configure command, start Circus
     client = SshClient()
-    # upload configure command
     client.doScp('configure.py', '/home/node/circus/')
     client.doSsh([
       '/home/node/circus/start.sh'
     ])
     
-  def restartCircus(self):
-    #TODO stop and restart Circus via parallel SSH
-    return
-  
   def upload(self):
     # update configuration file templates via parallel SSH
     client = SshClient()
@@ -173,7 +171,13 @@ class CircusNode:
       reply = False
     self.sending = False
     return reply
-    
+  
+  def stopCircus(self):
+    cmdStopCircus = {
+      'command': 'quit'
+    }
+    self.sendJson(cmdStopCircus)
+  
   def getStats(self):
     stats = self.sendJson({"command":"stats"})
     if stats:
@@ -216,7 +220,8 @@ class CircusNode:
       'properties': {
         'address': self.address,
         'cluster': cluster,
-        'identifier': self.identifier
+        'identifier': self.identifier,
+        'isMaster': (self.identifier == 1)
       }
     }
     print self.sendJson(cmdConfigure)
@@ -296,9 +301,9 @@ SSH_USER = 'node'
 TIMEOUT_POLL = 200
 # initial cluster
 #nodes = genNodes('127.0.0', 1, PORT)
-nodes = [ CircusNode(1, '192.168.56.101', PORT),
-CircusNode(2, '192.168.56.102', PORT),
-CircusNode(3, '192.168.56.103', PORT) ]
+nodes = [
+  CircusNode(1, '192.168.56.101', PORT)
+]
 # init with auto-update
 man = CircusMan(nodes)
 man.start()

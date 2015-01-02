@@ -6,7 +6,7 @@ from circus.exc import ArgumentError, MessageError
 PORT_NEO4J = 5001
 
 # paths to configuration file templates
-PATH_TMPL = '/home/sebschlicht/git/sebschlicht/graphity-benchmark/src/main/resources/'
+PATH_TMPL = '/usr/local/etc/templates/'
 PATH_TMPL_NEO4J_PROP = PATH_TMPL + 'neo4j.properties.tmpl'
 PATH_TMPL_NEO4J_SERVER = PATH_TMPL + 'neo4j-server.properties.tmpl'
 PATH_TMPL_TITAN_CASSANDRA = PATH_TMPL + 'cassandra-cluster.yaml.tmpl'
@@ -24,6 +24,7 @@ PATH_CONF_TITAN_REXSTER = PATH_CONF_TITAN + 'rexster-cassandra-cluster.xml'
 OPT_ADDRESS = 'address'
 OPT_CLUSTER = 'cluster'
 OPT_IDENTIFIER = 'identifier'
+OPT_IS_MASTER = 'isMaster'
 
 class Configure(Command):
   """
@@ -39,7 +40,8 @@ class Configure(Command):
   options = [
     ('', OPT_ADDRESS, None, 'IP address of the cluster node'),
     ('', OPT_CLUSTER, None, 'IP addresses of all cluster nodes'),
-    ('', OPT_IDENTIFIER, None, 'unique node identifier')
+    ('', OPT_IDENTIFIER, None, 'unique node identifier'),
+    ('', OPT_IS_MASTER, True, 'determines if node can be elected to master by Neo4j')
   ]
   
   def execute(self, arbiter, props):
@@ -81,16 +83,20 @@ class Configure(Command):
         fDestination.write(t.substitute(args).strip())
   
   def configureNeo4j(self, props):
+    print 'neo4j'
     endpoints = []
     for node in props[OPT_CLUSTER]:
       endpoints.append(node + ':' + str(PORT_NEO4J))
     endpoints = ','.join(endpoints)
+    print endpoints
       
     self.writeConfig(PATH_TMPL_NEO4J_PROP, PATH_CONF_NEO4J_PROP, {
       'address': props[OPT_ADDRESS],
       'identifier': props[OPT_IDENTIFIER],
-      'initial_hosts': endpoints
+      'initial_hosts': endpoints,
+      'slave_only': not props[OPT_IS_MASTER]
     })
+    print 'written'
     self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, {
     })
   
