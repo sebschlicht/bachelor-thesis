@@ -23,6 +23,10 @@ public class MasterConfiguration extends Config {
 
     public String targetType;
 
+    public int portNeo4j;
+
+    public int portTitan;
+
     private TargetType _targetType;
 
     public long id_start;
@@ -55,7 +59,7 @@ public class MasterConfiguration extends Config {
             }
             if (targetAddress.equals("")) {
                 throw new IllegalArgumentException(
-                        "target cluster address has to specified");
+                        "target cluster endpoint has to specified");
             }
             _targetType = TargetType.fromString(targetType);
             if (id_start > id_end) {

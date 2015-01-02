@@ -105,7 +105,8 @@ public class SingleClient {
                 new ClientConfiguration(baseConfig.id_start, baseConfig.id_end,
                         baseConfig.feed_length, baseConfig.maxThroughput,
                         baseConfig.numThreads, requestComposition,
-                        baseConfig.targetAddress, baseConfig.getTargetType());
+                        baseConfig.targetAddress, baseConfig.getTargetType(),
+                        baseConfig.portNeo4j, baseConfig.portTitan);
 
         // create client threads tasks
         List<BenchmarkClientTask> threadTasks =
@@ -119,6 +120,7 @@ public class SingleClient {
             }
             threadTasks.add(new BenchmarkClientTask(this, benchmarkClient));
         }
+        System.out.println("will now attack " + baseConfig.targetAddress);
 
         // start client threads
         threadHandler = new ThreadHandler(threadTasks);

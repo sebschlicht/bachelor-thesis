@@ -53,7 +53,8 @@ public class Neo4jClient extends AbstractBenchmarkClient {
             return parseBoolean(responseMessage) || true;
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
-                    .error("FOLLOW: client thread failed due to HTTP issue");
+                    .error("FOLLOW: client thread failed due to HTTP issue:");
+            SingleClient.LOG.error(e.getMessage());
             throw new IllegalStateException(
                     "FOLLOW: client thread failed due to HTTP issue");
         } finally {
