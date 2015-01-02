@@ -153,7 +153,8 @@ public class SingleClient {
 
                 case POST:
                     return new RequestPost(idUser,
-                            RandomStringUtils.random(config.getFeedLength()));
+                            RandomStringUtils.randomAlphanumeric(config
+                                    .getFeedLength()));
 
                 case FOLLOW:
                     int iBucket = RANDOM.nextInt(propabilities.lastKey());

@@ -7,6 +7,7 @@ import subprocess
 from threading import Event, Thread
 import StringIO
 import csv
+import ntpath
 # pip install circus
 import zmq
 # apt-get install python-django
@@ -44,6 +45,31 @@ class SshClient:
        print 'failed to copy "' + pathLocal + '" @ ' + row[0]
        return False
     return True
+  
+  def doScpMulti(self, pathsLocal, pathsRemote):
+    tarArgs = [
+      'zip',
+      '/tmp/circusman-scp.zip'
+    ]
+    for f in pathsLocal:
+      tarArgs.append(f)
+    if not subprocess.check_output(tarArgs):
+      return False
+    
+    self.doScp('/tmp/circusman-scp.zip', '/tmp/')
+    unzipArgs = [
+      'unzip -j /tmp/circusman-scp.zip -d /tmp/circusman-scp',
+      'rm /tmp/circusman-scp.zip'
+    ]
+    i = 0
+    for f in pathsLocal:
+      parent, filename = ntpath.split(f)
+      unzipArgs.append('cp /tmp/circusman-scp/' + filename + ' ' + pathsRemote[i])
+      i = i+1
+    unzipArgs.append('rm -rf /tmp/circusman-scp')
+    if not self.doSsh(unzipArgs):
+      return False
+    return True   
 
 class CircusController:
   def __init__(self):
@@ -83,25 +109,45 @@ class CircusController:
   
   def startCircus(self):
     # upload configure command, start Circus
+    pathsLocal = [
+      'configure.py',
+      PATH_LOCAL_NEO4J_PLUGIN
+    ]
+    pathsRemote = [
+      PATH_REMOTE_WORKING + 'configure.py',
+      PATH_REMOTE_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar'
+    ]
     client = SshClient()
-    client.doScp('configure.py', PATH_REMOTE_WORKING)
+    client.doScpMulti(pathsLocal, pathsRemote)
     client.doSsh([
       PATH_REMOTE_WORKING + 'start.sh'
     ])
   
   def restartCircus(self):
     # upload configure command, stop and restart Circus
+    pathsLocal = [
+      'configure.py',
+      PATH_LOCAL_NEO4J_PLUGIN
+    ]
+    pathsRemote = [
+      PATH_REMOTE_WORKING + 'configure.py',
+      PATH_REMOTE_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar'
+    ]
     client = SshClient()
-    client.doScp('configure.py', PATH_REMOTE_WORKING)
+    client.doScpMulti(pathsLocal, pathsRemote)
     client.doSsh([
       PATH_REMOTE_WORKING + 'restart.sh &'
     ])
   
   def upload(self):
-    # update configuration file templates via parallel SSH
+    pathsLocal = []
+    pathsRemote = []
     client = SshClient()
+    # upload configuration file templates
     for f in FILENAME_CONF:
-      client.doScp(PATH_LOCAL_TMPL_CONF + f, PATH_REMOTE_TMPL_CONF)
+      pathsLocal.append(PATH_LOCAL_TMPL_CONF + f)
+      pathsRemote.append(PATH_REMOTE_TMPL_CONF + f)
+    client.doScpMulti(pathsLocal, pathsRemote)
   
   def configure(self):
     self.isBusy = True
@@ -300,6 +346,7 @@ PATH_LOCAL_SSH_NODES = '/tmp/sshpt-hosts'
 PATH_LOCAL_SSH_RESULTS = 'ssh_results.txt'
 # remote working directory containing command/scripts
 PATH_REMOTE_WORKING = '/home/' + SSH_USER + '/circus/'
+PATH_LOCAL_NEO4J_PLUGIN = '/media/ubuntu-prog/git/sebschlicht/neo4j-graphity-baseline-server-plugin/target/uber-neo4j-graphity-baseline-server-plugin-0.0.1-SNAPSHOT.jar'
 # path to config template directories
 PATH_LOCAL_TMPL_CONF = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/src/main/resources/config-templates/'
 PATH_REMOTE_TMPL_CONF = '/usr/local/etc/templates/'
