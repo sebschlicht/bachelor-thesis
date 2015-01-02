@@ -46,14 +46,14 @@ class SshClient:
        return False
     return True
   
-  def doScpMulti(self, pathsLocal, pathsRemote):
-    tarArgs = [
+  def doScpMulti(self, files):
+    zipArgs = [
       'zip',
       '/tmp/circusman-scp.zip'
     ]
-    for f in pathsLocal:
-      tarArgs.append(f)
-    if not subprocess.check_output(tarArgs):
+    for f in files:
+      zipArgs.append(f[0])
+    if not subprocess.check_output(zipArgs):
       return False
     
     self.doScp('/tmp/circusman-scp.zip', '/tmp/')
@@ -61,15 +61,13 @@ class SshClient:
       'unzip -j /tmp/circusman-scp.zip -d /tmp/circusman-scp',
       'rm /tmp/circusman-scp.zip'
     ]
-    i = 0
-    for f in pathsLocal:
-      parent, filename = ntpath.split(f)
-      unzipArgs.append('cp /tmp/circusman-scp/' + filename + ' ' + pathsRemote[i])
-      i = i+1
+    for f in files:
+      parent, filename = ntpath.split(f[0])
+      unzipArgs.append('cp /tmp/circusman-scp/' + filename + ' ' + f[1])
     unzipArgs.append('rm -rf /tmp/circusman-scp')
     if not self.doSsh(unzipArgs):
       return False
-    return True   
+    return True
 
 class CircusController:
   def __init__(self):
@@ -109,45 +107,35 @@ class CircusController:
   
   def startCircus(self):
     # upload configure command, start Circus
-    pathsLocal = [
-      'configure.py',
-      PATH_LOCAL_NEO4J_PLUGIN
-    ]
-    pathsRemote = [
-      PATH_REMOTE_WORKING + 'configure.py',
-      PATH_REMOTE_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar'
+    files = [
+      ('configure.py', PATH_REMOTE_WORKING + 'configure.py'),
+      (PATH_LOCAL_NEO4J_PLUGIN, PATH_REMOTE_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar')
     ]
     client = SshClient()
-    client.doScpMulti(pathsLocal, pathsRemote)
+    client.doScpMulti(files)
     client.doSsh([
       PATH_REMOTE_WORKING + 'start.sh'
     ])
   
   def restartCircus(self):
     # upload configure command, stop and restart Circus
-    pathsLocal = [
-      'configure.py',
-      PATH_LOCAL_NEO4J_PLUGIN
-    ]
-    pathsRemote = [
-      PATH_REMOTE_WORKING + 'configure.py',
-      PATH_REMOTE_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar'
+    files = [
+      ('configure.py', PATH_REMOTE_WORKING + 'configure.py'),
+      (PATH_LOCAL_NEO4J_PLUGIN, PATH_REMOTE_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar')
     ]
     client = SshClient()
-    client.doScpMulti(pathsLocal, pathsRemote)
+    client.doScpMulti(files)
     client.doSsh([
       PATH_REMOTE_WORKING + 'restart.sh &'
     ])
   
   def upload(self):
-    pathsLocal = []
-    pathsRemote = []
-    client = SshClient()
+    files = []
     # upload configuration file templates
     for f in FILENAME_CONF:
-      pathsLocal.append(PATH_LOCAL_TMPL_CONF + f)
-      pathsRemote.append(PATH_REMOTE_TMPL_CONF + f)
-    client.doScpMulti(pathsLocal, pathsRemote)
+      files.append((PATH_LOCAL_TMPL_CONF + f, PATH_REMOTE_TMPL_CONF + f))
+    client = SshClient()
+    client.doScpMulti(files)
   
   def configure(self):
     self.isBusy = True
