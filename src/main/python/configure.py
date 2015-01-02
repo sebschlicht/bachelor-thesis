@@ -48,7 +48,7 @@ class Configure(Command):
     # execute command
     self.configureNeo4j(props)
     self.configureTitan(props)
-    return { 'test': False }
+    return { 'success': True }
   
   def validate(self, props):
     # validate arguments, can changes props
@@ -83,12 +83,10 @@ class Configure(Command):
         fDestination.write(t.substitute(args).strip())
   
   def configureNeo4j(self, props):
-    print 'neo4j'
     endpoints = []
     for node in props[OPT_CLUSTER]:
       endpoints.append(node + ':' + str(PORT_NEO4J))
     endpoints = ','.join(endpoints)
-    print endpoints
       
     self.writeConfig(PATH_TMPL_NEO4J_PROP, PATH_CONF_NEO4J_PROP, {
       'address': props[OPT_ADDRESS],
@@ -96,15 +94,18 @@ class Configure(Command):
       'initial_hosts': endpoints,
       'slave_only': not props[OPT_IS_MASTER]
     })
-    print 'written'
     self.writeConfig(PATH_TMPL_NEO4J_SERVER, PATH_CONF_NEO4J_SERVER, {
     })
   
   def configureTitan(self, props):
     cluster = props[OPT_CLUSTER]
+    # seeds node: first node and each i%5==0 ([5], [10], [15] aso.)
     seeds = [ cluster[0] ]
-    if len(cluster) > 3:
-      seeds.append(cluster[-1])
+    n = len(cluster)
+    i = 5
+    while i < n:
+      seeds.append(cluster[i])
+      i = i+5
     seeds = ','.join(seeds)
     
     self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, {

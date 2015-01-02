@@ -161,8 +161,8 @@ class CircusNode:
   def close(self):
     self.socket.close(0)
     
-  def sendJson(self, json):
-    self.socket.send_json(json)
+  def sendJson(self, jsonValue):
+    self.socket.send_json(jsonValue)
     self.sending = True
     socks = dict(self.poller.poll(TIMEOUT_POLL))
     if self.socket in socks and socks[self.socket] == zmq.POLLIN:
@@ -224,7 +224,12 @@ class CircusNode:
         'isMaster': (self.identifier == 1)
       }
     }
-    print self.sendJson(cmdConfigure)
+    reply = self.sendJson(cmdConfigure)
+    if not reply:
+      print self.address + ' is not responding'
+    elif not 'success' in reply:
+      print 'failed to configure ' + self.address + ':'
+      print reply
 
 class CircusMan:
   def __init__(self, nodes):
@@ -302,7 +307,8 @@ TIMEOUT_POLL = 200
 # initial cluster
 #nodes = genNodes('127.0.0', 1, PORT)
 nodes = [
-  CircusNode(1, '192.168.56.101', PORT)
+  CircusNode(1, '192.168.56.101', PORT),
+  CircusNode(2, '192.168.56.102', PORT)
 ]
 # init with auto-update
 man = CircusMan(nodes)
