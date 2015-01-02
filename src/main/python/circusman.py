@@ -5,14 +5,14 @@ from os.path import isfile, join
 import json
 import subprocess
 from threading import Event, Thread
+import StringIO
+import csv
 # pip install circus
 import zmq
 # apt-get install python-django
 from django.template import Template, Context
 from django.conf import settings
 settings.configure()
-import StringIO
-import csv
 
 class SshClient:
   def __init__(self):
@@ -87,6 +87,14 @@ class CircusController:
     client.doScp('configure.py', '/home/node/circus/')
     client.doSsh([
       '/home/node/circus/start.sh'
+    ])
+  
+  def restartCircus(self):
+    # upload configure command, stop and restart Circus
+    client = SshClient()
+    client.doScp('configure.py', '/home/node/circus/')
+    client.doSsh([
+      '/home/node/circus/restart.sh &'
     ])
     
   def upload(self):
@@ -171,12 +179,6 @@ class CircusNode:
       reply = False
     self.sending = False
     return reply
-  
-  def stopCircus(self):
-    cmdStopCircus = {
-      'command': 'quit'
-    }
-    self.sendJson(cmdStopCircus)
   
   def getStats(self):
     stats = self.sendJson({"command":"stats"})
@@ -329,6 +331,10 @@ try:
         c.upload()
       elif cmd == 'init':
         c.startCircus()
+      elif cmd == 'restart':
+        man.stop()
+        c.restartCircus()
+        man.start()
       elif cmd == 'start':
         if len(args) == 0:
           args.append(None)
