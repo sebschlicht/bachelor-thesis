@@ -3,6 +3,7 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 import java.util.concurrent.Callable;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.BenchmarkResult;
+import de.uniko.sebschlicht.graphity.benchmark.api.RequestType;
 import de.uniko.sebschlicht.graphity.benchmark.client.SingleClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
@@ -41,6 +42,10 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
         RequestPost requestPost;
         RequestUnfollow requestUnfollow;
 
+        long msStarted = System.currentTimeMillis();
+        long msLastCheckpoint = 0;
+        long[] numRequests = new long[4];
+
         while (!isStopped()) {
             request = client.nextRequest();
             // TODO: start measurement
@@ -71,8 +76,20 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
                             requestUnfollow.getIdFollowed());
                     break;
             }
-            long duration = System.currentTimeMillis() - msStart;
-            SingleClient.LOG.debug(request.getType() + ": " + duration);
+            long msCrr = System.currentTimeMillis();
+            long duration = msCrr - msStart;
+            numRequests[request.getType().getId()] += 1;
+            //            SingleClient.LOG.debug(request.getType() + ": " + duration);
+
+            if (msCrr > msLastCheckpoint + 10000) {
+                SingleClient.LOG.debug("progress after " + (msCrr - msStarted)
+                        + "ms");
+                for (int i = 0; i < 4; ++i) {
+                    SingleClient.LOG.debug(RequestType.getTypeById(i) + ": "
+                            + numRequests[i]);
+                }
+                msLastCheckpoint = msCrr;
+            }
 
             // TODO: stop and save measurement
         }

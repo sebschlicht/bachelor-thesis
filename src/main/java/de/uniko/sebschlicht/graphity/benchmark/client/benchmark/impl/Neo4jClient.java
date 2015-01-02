@@ -49,7 +49,6 @@ public class Neo4jClient extends AbstractBenchmarkClient {
                             .type(MediaType.APPLICATION_JSON)
                             .entity(jsonString).post(ClientResponse.class);
             String responseMessage = response.getEntity(String.class);
-            System.out.println(responseMessage);
             // TODO: handle result
             return parseBoolean(responseMessage);
         } catch (ClientHandlerException e) {// connection failed
