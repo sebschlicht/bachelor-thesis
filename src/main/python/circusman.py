@@ -23,7 +23,7 @@ class SshClient:
       '-s',
       '-U', self.username,
       '-P', SSH_USER,
-      '-f', PATH_LOCAL_NODES,
+      '-f', PATH_LOCAL_SSH_NODES,
       '-o', PATH_LOCAL_SSH_RESULTS
     ]
   
@@ -278,7 +278,7 @@ PATH_HTML = '/var/www/circusMan/index.html'
 PATH_HTML_TMPL = '../resources/tmpl_list.html'
 PATH_SSH_KEY = os.path.expanduser('~') + '/.ssh/id_rsa'
 
-PATH_LOCAL_NODES = 'hosts'
+PATH_LOCAL_SSH_NODES = '/tmp/sshpt-hosts'
 PATH_LOCAL_SSH_RESULTS = 'ssh_results.txt'
 PATH_REMOTE_SCRIPT_CIRCUS = '/home/node/circus/start.sh'
 # path to config template directory
