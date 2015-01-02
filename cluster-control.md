@@ -30,17 +30,31 @@ Circus allows to define own commands and we will define a `configure` command th
 
 will bring you into the controller console.
 
+#### Start Circus
+You can start a Circus node using the following command. It uploads the `configure` command and then executes the startup script located in `/home/node/circus/start.sh` via SSH.
+
+    $ >startCircus
+
+Please note that the command does not wait for Circus to start up. It returns immediately after executing the script. You can watch the status of the node in the status HTML file generated.
+
+#### Restart Circus
+You can restart a Circus node using the following command. It uploads the `configure` command and then executes the restart script located in `/home/node/circus/restart.sh` via SSH.
+
+    $ >restartCircus
+
+Please note that the command does not wait for Circus to shutdown or start up. It returns immediately after executing the script. You can watch the status of the node in the status HTML file generated.
+
 #### Start watchers
 
     $ >start [watcher_name]
 
-Please note that the script does not wait for the watcher startup. It returns immediately after getting a response from the Circus node. You can watch the status of each watcher in the status HTML file generated.
+Please note that the command does not wait for the watcher startup. It returns immediately after getting a response from the Circus node. You can watch the status of each watcher in the status HTML file generated.
 
 #### Stop watchers
 
     $ >stop [watcher_name]
 
-Please note that the script does not wait for the watcher shutdown. It returns immediately after getting a response from the Circus node. You can watch the status of each watcher in the status HTML file generated.
+Please note that the command does not wait for the watcher shutdown. It returns immediately after getting a response from the Circus node. You can watch the status of each watcher in the status HTML file generated.
 
 #### Change the cluster range
 The default cluster contains your local machine only. You can change the cluster, e.g. when adding/removing nodes. Specify a network and the number of nodes.
@@ -97,9 +111,10 @@ To update the configuration of the cluster nodes we define a new `circus` comman
 but before executing the command on the node, the controller updates the configuration file templates via parallel SSH.
 
 Along with the command some information is sent to each node:
- * node identifier
- * node address
- * list containing addresses of all nodes
+ * node identifier `identifier`
+ * node address `address`
+ * Neo4j master election flag `isMaster`
+ * list containing addresses of all nodes `cluster`
 
 These information can be used in the configuration file creation process using the (updated) templates and thus we can
 * update the configuration when nodes were added/removed
@@ -112,7 +127,7 @@ To write the configuration files using templates you need to specify where the c
 
     ...
     # paths to configuration file templates
-    PATH_TMPL = '/home/sebschlicht/git/sebschlicht/graphity-benchmark/src/main/resources/'
+    PATH_TMPL = '/usr/local/etc/templates/'
     ...
     # paths to configuration files
     PATH_CONF_NEO4J = '/etc/neo4j/'
