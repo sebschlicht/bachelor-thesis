@@ -44,7 +44,7 @@ class SshClient:
        print 'failed to copy "' + pathLocal + '" @ ' + row[0]
        return False
     return True
-       
+
 class CircusController:
   def __init__(self):
     self.nodes = []
@@ -96,7 +96,7 @@ class CircusController:
     client.doSsh([
       '/home/node/circus/restart.sh &'
     ])
-    
+  
   def upload(self):
     # update configuration file templates via parallel SSH
     client = SshClient()
@@ -151,7 +151,7 @@ class CircusNode:
     self.isMaster = False
     if identifier == 1:
       self.isMaster = True
-    
+  
   def getDict(self):
     return {
       'address': self.address,
@@ -223,7 +223,7 @@ class CircusNode:
         'address': self.address,
         'cluster': cluster,
         'identifier': self.identifier,
-        'isMaster': (self.identifier == 1)
+        'isMaster': self.isMaster
       }
     }
     reply = self.sendJson(cmdConfigure)
@@ -329,9 +329,9 @@ try:
     if not c is None:
       if cmd == 'upload':
         c.upload()
-      elif cmd == 'init':
+      elif cmd == 'startCircus':
         c.startCircus()
-      elif cmd == 'restart':
+      elif cmd == 'restartCircus':
         man.stop()
         c.restartCircus()
         man.start()
@@ -339,12 +339,10 @@ try:
         if len(args) == 0:
           args.append(None)
         c.start(args[0])
-        c.update()
       elif cmd == 'stop':
         if len(args) == 0:
           args.append(None)
         c.stop(args[0])
-        c.update()
       elif cmd == 'cluster':
         man.stop()
         c.disconnect()
