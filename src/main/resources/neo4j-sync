@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function clean_up {
+  #TODO: stop Neo4j
+  echo 'cleaned up'
+  exit $1
+}
+trap clean_up SIGHUP SIGINT SIGTERM
+
+#TODO: start Neo4j and block until stopped
+while :
+  do
+    sleep 1
+done
+
+clean_up
+
