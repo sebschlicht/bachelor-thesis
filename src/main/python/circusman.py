@@ -105,35 +105,44 @@ class CircusController:
     self.nodeAddresses.append(node.address)
     node.connect(self.context)
   
-  def startCircus(self):
-    # upload configure command, start Circus
-    files = [
-      ('configure.py', PATH_REMOTE_WORKING + 'configure.py'),
-      (PATH_LOCAL_NEO4J_PLUGIN, PATH_REMOTE_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar')
+  def getResources(self):
+    return [
+      # remote scripts
+      (LOCAL_FILE_NEO4J_SCRIPT, REMOTE_FILE_NEO4J_SCRIPT),
+      # Circus command
+      (LOCAL_FILE_COMMAND_CONFIGURE, REMOTE_FILE_COMMAND_CONFIGURE),
+      # Graphity plugin/extension
+      (LOCAL_FILE_NEO4J_PLUGIN, REMOTE_FILE_NEO4J_PLUGIN)
     ]
+  
+  def startCircus(self):
+    # upload resources, start Circus
     client = SshClient()
-    client.doScpMulti(files)
+    client.doScpMulti(self.getResources())
     client.doSsh([
-      PATH_REMOTE_WORKING + 'start.sh'
+      REMOTE_DIR_WORKING + 'start.sh'
     ])
   
   def restartCircus(self):
-    # upload configure command, stop and restart Circus
-    files = [
-      ('configure.py', PATH_REMOTE_WORKING + 'configure.py'),
-      (PATH_LOCAL_NEO4J_PLUGIN, PATH_REMOTE_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar')
-    ]
+    # upload resources, stop and restart Circus
     client = SshClient()
-    client.doScpMulti(files)
+    client.doScpMulti(self.getResources())
     client.doSsh([
-      PATH_REMOTE_WORKING + 'restart.sh &'
+      REMOTE_DIR_WORKING + 'restart.sh &'
+    ])
+    
+  def reset(self, name):
+    # reset the data files of a watcher
+    client = SshClient()
+    client.doSsh([
+      REMOTE_DIR_WORKING + 'reset.sh'
     ])
   
   def upload(self):
     files = []
     # upload configuration file templates
-    for f in FILENAME_CONF:
-      files.append((PATH_LOCAL_TMPL_CONF + f, PATH_REMOTE_TMPL_CONF + f))
+    for filename in FILENAMES_CONFIG_TEMPLATES:
+      files.append((LOCAL_DIR_CONFIG_TEMPLATES + filename, REMOTE_DIR_CONFIG_TEMPLATES + filename))
     client = SshClient()
     client.doScpMulti(files)
   
@@ -332,25 +341,42 @@ PATH_SSH_KEY = os.path.expanduser('~') + '/.ssh/id_rsa'
 SSH_USER = 'node'
 PATH_LOCAL_SSH_NODES = '/tmp/sshpt-hosts'
 PATH_LOCAL_SSH_RESULTS = 'ssh_results.txt'
-# remote working directory containing command/scripts
-PATH_REMOTE_WORKING = '/home/' + SSH_USER + '/circus/'
-PATH_LOCAL_NEO4J_PLUGIN = '/media/ubuntu-prog/git/sebschlicht/neo4j-graphity-baseline-server-plugin/target/uber-neo4j-graphity-baseline-server-plugin-0.0.1-SNAPSHOT.jar'
-# path to config template directories
-PATH_LOCAL_TMPL_CONF = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/src/main/resources/config-templates/'
-PATH_REMOTE_TMPL_CONF = '/usr/local/etc/templates/'
-# files in config template directory
-FILENAME_CONF = [
+
+# base directories
+LOCAL_DIR_PROJECT = '/media/ubuntu-prog/git/sebschlicht/graphity-benchmark/'
+REMOTE_DIR_WORKING = '/home/' + SSH_USER + '/circus/'
+REMOTE_DIR_NEO4J = '/var/lib/neo4j/'
+REMOTE_DIR_TITAN = '/var/lib/titan/'
+REMOTE_DIR_CONFIG_TEMPLATES = '/usr/local/etc/templates/'
+
+# local paths
+LOCAL_DIR_RESOURCES = LOCAL_DIR_PROJECT + 'src/main/resources/'
+LOCAL_DIR_CONFIG_TEMPLATES = LOCAL_DIR_RESOURCES + 'config-templates/'
+LOCAL_FILE_COMMAND_CONFIGURE = LOCAL_DIR_PROJECT + 'src/main/python/configure.py'
+LOCAL_FILE_NEO4J_PLUGIN = LOCAL_DIR_RESOURCES + 'neo4j-plugin.jar'
+LOCAL_FILE_NEO4J_SCRIPT = LOCAL_DIR_RESOURCES + 'neo4j-circus'
+LOCAL_FILE_TITAN_EXTENSION = LOCAL_DIR_RESOURCES + 'titan-extension.jar'
+LOCAL_FILE_TITAN_SCRIPT = LOCAL_DIR_RESOURCES + 'titan-sync'
+
+FILENAMES_CONFIG_TEMPLATES = [
   'neo4j.properties.tmpl',
   'neo4j-server.properties.tmpl',
   'cassandra-cluster.yaml.tmpl',
   'rexster-cassandra-cluster.xml.tmpl'
 ]
 
+# remote paths
+REMOTE_FILE_COMMAND_CONFIGURE = REMOTE_DIR_WORKING + 'configure.py'
+REMOTE_FILE_NEO4J_PLUGIN = REMOTE_DIR_WORKING + 'graphity-plugin-neo4j-0.0.1-SNAPSHOT.jar'
+REMOTE_FILE_NEO4J_SCRIPT = REMOTE_DIR_NEO4J + 'bin/neo4j-circus'
+REMOTE_FILE_TITAN_PLUGIN = REMOTE_DIR_WORKING + 'graphity-extension-titan-0.0.1-SNAPSHOT.jar'
+REMOTE_FILE_TITAN_SCRIPT = REMOTE_DIR_TITAN + 'bin/titan-circus.sh'
+
 # initial cluster
 #nodes = genNodes('127.0.0', 1, PORT)
 nodes = [
-  CircusNode(1, '192.168.56.101', PORT),
-  CircusNode(2, '192.168.56.102', PORT)
+  CircusNode(1, '192.168.56.101', PORT)#,
+  #CircusNode(2, '192.168.56.102', PORT)
 ]
 # init with auto-update
 man = CircusMan(nodes)
