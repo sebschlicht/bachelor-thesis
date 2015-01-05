@@ -414,7 +414,7 @@ try:
           args.append(None)
         c.stop(args[0])
       elif cmd == 'reset':
-        choice = raw_input('Do you really want to delete all remote data? [y/n]').lower()
+        choice = raw_input('Do you really want to delete all remote data? [y/n] ').lower()
         if choice == 'y':
           c.reset()
         else:
