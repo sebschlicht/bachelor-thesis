@@ -107,7 +107,11 @@ class CircusController:
   
   def getResources(self):
     return [
-      # remote scripts
+      # remote shell scripts
+      (LOCAL_DIR_RESOURCES + 'start.sh', REMOTE_DIR_WORKING + 'start.sh'),
+      (LOCAL_DIR_RESOURCES + 'restart.sh', REMOTE_DIR_WORKING + 'restart.sh'),
+      (LOCAL_DIR_RESOURCES + 'reset.sh', REMOTE_DIR_WORKING + 'reset.sh'),
+      # remote service scripts
       (LOCAL_FILE_NEO4J_SCRIPT, REMOTE_FILE_NEO4J_SCRIPT),
       # Circus command
       (LOCAL_FILE_COMMAND_CONFIGURE, REMOTE_FILE_COMMAND_CONFIGURE),
