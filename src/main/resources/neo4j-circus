@@ -10,7 +10,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 ### END INIT INFO
-# Copyright (c) 2002-2014 "Neo Technology,"
+# Copyright (c) 2002-2015 "Neo Technology,Sebastian Schlicht"
 
 # Network Engine for Objects in Lund AB [http://neotechnology.com]
 #
@@ -28,6 +28,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# The changes made by Sebastian Schlicht make this script sychronous:
+# It will wait until Neo4j was stopped manually and will stop Neo4j on exit.
+# See function "clean_up".
 
 FRIENDLY_NAME="Neo4j Server"
 LAUNCHD_NAME="org.neo4j.server"
@@ -340,9 +344,6 @@ while getopts "u:h" opt; do
       ;;
   esac
 done
-
-# END{Neo4j section}
-# changes by Sebastian Schlicht:
 
 # stop Neo4j when exiting
 function clean_up {
