@@ -113,7 +113,9 @@ class CircusController:
       (LOCAL_DIR_RESOURCES + 'reset.sh', REMOTE_DIR_WORKING + 'reset.sh'),
       # remote service scripts
       (LOCAL_FILE_NEO4J_SCRIPT, REMOTE_FILE_NEO4J_SCRIPT),
-      # Circus command
+      (LOCAL_FILE_TITAN_SCRIPT, REMOTE_FILE_TITAN_SCRIPT),
+      # Circus config + command
+      (LOCAL_DIR_RESOURCES + 'circus.ini', REMOTE_DIR_WORKING + 'circus.ini'),
       (LOCAL_FILE_COMMAND_CONFIGURE, REMOTE_FILE_COMMAND_CONFIGURE),
       # Graphity plugin/extension
       (LOCAL_FILE_NEO4J_PLUGIN, REMOTE_FILE_NEO4J_PLUGIN)
@@ -360,7 +362,7 @@ LOCAL_FILE_COMMAND_CONFIGURE = LOCAL_DIR_PROJECT + 'src/main/python/configure.py
 LOCAL_FILE_NEO4J_PLUGIN = LOCAL_DIR_RESOURCES + 'neo4j-plugin.jar'
 LOCAL_FILE_NEO4J_SCRIPT = LOCAL_DIR_RESOURCES + 'neo4j-circus'
 LOCAL_FILE_TITAN_EXTENSION = LOCAL_DIR_RESOURCES + 'titan-extension.jar'
-LOCAL_FILE_TITAN_SCRIPT = LOCAL_DIR_RESOURCES + 'titan-sync'
+LOCAL_FILE_TITAN_SCRIPT = LOCAL_DIR_RESOURCES + 'titan-circus.sh'
 
 FILENAMES_CONFIG_TEMPLATES = [
   'neo4j.properties.tmpl',
