@@ -135,13 +135,6 @@ class CircusController:
       REMOTE_DIR_WORKING + 'restart.sh &'
     ])
     
-  def reset(self, name):
-    # reset the data files of a watcher
-    client = SshClient()
-    client.doSsh([
-      REMOTE_DIR_WORKING + 'reset.sh'
-    ])
-  
   def upload(self):
     files = []
     # upload configuration file templates
@@ -188,6 +181,13 @@ class CircusController:
     for node in self.nodes:
       node.stop(name)
     self.isBusy = False
+  
+  def reset(self):
+    # reset the data files of a watcher
+    client = SshClient()
+    client.doSsh([
+      REMOTE_DIR_WORKING + 'reset.sh'
+    ])
 
 class CircusNode:
   def __init__(self, identifier, address, port):
@@ -413,6 +413,12 @@ try:
         if len(args) == 0:
           args.append(None)
         c.stop(args[0])
+      elif cmd == 'reset':
+        choice = raw_input('Do you really want to delete all remote data? [y/n]').lower()
+        if choice == 'y':
+          c.reset()
+        else:
+          print 'Aborted.'
       elif cmd == 'cluster':
         man.stop()
         c.disconnect()
