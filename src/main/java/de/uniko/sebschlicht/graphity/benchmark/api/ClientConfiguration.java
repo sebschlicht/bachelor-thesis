@@ -14,21 +14,32 @@ public class ClientConfiguration {
 
     private RequestComposition requests;
 
-    private String targetEndpoint;
-
     private TargetType targetType;
+
+    private String targetEndpoint;
 
     /**
      * Creates a transferable benchmark client configuration.
      * 
+     * @param idStart
+     *            first user id handled
+     * @param idEnd
+     *            last user id handled
+     * @param lengthFeed
+     *            number of characters used in feeds created by request type
+     *            FEED
      * @param maxThroughput
      *            maximum number of requests per second per client
      * @param numThreads
      *            number of threads per client
      * @param requestComposition
      *            request composition
-     * @param targetEndpoint
-     *            endpoint of the target cluster
+     * @param targetType
+     *            target cluster type
+     * @param endpointNeo4j
+     *            endpoint for Neo4j cluster
+     * @param endpointTitan
+     *            endpoint for Titan cluster
      */
     public ClientConfiguration(
             long idStart,
@@ -37,10 +48,9 @@ public class ClientConfiguration {
             int maxThroughput,
             int numThreads,
             RequestComposition requestComposition,
-            String targetEndpoint,
             TargetType targetType,
-            int portNeo4j,
-            int portTitan) {
+            String endpointNeo4j,
+            String endpointTitan) {
         this.idStart = idStart;
         this.idEnd = idEnd;
         this.lengthFeed = lengthFeed;
@@ -48,8 +58,10 @@ public class ClientConfiguration {
         this.numThreads = numThreads;
         requests = requestComposition;
         this.targetType = targetType;
-        int port = (targetType == TargetType.NEO4J) ? portNeo4j : portTitan;
-        this.targetEndpoint = targetEndpoint + ':' + port;
+        targetEndpoint =
+                (targetType == TargetType.NEO4J)
+                        ? endpointNeo4j
+                        : endpointTitan;
     }
 
     /**
@@ -91,14 +103,14 @@ public class ClientConfiguration {
         return requests;
     }
 
+    public TargetType getTargetType() {
+        return targetType;
+    }
+
     /**
      * @return endpoint of the target cluster
      */
     public String getTargetEndpoint() {
         return targetEndpoint;
-    }
-
-    public TargetType getTargetType() {
-        return targetType;
     }
 }

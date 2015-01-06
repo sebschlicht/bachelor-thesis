@@ -28,6 +28,7 @@ import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.BenchmarkClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.BenchmarkClientTask;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.impl.Neo4jClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.impl.TitanClient;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
@@ -57,6 +58,8 @@ public class SingleClient {
     private Map<Long, List<Long>> subscriptions;
 
     private ThreadHandler threadHandler;
+
+    private ResultManager resultManager;
 
     public SingleClient() throws IOException {
         subscriptions = new HashMap<Long, List<Long>>();
@@ -105,12 +108,13 @@ public class SingleClient {
                 new ClientConfiguration(baseConfig.id_start, baseConfig.id_end,
                         baseConfig.feed_length, baseConfig.maxThroughput,
                         baseConfig.numThreads, requestComposition,
-                        baseConfig.targetAddress, baseConfig.getTargetType(),
-                        baseConfig.portNeo4j, baseConfig.portTitan);
+                        baseConfig.getTargetType(), baseConfig.endpointNeo4j,
+                        baseConfig.endpointTitan);
 
         // create client threads tasks
         List<BenchmarkClientTask> threadTasks =
                 new LinkedList<BenchmarkClientTask>();
+        resultManager = new ResultManager();
         for (int i = 0; i < config.getNumThreads(); ++i) {
             BenchmarkClient benchmarkClient;
             if (config.getTargetType() == TargetType.NEO4J) {
@@ -118,13 +122,15 @@ public class SingleClient {
             } else {
                 benchmarkClient = new TitanClient(config);
             }
-            threadTasks.add(new BenchmarkClientTask(this, benchmarkClient));
+            threadTasks.add(new BenchmarkClientTask(this, resultManager,
+                    benchmarkClient));
         }
-        System.out.println("will now attack " + baseConfig.targetAddress);
+        System.out.println("will now attack " + config.getTargetEndpoint());
 
         // start client threads
         threadHandler = new ThreadHandler(threadTasks);
         threadHandler.start();
+        resultManager.start();
     }
 
     public boolean stop() {

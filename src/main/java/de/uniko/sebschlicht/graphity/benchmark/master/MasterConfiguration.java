@@ -19,15 +19,13 @@ public class MasterConfiguration extends Config {
 
     public int numThreads;
 
-    public String targetAddress;
-
     public String targetType;
 
-    public int portNeo4j;
-
-    public int portTitan;
-
     private TargetType _targetType;
+
+    public String endpointNeo4j;
+
+    public String endpointTitan;
 
     public long id_start;
 
@@ -57,11 +55,15 @@ public class MasterConfiguration extends Config {
                 throw new IllegalArgumentException(
                         "number of threads must be greater than zero");
             }
-            if (targetAddress.equals("")) {
-                throw new IllegalArgumentException(
-                        "target cluster endpoint has to specified");
-            }
             _targetType = TargetType.fromString(targetType);
+            if (_targetType == TargetType.NEO4J && endpointNeo4j.equals("")) {
+                throw new IllegalArgumentException(
+                        "Neo4j cluster endpoint has to specified");
+            }
+            if (_targetType == TargetType.TITAN && endpointTitan.equals("")) {
+                throw new IllegalArgumentException(
+                        "Titan cluster endpoint has to specified");
+            }
             if (id_start > id_end) {
                 throw new IllegalArgumentException(
                         "lower ID range border (start ID) is higher than upper ID range border (end ID)");

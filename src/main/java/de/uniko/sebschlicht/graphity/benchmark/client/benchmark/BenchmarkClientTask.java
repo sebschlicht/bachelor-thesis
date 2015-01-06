@@ -3,8 +3,8 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 import java.util.concurrent.Callable;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.BenchmarkResult;
-import de.uniko.sebschlicht.graphity.benchmark.api.RequestType;
 import de.uniko.sebschlicht.graphity.benchmark.client.SingleClient;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
@@ -17,12 +17,16 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
 
     private SingleClient client;
 
+    private ResultManager man;
+
     private BenchmarkClient benchmarkClient;
 
     public BenchmarkClientTask(
             SingleClient client,
+            ResultManager man,
             BenchmarkClient benchmarkClient) {
         this.client = client;
+        this.man = man;
         this.benchmarkClient = benchmarkClient;
     }
 
@@ -41,10 +45,6 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
         RequestFollow requestFollow;
         RequestPost requestPost;
         RequestUnfollow requestUnfollow;
-
-        long msStarted = System.currentTimeMillis();
-        long msLastCheckpoint = 0;
-        long[] numRequests = new long[4];
 
         while (!isStopped()) {
             request = client.nextRequest();
@@ -78,23 +78,9 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
             }
             long msCrr = System.currentTimeMillis();
             long duration = msCrr - msStart;
-            numRequests[request.getType().getId()] += 1;
-            //            SingleClient.LOG.debug(request.getType() + ": " + duration);
-
-            if (msCrr > msLastCheckpoint + 10000) {
-                SingleClient.LOG.debug("progress after " + (msCrr - msStarted)
-                        + "ms");
-                for (int i = 0; i < 4; ++i) {
-                    SingleClient.LOG.debug(RequestType.getTypeById(i) + ": "
-                            + numRequests[i]);
-                }
-                msLastCheckpoint = msCrr;
-            }
-
-            // TODO: stop and save measurement
+            man.addResult(request.getType(), duration);
         }
 
-        // TODO: merge measurements if still necessary
         return null;
     }
 }

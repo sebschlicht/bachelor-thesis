@@ -140,8 +140,8 @@ public class Master implements MasterListener {
                     new ClientConfiguration(config.id_start, config.id_end,
                             config.feed_length, maxThroughputPerClient,
                             config.numThreads, requestComposition,
-                            config.targetAddress, config.getTargetType(),
-                            config.portNeo4j, config.portTitan);
+                            config.getTargetType(), config.endpointNeo4j,
+                            config.endpointTitan);
             tasksStart.add(new StartBenchmarkTask(client, clientConfig));
         }
         LOG.debug("starting " + tasksStart.size() + " clients...");
