@@ -149,6 +149,19 @@ public class SingleClient {
         return nextRequest(type, 10);
     }
 
+    /**
+     * CURRENT APPROACH:
+     * 1. choose user (random)
+     * 2. choose next action
+     * * if POST: post fixed-length String
+     * * if FOLLOW: subscribe to a user (longtail)
+     * * if UNFOLLOW: unsubscribe a subscription (random) of this user
+     * NEW APPROACH to prevent UNFOLLOW from failing:
+     * 1. choose action
+     * * if POST: choose user (random), post fixed-length String
+     * * if FOLLOW: choose user (random), subscribe to a user (longtail)
+     * * if UNFOLLOW: unsubscribe a subscription (random)
+     */
     private Request nextRequest(RequestType type, int numTry) {
         long idUser = nextUserId();
         List<Long> userSubscriptions;
