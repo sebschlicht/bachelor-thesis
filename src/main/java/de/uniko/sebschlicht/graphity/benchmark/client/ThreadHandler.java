@@ -49,11 +49,7 @@ public class ThreadHandler implements Runnable {
     @Override
     public void run() {
         try {
-            SingleClient.LOG.info("starting " + tasks.size()
-                    + " client threads...");
             threadpool = Executors.newFixedThreadPool(tasks.size());
-            SingleClient.LOG.info("benchmark started at "
-                    + System.currentTimeMillis());
             threadpool.invokeAll(tasks);
         } catch (InterruptedException e) {
             e.printStackTrace();

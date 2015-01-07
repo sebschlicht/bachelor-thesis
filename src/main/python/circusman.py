@@ -260,7 +260,7 @@ class CircusNode:
       'command': 'stop'
     }
     if not name is None:
-      cmdStart['properties'] = {
+      cmdStop['properties'] = {
         'name': name
       }
     self.sendJson(cmdStop)

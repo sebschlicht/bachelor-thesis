@@ -58,14 +58,14 @@ public class SingleClient {
 
     private TreeMap<Integer, List<Long>> propabilities;
 
-    private Set<long[]> subscriptions;
+    private Set<Subscription> subscriptions;
 
     private ThreadHandler threadHandler;
 
     private ResultManager resultManager;
 
     public SingleClient() throws IOException {
-        subscriptions = new TreeSet<long[]>();
+        subscriptions = new TreeSet<Subscription>();
         // load statistics
         FileReader dumpFileReader = new FileReader(PATH_WIKI_DUMP);
         WikidumpInfo dumpInfo =
@@ -128,11 +128,13 @@ public class SingleClient {
             threadTasks.add(new BenchmarkClientTask(this, resultManager,
                     benchmarkClient));
         }
-        System.out.println("will now attack " + config.getTargetEndpoint());
+        System.out.println("will now attack " + config.getTargetEndpoint()
+                + " with " + config.getNumThreads() + " client threads...");
 
         // start client threads
         threadHandler = new ThreadHandler(threadTasks);
         threadHandler.start();
+        LOG.info("benchmark started at " + System.currentTimeMillis());
         resultManager.start();
     }
 
@@ -147,7 +149,7 @@ public class SingleClient {
         return false;
     }
 
-    public Request nextRequest() {
+    public synchronized Request nextRequest() {
         RequestType type = nextRequestType();
         return nextRequest(type);
     }
@@ -167,7 +169,7 @@ public class SingleClient {
      */
     private Request nextRequest(RequestType type) {
         long idUser;
-        long[] subscription;
+        Subscription subscription;
 
         try {
             switch (type) {
@@ -200,9 +202,7 @@ public class SingleClient {
                     List<Long> bucket = entry.getValue();
                     long idFollowed = bucket.get(RANDOM.nextInt(bucket.size()));
 
-                    subscription = new long[2];
-                    subscription[0] = idUser;
-                    subscription[1] = idFollowed;
+                    subscription = new Subscription(idUser, idFollowed);
                     subscriptions.add(subscription);
 
                     return new RequestFollow(idUser, idFollowed);
@@ -219,13 +219,14 @@ public class SingleClient {
                     idUser = nextUserId();
                     // get random subscription
                     int iSubscription = RANDOM.nextInt(numSubscriptions);
-                    Iterator<long[]> iter = subscriptions.iterator();
+                    Iterator<Subscription> iter = subscriptions.iterator();
                     for (int i = 0; i < iSubscription; i++) {
                         iter.next();
                     }
                     subscription = iter.next();
                     subscriptions.remove(subscription);
-                    return new RequestUnfollow(subscription[0], subscription[1]);
+                    return new RequestUnfollow(subscription.getIdSubscriber(),
+                            subscription.getIdFollowed());
             }
             throw new IllegalStateException("unknown request type");
         } catch (Exception e) {
