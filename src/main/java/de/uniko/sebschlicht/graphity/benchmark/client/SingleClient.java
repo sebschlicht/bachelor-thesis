@@ -7,12 +7,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
@@ -55,14 +58,14 @@ public class SingleClient {
 
     private TreeMap<Integer, List<Long>> propabilities;
 
-    private Map<Long, List<Long>> subscriptions;
+    private Set<long[]> subscriptions;
 
     private ThreadHandler threadHandler;
 
     private ResultManager resultManager;
 
     public SingleClient() throws IOException {
-        subscriptions = new HashMap<Long, List<Long>>();
+        subscriptions = new TreeSet<long[]>();
         // load statistics
         FileReader dumpFileReader = new FileReader(PATH_WIKI_DUMP);
         WikidumpInfo dumpInfo =
@@ -146,7 +149,7 @@ public class SingleClient {
 
     public Request nextRequest() {
         RequestType type = nextRequestType();
-        return nextRequest(type, 10);
+        return nextRequest(type);
     }
 
     /**
@@ -162,51 +165,67 @@ public class SingleClient {
      * * if FOLLOW: choose user (random), subscribe to a user (longtail)
      * * if UNFOLLOW: unsubscribe a subscription (random)
      */
-    private Request nextRequest(RequestType type, int numTry) {
-        long idUser = nextUserId();
-        List<Long> userSubscriptions;
+    private Request nextRequest(RequestType type) {
+        long idUser;
+        long[] subscription;
+
         try {
             switch (type) {
                 case FEED:
+                    /*
+                     * retrieve news feed for random user
+                     */
+                    idUser = nextUserId();
                     return new RequestFeed(idUser);
 
                 case POST:
-                    return new RequestPost(idUser,
-                            RandomStringUtils.randomAlphanumeric(config
-                                    .getFeedLength()));
+                    /*
+                     * let random user post a fixed-length alphanumeric feed
+                     */
+                    idUser = nextUserId();
+                    int feedLength = config.getFeedLength();
+                    String message =
+                            RandomStringUtils.randomAlphanumeric(feedLength);
+                    return new RequestPost(idUser, message);
 
                 case FOLLOW:
+                    /*
+                     * let random user follow another user according to longtail
+                     * distribution
+                     */
+                    idUser = nextUserId();
                     int iBucket = RANDOM.nextInt(propabilities.lastKey());
                     Entry<Integer, List<Long>> entry =
                             propabilities.ceilingEntry(iBucket);
                     List<Long> bucket = entry.getValue();
                     long idFollowed = bucket.get(RANDOM.nextInt(bucket.size()));
 
-                    userSubscriptions = subscriptions.get(idUser);
-                    if (userSubscriptions == null) {
-                        userSubscriptions = new LinkedList<Long>();
-                        subscriptions.put(idUser, userSubscriptions);
-                    }
-                    userSubscriptions.add(idFollowed);
+                    subscription = new long[2];
+                    subscription[0] = idUser;
+                    subscription[1] = idFollowed;
+                    subscriptions.add(subscription);
 
                     return new RequestFollow(idUser, idFollowed);
 
                 case UNFOLLOW:
-                    userSubscriptions = subscriptions.get(idUser);
-                    if (userSubscriptions != null
-                            && !userSubscriptions.isEmpty()) {
-                        int iFollower =
-                                RANDOM.nextInt(userSubscriptions.size());
-                        long idUnsubscribe =
-                                userSubscriptions.remove(iFollower);
-                        return new RequestUnfollow(idUser, idUnsubscribe);
-                    }
-                    // temporarily not possible for this user
-                    if (numTry > 0) {
-                        return nextRequest(type, numTry - 1);
-                    } else {
+                    /*
+                     * unsubcribe a random subscription created before
+                     */
+                    int numSubscriptions = subscriptions.size();
+                    if (numSubscriptions == 0) {
+                        // no subscriptions available, request not possible atm.
                         return nextRequest();
                     }
+                    idUser = nextUserId();
+                    // get random subscription
+                    int iSubscription = RANDOM.nextInt(numSubscriptions);
+                    Iterator<long[]> iter = subscriptions.iterator();
+                    for (int i = 0; i < iSubscription; i++) {
+                        iter.next();
+                    }
+                    subscription = iter.next();
+                    subscriptions.remove(subscription);
+                    return new RequestUnfollow(subscription[0], subscription[1]);
             }
             throw new IllegalStateException("unknown request type");
         } catch (Exception e) {

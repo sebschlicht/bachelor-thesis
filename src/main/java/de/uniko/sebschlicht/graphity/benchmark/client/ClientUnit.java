@@ -9,7 +9,6 @@ import de.uniko.sebschlicht.graphity.benchmark.client.servlets.ControlServlet;
 public class ClientUnit {
 
     public static void main(String[] args) throws Exception {
-        ClientUnit client = new ClientUnit();
         Server server = new Server(8081);
 
         ServletContextHandler context =
