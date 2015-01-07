@@ -27,7 +27,7 @@ public abstract class AbstractBenchmarkClient implements BenchmarkClient {
         this.config = config;
         httpClient = Client.create();
         httpClient.setConnectTimeout(1000);
-        httpClient.setReadTimeout(5000);
+        //httpClient.setReadTimeout(5000);
     }
 
     protected WebResource resourceFromUrl(String url) {

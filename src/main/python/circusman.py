@@ -62,7 +62,8 @@ class SshClient:
     
     # remove archive file
     rmArgs = [
-      'rm /tmp/circusman-scp.zip'
+      'rm',
+      '/tmp/circusman-scp.zip'
     ]
     if not subprocess.check_output(rmArgs):
       return False
