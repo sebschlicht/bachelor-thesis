@@ -47,6 +47,7 @@ class SshClient:
     return True
   
   def doScpMulti(self, files):
+    # create archive file
     zipArgs = [
       'zip',
       '/tmp/circusman-scp.zip'
@@ -56,11 +57,22 @@ class SshClient:
     if not subprocess.check_output(zipArgs):
       return False
     
+    # transmit archive file
     self.doScp('/tmp/circusman-scp.zip', '/tmp/')
+    
+    # remove archive file
+    rmArgs = [
+      'rm /tmp/circusman-scp.zip'
+    ]
+    if not subprocess.check_output(rmArgs):
+      return False
+    
+    # unzip remote archive file
     unzipArgs = [
       'unzip -j /tmp/circusman-scp.zip -d /tmp/circusman-scp',
       'rm /tmp/circusman-scp.zip'
     ]
+    # move files to their destinations
     for f in files:
       parent, filename = ntpath.split(f[0])
       unzipArgs.append('cp /tmp/circusman-scp/' + filename + ' ' + f[1])

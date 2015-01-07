@@ -39,6 +39,7 @@ public class ResultManager implements Runnable {
         long tsStart = System.currentTimeMillis();
         long tsLastUpdate = 0;
         SingleResult result;
+        StringBuilder logMessage;
 
         isRunning = true;
         while (isRunning) {
@@ -57,13 +58,13 @@ public class ResultManager implements Runnable {
                 }
             }
             if (System.currentTimeMillis() >= tsLastUpdate + INTERVAL_UPDATE) {
-                SingleClient.LOG.info("progress after "
+                logMessage = new StringBuilder();
+                logMessage.append("progress after "
                         + (System.currentTimeMillis() - tsStart) + "ms:");
-                for (int i = 0; i < 4; ++i) {
-                    RequestType type = RequestType.getTypeById(i);
-                    SingleClient.LOG.info(type + ": "
-                            + results[i].getNumEntries() + " requests");
+                for (ResultContainer container : results) {
+                    logMessage.append("\t" + container.getNumEntries());
                 }
+                SingleClient.LOG.info(logMessage);
                 tsLastUpdate = System.currentTimeMillis();
             }
         }
