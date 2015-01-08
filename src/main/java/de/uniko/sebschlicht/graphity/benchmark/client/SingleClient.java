@@ -128,8 +128,9 @@ public class SingleClient {
             threadTasks.add(new BenchmarkClientTask(this, resultManager,
                     benchmarkClient));
         }
-        System.out.println("will now attack " + config.getTargetEndpoint()
-                + " with " + config.getNumThreads() + " client threads...");
+        System.out.println("will now attack " + config.getTargetType() + " on "
+                + config.getTargetEndpoint() + " with "
+                + config.getNumThreads() + " client threads...");
 
         // start client threads
         threadHandler = new ThreadHandler(threadTasks);
