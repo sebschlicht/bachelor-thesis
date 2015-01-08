@@ -131,7 +131,8 @@ class CircusController:
       (LOCAL_DIR_RESOURCES + 'circus.ini', REMOTE_DIR_WORKING + 'circus.ini'),
       (LOCAL_FILE_COMMAND_CONFIGURE, REMOTE_FILE_COMMAND_CONFIGURE),
       # Graphity plugin/extension
-      (LOCAL_FILE_NEO4J_PLUGIN, REMOTE_FILE_NEO4J_PLUGIN)
+      (LOCAL_FILE_NEO4J_PLUGIN, REMOTE_FILE_NEO4J_PLUGIN),
+      (LOCAL_FILE_TITAN_EXTENSION, REMOTE_FILE_TITAN_EXTENSION)
     ]
   
   def startCircus(self):
