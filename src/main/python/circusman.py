@@ -65,7 +65,7 @@ class SshClient:
       'rm',
       '/tmp/circusman-scp.zip'
     ]
-    if not subprocess.check_output(rmArgs):
+    if subprocess.check_output(rmArgs):
       return False
     
     # unzip remote archive file
