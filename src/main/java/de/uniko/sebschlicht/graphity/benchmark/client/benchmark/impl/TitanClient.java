@@ -6,6 +6,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
+import de.uniko.sebschlicht.graphity.benchmark.api.TargetType;
 import de.uniko.sebschlicht.graphity.benchmark.client.SingleClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AbstractBenchmarkClient;
 
@@ -32,7 +33,30 @@ public class TitanClient extends AbstractBenchmarkClient {
 
     @Override
     public boolean retrieveNewsFeed(long id) {
-        // TODO Auto-generated method stub
+        ClientResponse response = null;
+        try {
+            String jsonString = "{\"reader\":\"" + id + "\"}";
+            response =
+                    resFeed.accept(MediaType.APPLICATION_JSON)
+                            .type(MediaType.APPLICATION_JSON)
+                            .entity(jsonString).post(ClientResponse.class);
+            //TODO: handle result
+            System.out.println(response.getEntity(String.class));
+        } catch (ClientHandlerException e) {// connection failed
+            SingleClient.LOG
+                    .error("FEED: client thread failed due to HTTP issue");
+            SingleClient.LOG.error(e.getMessage());
+            throw new IllegalStateException(
+                    "FEED: client thread failed due to HTTP issue");
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (ClientHandlerException e) {
+                // ignore
+            }
+        }
         return false;
     }
 
@@ -50,7 +74,7 @@ public class TitanClient extends AbstractBenchmarkClient {
             ResponseBoolean responseFollow =
                     GSON.fromJson(response.getEntity(String.class),
                             ResponseBoolean.class);
-            return responseFollow.getResponseValue() || true;
+            return responseFollow.getResponseValue();
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
                     .error("FOLLOW: client thread failed due to HTTP issue");
@@ -116,7 +140,7 @@ public class TitanClient extends AbstractBenchmarkClient {
             ResponseBoolean responseUnfollow =
                     GSON.fromJson(response.getEntity(String.class),
                             ResponseBoolean.class);
-            return responseUnfollow.getResponseValue() || true;
+            return responseUnfollow.getResponseValue();
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
                     .error("UNFOLLOW: client thread failed due to HTTP issue");
@@ -133,5 +157,17 @@ public class TitanClient extends AbstractBenchmarkClient {
             }
         }
         //return false;
+    }
+
+    public static void main(String[] args) {
+        ClientConfiguration config =
+                new ClientConfiguration(0, 0, 0, 0, 0, null, TargetType.TITAN,
+                        null, "192.168.56.101:8182");
+        TitanClient c = new TitanClient(config);
+        //        System.out.println(c.postStatusUpdate(1000, "blargh"));
+        System.out.println(c.retrieveNewsFeed(1001));
+        System.out.println(c.unsubscribe(1001, 1000));
+        //        System.out.println(c.retrieveNewsFeed(1001));
+        //        System.out.println(c.subscribe(1001, 1000));
     }
 }
