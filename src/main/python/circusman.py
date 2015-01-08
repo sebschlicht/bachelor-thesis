@@ -382,6 +382,7 @@ FILENAMES_CONFIG_TEMPLATES = [
   'neo4j.properties.tmpl',
   'neo4j-server.properties.tmpl',
   'cassandra-cluster.yaml.tmpl',
+  'cassandra-rackdc.properties.tmpl',
   'rexster-cassandra-cluster.xml.tmpl'
 ]
 

@@ -10,14 +10,15 @@ PATH_TMPL = '/usr/local/etc/templates/'
 PATH_TMPL_NEO4J_PROP = PATH_TMPL + 'neo4j.properties.tmpl'
 PATH_TMPL_NEO4J_SERVER = PATH_TMPL + 'neo4j-server.properties.tmpl'
 PATH_TMPL_TITAN_CASSANDRA = PATH_TMPL + 'cassandra-cluster.yaml.tmpl'
+PATH_TMPL_TITAN_CASSANDRA_RACKDC = PATH_TMPL + 'cassandra-rackdc.properties.tmpl'
 PATH_TMPL_TITAN_REXSTER = PATH_TMPL + 'rexster-cassandra-cluster.xml.tmpl'
 # paths to configuration files
 PATH_CONF_NEO4J = '/etc/neo4j/'
 PATH_CONF_NEO4J_PROP = PATH_CONF_NEO4J + 'neo4j.properties'
 PATH_CONF_NEO4J_SERVER = PATH_CONF_NEO4J + 'neo4j-server.properties'
-#PATH_CONF_TITAN = '/etc/titan/'
 PATH_CONF_TITAN = '/etc/titan/'
 PATH_CONF_TITAN_CASSANDRA = PATH_CONF_TITAN + 'cassandra-cluster.yaml'
+PATH_CONF_TITAN_CASSANDRA_RACKDC = PATH_CONF_TITAN + 'cassandra-rackdc.properties'
 PATH_CONF_TITAN_REXSTER = PATH_CONF_TITAN + 'rexster-cassandra-cluster.xml'
 
 OPT_ADDRESS = 'address'
@@ -110,6 +111,8 @@ class Configure(Command):
     self.writeConfig(PATH_TMPL_TITAN_CASSANDRA, PATH_CONF_TITAN_CASSANDRA, {
       'address': props[OPT_ADDRESS],
       'seeds': seeds
+    })
+    self.writeConfig(PATH_TMPL_TITAN_CASSANDRA_RACKDC, PATH_CONF_TITAN_CASSANDRA_RACKDC, {
     })
     self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, {
       'address': props[OPT_ADDRESS]
