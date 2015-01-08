@@ -16,7 +16,7 @@ PATH_CONF_NEO4J = '/etc/neo4j/'
 PATH_CONF_NEO4J_PROP = PATH_CONF_NEO4J + 'neo4j.properties'
 PATH_CONF_NEO4J_SERVER = PATH_CONF_NEO4J + 'neo4j-server.properties'
 #PATH_CONF_TITAN = '/etc/titan/'
-PATH_CONF_TITAN = '/tmp/'
+PATH_CONF_TITAN = '/etc/titan/'
 PATH_CONF_TITAN_CASSANDRA = PATH_CONF_TITAN + 'cassandra-cluster.yaml'
 PATH_CONF_TITAN_REXSTER = PATH_CONF_TITAN + 'rexster-cassandra-cluster.xml'
 
