@@ -27,6 +27,12 @@ When using the Titan Server that bases upon Rexster, you have to configurate the
 
     <?xml version="1.0" encoding="UTF-8"?>
     <rexster>
+      <http>
+        ...
+        <server-host>${address}</server-host>
+        <base-uri>http://${address}</base-uri>
+        ...
+      </http>
       ...
       <graphs>
         <graph>
@@ -37,11 +43,13 @@ When using the Titan Server that bases upon Rexster, you have to configurate the
             <!-- Titan configuration -->
             <cluster.max-partitions>128</cluster.max-partitions>
             <storage.backend>cassandra</storage.backend>
-            <storage.hostname>127.0.0.1</storage>
+            <storage.hostname>${address}</storage>
+            <!-- do not work in a whole:
             <storage.cassandra.read-consistency-level>ONE</storage.cassandra.read-consistency-level>
             <storage.cassandra.write-consistency-level>QUORUM</storage.cassandra.write-consistency-level>
             <storage.cassandra.replication-factor>1</storage.cassandra.replication-factor>
             <storage.cassandra.keyspace>test1</storage.cassandra.keyspace>
+            -->
           </properties>
           <extensions>
             <allows>
