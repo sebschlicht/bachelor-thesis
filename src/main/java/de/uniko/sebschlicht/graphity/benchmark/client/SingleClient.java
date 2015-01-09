@@ -18,7 +18,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 
@@ -41,7 +42,7 @@ import de.uniko.sebschlicht.graphity.benchmark.master.MasterConfiguration;
 
 public class SingleClient {
 
-    public static final Logger LOG = Logger.getLogger(SingleClient.class);
+    public static final Logger LOG = LogManager.getLogger("requests-async");
 
     private static final String PATH_CONFIG =
             "src/main/resources/client-config.properties";
@@ -128,7 +129,7 @@ public class SingleClient {
             threadTasks.add(new BenchmarkClientTask(this, resultManager,
                     benchmarkClient));
         }
-        System.out.println("will now attack " + config.getTargetType() + " on "
+        LOG.info("will now attack " + config.getTargetType() + " on "
                 + config.getTargetEndpoint() + " with "
                 + config.getNumThreads() + " client threads...");
 

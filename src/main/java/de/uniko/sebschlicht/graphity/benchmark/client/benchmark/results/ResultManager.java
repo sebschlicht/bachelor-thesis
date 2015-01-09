@@ -27,6 +27,8 @@ public class ResultManager implements Runnable {
 
     public void addResult(RequestType type, long duration) {
         pendingResults.add(new SingleResult(type, duration));
+        SingleClient.LOG.info(type.getId() + "\t" + duration);
+        // timestamp is in [0]
     }
 
     public BenchmarkResult getResults() {
@@ -59,10 +61,12 @@ public class ResultManager implements Runnable {
             }
             if (System.currentTimeMillis() >= tsLastUpdate + INTERVAL_UPDATE) {
                 logMessage = new StringBuilder();
-                logMessage.append("progress after "
-                        + (System.currentTimeMillis() - tsStart) + "ms:");
+                // time
+                logMessage.append(System.currentTimeMillis() - tsStart);
                 for (ResultContainer container : results) {
+                    // number of requests
                     logMessage.append("\t" + container.getNumEntries());
+                    // duration
                 }
                 SingleClient.LOG.info(logMessage);
                 tsLastUpdate = System.currentTimeMillis();
@@ -76,17 +80,17 @@ public class ResultManager implements Runnable {
     }
 
     public void start() {
-        thread = new Thread(this);
-        thread.start();
+        //thread = new Thread(this);
+        //thread.start();
     }
 
     public void stop() {
-        isRunning = false;
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        thread = null;
+        //isRunning = false;
+        //try {
+        //    thread.join();
+        //} catch (InterruptedException e) {
+        //    e.printStackTrace();
+        //}
+        //thread = null;
     }
 }

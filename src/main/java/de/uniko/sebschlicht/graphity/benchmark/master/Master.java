@@ -13,7 +13,8 @@ import java.util.concurrent.Future;
 
 import javax.servlet.DispatcherType;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -33,7 +34,7 @@ public class Master implements MasterListener {
 
     private static final String PATH_CONFIG = "master-config.properties";
 
-    protected static final Logger LOG = Logger.getLogger(Master.class);
+    protected static final Logger LOG = LogManager.getLogger(Master.class);
 
     private Set<ClientWrapper> clients;
 
