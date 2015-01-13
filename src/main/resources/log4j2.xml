@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="MyApp" packages="">
+  <Appenders>
+    <Console name="stdout" target="SYSTEM_OUT">
+      <PatternLayout pattern="%r [%t] %-5p %c %x \t %m%n" />
+    </Console>
+    <File name="requests" fileName="requests.log">
+      <PatternLayout pattern="%r [%t] %-5p %c %x \t %m%n" />
+    </File>
+    <Async name="requests-async">
+      <AppenderRef ref="requests" />
+      <AppenderRef ref="stdout" />
+    </Async>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="requests-async" />
+    </Root>
+  </Loggers>
+</Configuration>
