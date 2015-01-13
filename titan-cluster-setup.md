@@ -117,4 +117,4 @@ The scripts can watch the status and also stop the components via
 
     $ bin/titan.sh stop
 
-To avoid manual logins to each cluster node I derived a [Titan script](src/main/resources/titan-circus.sh) that [can be used with Circus](../../wiki/Control-Titan-via-process-management-tool-Circus), a process management tool that allows remote control.
+To avoid manual logins to each cluster node I derived a synchronous [Titan script](src/main/resources/titan-circus.sh) that [can be used with Circus](../../wiki/Control-Titan-via-process-management-tool-Circus), a process management tool that allows remote control.
