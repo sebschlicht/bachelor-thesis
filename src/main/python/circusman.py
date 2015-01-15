@@ -338,13 +338,30 @@ class UpdateThread(Thread):
       if not c is None:
         c.update()
 
-def genNodes(network, numNodes, port):
-  i = 1
-  nodes = []
-  while i <= int(numNodes):
-    address = network + '.' + str(i)
-    nodes.append(CircusNode(i, address, port))
+def genNodes(startAddress, endAddress, port):
+  aStartAddress = startAddress.split('.')
+  aEndAddress = endAddress.split('.')
+  i = 0
+  while i < 4:
+    aStartAddress[i] = int(aStartAddress[i])
+    aEndAddress[i] = int(aEndAddress[i])
     i = i+1
+
+  identifier = 1
+  nodes = []
+  currentAddress = [
+    str(aStartAddress[0]),
+    str(aStartAddress[1]),
+    str(aStartAddress[2]),
+    str(aStartAddress[3])
+  ]
+  numNodes = aEndAddress[3] - aStartAddress[3] + 1
+  
+  while identifier <= numNodes:
+    address = '.'.join(currentAddress)
+    nodes.append(CircusNode(identifier, address, port))
+    currentAddress[3] = str(aStartAddress[3] + identifier)
+    identifier = identifier+1
   return nodes
 
 """
@@ -395,13 +412,18 @@ REMOTE_FILE_TITAN_SCRIPT = REMOTE_DIR_TITAN + 'bin/titan-circus.sh'
 
 # initial cluster
 #nodes = genNodes('127.0.0', 1, PORT)
-nodes = [
-  CircusNode(1, '192.168.56.101', PORT)#,
-  #CircusNode(2, '192.168.56.102', PORT)
-]
+nodes = genNodes('192.168.56.101', '192.168.56.103', PORT)
 # init with auto-update
 man = CircusMan(nodes)
 man.start()
+
+def printUsage(cmd):
+  if cmd == 'cluster':
+    print 'usage:'
+    print '\tcluster <startAddress> <endAddress> <circusPort>'
+    print '\nexample:'
+    print '\tcluster 192.168.56.101 192.168.56.103 5555'
+    print '\nNote that start and end address must be in the same C net.'
 
 try:
   print 'CircusMan console'
@@ -437,6 +459,30 @@ try:
         else:
           print 'Aborted.'
       elif cmd == 'cluster':
+        if len(args) != 3:
+          printUsage('cluster')
+          continue;
+        
+        startAddress = args[0].split('.')
+        endAddress = args[1].split('.')
+        if len(startAddress) != 4 or len(endAddress) != 4:
+          printUsage('cluster')
+          continue;
+        
+        i = 0
+        while i < 4:
+          startAddress[i] = int(startAddress[i])
+          endAddress[i] = int(endAddress[i])
+          i = i+1
+        i = 0
+        while i < 3:
+          if startAddress[i] != endAddress[i]:
+            print 'Error: Start and end address must be in the same C net.'
+            break;
+          i = i+1
+        if i < 3:
+          continue;
+      
         man.stop()
         c.disconnect()
         nodes = genNodes(args[0], args[1], PORT)
