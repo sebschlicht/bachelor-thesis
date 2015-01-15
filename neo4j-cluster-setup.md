@@ -15,7 +15,7 @@ To deploy a plugin to Neo4j you have to put it in the Neo4j plugin directory `$N
 Make sure to use a uber-JAR that provides all dependencies your application needs, if any.
 
 ## Code changes
-Changing `GraphDatabaseFactory` to `HighlyAvailableGraphDatabaseFactory` in the creation process of the `GraphDatabaseService` should be sufficient.
+Changing `GraphDatabaseFactory` to `HighlyAvailableGraphDatabaseFactory` in the creation process of the `GraphDatabaseService` should be sufficient. Since Graphity is a plugin to the server we do not work with factories and thus can only assume that the database passed by the plugin API is HA ready.
 
 ## Configuration
 This configuration is a result of the [HA setup tutorial](http://neo4j.com/docs/stable/ha-setup-tutorial.html) and the [performance guide](http://docs.neo4j.org/chunked/stable/performance-guide.html).
