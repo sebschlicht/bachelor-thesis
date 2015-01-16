@@ -34,6 +34,7 @@ The benchmark code will be executed from this node to reduce network latency and
 * `git`
 * `python-django`
 * [sshpt](https://code.google.com/p/sshpt/)
+* (pip) paramiko
 
 ### Cluster access
 At the moment we have a cluster with size 3. In my setting only the master is accessible from outside the cluster.
