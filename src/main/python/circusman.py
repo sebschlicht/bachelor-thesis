@@ -181,10 +181,10 @@ class CircusController:
     for node in self.nodes:
       node_list.append(node.getDict())
     # build content object and fill template
-    content = {'node_list': node_list}
-    htmlContent = self.template.render(Context(content))
-    with open(PATH_LOCAL_HTML, 'w') as htmlFile:
-      htmlFile.write(htmlContent)
+    #content = {'node_list': node_list}
+    #htmlContent = self.template.render(Context(content))
+    #with open(PATH_LOCAL_HTML, 'w') as htmlFile:
+    #  htmlFile.write(htmlContent)
   
   def start(self, name):
     self.isBusy = True
@@ -370,12 +370,9 @@ config section
 INTERVAL_UPDATE = 1
 PORT = 5555
 TIMEOUT_POLL = 200
-# HTML file paths (node status overview)
-PATH_LOCAL_HTML = '/var/www/circusMan/index.html'
-PATH_LOCAL_TMPL_HTML = '../resources/tmpl_list.html'
 # SSH options
 PATH_SSH_KEY = os.path.expanduser('~') + '/.ssh/id_rsa'
-SSH_USER = 'node'
+SSH_USER = 'ubuntu'
 PATH_LOCAL_SSH_NODES = '/tmp/sshpt-hosts'
 PATH_LOCAL_SSH_RESULTS = 'ssh_results.txt'
 
