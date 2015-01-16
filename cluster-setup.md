@@ -3,9 +3,14 @@
 ## Overview
 
 ## Basic node setup
+Software installed on each node:
 * `nano`
 * `htop`
 * `unzip`
+* Circus
+ * `python-pip`
+ * `python-dev`
+ * (pip) `circus`
 
 Every node has an entry in its `hosts`-file for its hostname, since in the cloud every `sudo` call via SSH triggered a DNS lookup that actually did not even succeed but printed `sudo: unable to resolve host node` every time.
 
@@ -14,18 +19,21 @@ Every node has an entry in its `hosts`-file for its hostname, since in the cloud
     127.0.0.1 <name>
 
 ## Cluster nodes
+The cluster nodes will run Circus controlling both distributed services, Neo4j and Titan.
+
 ### Software
 * [Neo4j](neo4j-cluster-setup.md)
 * [Titan](titan-cluster-setup.md)
-* Circus
- * `python-pip`
- * `python-dev`
- * pip install circus
 
 ## Router Node
+The router node will be the central cluster entry point balancing the load over all nodes.
+The benchmark code will be executed from this node to reduce network latency and avoid security problems.
+
 ### Software
 * `apache2`
 * `git`
+* `python-django`
+* [sshpt](https://code.google.com/p/sshpt/)
 
 ### Cluster access
 At the moment we have a cluster with size 3. In my setting only the master is accessible from outside the cluster.
