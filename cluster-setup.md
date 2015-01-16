@@ -6,7 +6,7 @@
 Software installed on each node:
 * `nano`
 * `htop`
-* `unzip`
+* `zip`, `unzip`
 * Circus
  * `python-pip`
  * `python-dev`
