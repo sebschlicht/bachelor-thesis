@@ -5,15 +5,27 @@
 ## Basic node setup
 * `nano`
 * `htop`
+* `unzip`
+
+Every node has an entry in its `hosts`-file for its hostname, since in the cloud every `sudo` call via SSH triggered a DNS lookup that actually did not even succeed but printed `sudo: unable to resolve host node` every time.
+
+**/etc/hosts** (changes only)
+
+    127.0.0.1 <name>
 
 ## Cluster nodes
 ### Software
 * [Neo4j](neo4j-cluster-setup.md)
 * [Titan](titan-cluster-setup.md)
+* Circus
+ * `python-pip`
+ * `python-dev`
+ * pip install circus
 
 ## Router Node
 ### Software
 * `apache2`
+* `git`
 
 ### Cluster access
 At the moment we have a cluster with size 3. In my setting only the master is accessible from outside the cluster.
