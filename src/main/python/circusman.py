@@ -11,8 +11,8 @@ import ntpath
 # pip install circus
 import zmq
 # apt-get install python-django
-from django.template import Template, Context
-from django.conf import settings
+#from django.template import Template, Context
+#from django.conf import settings
 settings.configure()
 
 class SshClient:
@@ -90,8 +90,8 @@ class CircusController:
     self.connected = False
     self.context = zmq.Context()
     self.key = None
-    with open(PATH_LOCAL_TMPL_HTML, 'r') as templateFile:
-      self.template = Template(templateFile.read())
+    #with open(PATH_LOCAL_TMPL_HTML, 'r') as templateFile:
+    #  self.template = Template(templateFile.read())
   
   def disconnect(self):
     if self.connected:
