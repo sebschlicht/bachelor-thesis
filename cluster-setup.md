@@ -8,8 +8,8 @@
 
 ## Cluster nodes
 ### Software
-* `neo4j-enterprise`
-* Titan
+* [Neo4j](neo4j-cluster-setup.md)
+* [Titan](titan-cluster-setup.md)
 
 ## Router Node
 ### Software
