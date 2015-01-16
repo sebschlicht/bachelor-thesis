@@ -13,7 +13,7 @@ import zmq
 # apt-get install python-django
 #from django.template import Template, Context
 #from django.conf import settings
-settings.configure()
+#settings.configure()
 
 class SshClient:
   def __init__(self):
