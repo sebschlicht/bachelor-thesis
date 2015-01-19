@@ -121,4 +121,6 @@ and enable both sites and the Proxy module
     $ a2ensite neo4j titan
     $ service apache2 reload
 
+When using Apache 2.4 make sure to enable the module `lbmethod_byrequests` in addition.
+
 While the first endpoint balances all requests across the cluster, the second endpoint (Neo4j only) does not include any nodes other than the master. The intention is to have a separate endpoint for write requests. The cluster may perform better when using only the master node for writes: Slaves are forced to synchronize with the master in order to execute a write request.
