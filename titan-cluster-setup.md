@@ -9,6 +9,8 @@ Titan can be downloaded together with storage and indexing backends and Rexster 
 
 Unzip the archive file to a directory of your choice referred to as `$TITAN_SERVER_HOME`. Relative paths are always relative to this directory. The database will be stored in `db`.
 
+Since Titan depends on `jps` `openjdk-7-jdk` has to be installed.
+
 ## Plugin
 To deploy a plugin to Rexster you have to put it in the Rexster extension directory `$TITAN_SERVER_HOME/ext`.
 Make sure to use a uber-JAR that provides all dependencies your application needs, if any.
