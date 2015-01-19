@@ -3,9 +3,15 @@
 ## Overview
 
 ## Basic node setup
+Software installed on each node:
 * `nano`
 * `htop`
-* `unzip`
+* `zip`, `unzip`
+* Circus
+ * `python-pip`
+ * `python-dev`
+ * `libzmq1 libzmq-dev` (ZMQ did not work when using `libzmq3` or PyZMQ's self-compiled version)
+ * (pip) `circus`
 
 Every node has an entry in its `hosts`-file for its hostname, since in the cloud every `sudo` call via SSH triggered a DNS lookup that actually did not even succeed but printed `sudo: unable to resolve host node` every time.
 
@@ -14,18 +20,29 @@ Every node has an entry in its `hosts`-file for its hostname, since in the cloud
     127.0.0.1 <name>
 
 ## Cluster nodes
+The cluster nodes will run Circus controlling both distributed services, Neo4j and Titan.
+
 ### Software
 * [Neo4j](neo4j-cluster-setup.md)
 * [Titan](titan-cluster-setup.md)
-* Circus
- * `python-pip`
- * `python-dev`
- * pip install circus
+
+### Connect Storage
+
+    $ echo -e "o\nn\np\n1\n\n\nw\n" | fdisk /dev/vdb
+    $ mkfs -t ext4 /dev/vdb1
+
+`etc/fstab` mounts `/dev/vdb1` on `/media/data` where the services will store their data.
 
 ## Router Node
+The router node will be the central cluster entry point balancing the load over all nodes.
+The benchmark code will be executed from this node to reduce network latency and avoid security problems.
+
 ### Software
 * `apache2`
 * `git`
+* `python-django`
+* [sshpt](https://code.google.com/p/sshpt/)
+* (pip) paramiko
 
 ### Cluster access
 At the moment we have a cluster with size 3. In my setting only the master is accessible from outside the cluster.
