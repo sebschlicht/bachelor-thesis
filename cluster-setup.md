@@ -10,6 +10,7 @@ Software installed on each node:
 * Circus
  * `python-pip`
  * `python-dev`
+ * `libzmq1 libzmq-dev` (ZMQ did not work when using `libzmq3` or PyZMQ's self-compiled version)
  * (pip) `circus`
 
 Every node has an entry in its `hosts`-file for its hostname, since in the cloud every `sudo` call via SSH triggered a DNS lookup that actually did not even succeed but printed `sudo: unable to resolve host node` every time.
