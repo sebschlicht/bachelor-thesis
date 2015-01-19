@@ -42,9 +42,9 @@
             <properties>
                 <cluster.max-partitions>128</cluster.max-partitions>
                 <storage.backend>cassandra</storage.backend>
-                <storage.hostname>127.0.0.1</storage.hostname>
-                <storage.cassandra.keyspace>test1</storage.cassandra.keyspace>
+                <storage.hostname>${address}</storage.hostname>
                 <!-- not working in a whole
+                <storage.cassandra.keyspace>test1</storage.cassandra.keyspace>
                 <storage.cassandra.replication-factor>1</storage.replication-factor>
                 <storage.cassandra.read-consistency-level>ONE</storage.cassandra.read-consistency-level>
                 <storage.cassandra.write-consistency-level>QUORUM</storage.cassandra.write-consistency-level>
