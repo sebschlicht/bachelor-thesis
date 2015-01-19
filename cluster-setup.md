@@ -26,6 +26,13 @@ The cluster nodes will run Circus controlling both distributed services, Neo4j a
 * [Neo4j](neo4j-cluster-setup.md)
 * [Titan](titan-cluster-setup.md)
 
+### Connect Storage
+
+    $ echo -e "o\nn\np\n1\n\n\nw\n" | fdisk /dev/vdb
+    $ mkfs -t ext4 /dev/vdb1
+
+`etc/fstab` mounts `/dev/vdb1` on `/media/data` where the services will store their data.
+
 ## Router Node
 The router node will be the central cluster entry point balancing the load over all nodes.
 The benchmark code will be executed from this node to reduce network latency and avoid security problems.
