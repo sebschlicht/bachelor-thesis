@@ -32,6 +32,11 @@ The cluster nodes will run Circus controlling both distributed services, Neo4j a
     $ mkfs -t ext4 /dev/vdb1
 
 `etc/fstab` mounts `/dev/vdb1` on `/media/data` where the services will store their data.
+This had to be once, each replica is configured properly.
+
+### Replica issues
+The data storage of Titan has to be empty when replicating nodes. The Cassandra nodes will have the same token otherwise which leads to problems.
+At the moment at least Titan won't start up until `/etc/hosts` redirects the hostname to the loopback. This may be due to unexpected output the startup script can't handle.
 
 ## Router Node
 The router node will be the central cluster entry point balancing the load over all nodes.
