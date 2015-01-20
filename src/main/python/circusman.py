@@ -372,7 +372,7 @@ def loadNodes(filepath, port):
   nodes = []
   identifier = 1
   for nodeLine in nodeLines:
-    nodes.append(CircusNode(identifier, nodeLine, port))
+    nodes.append(CircusNode(identifier, nodeLine.strip(), port))
     identifier = identifier + 1
   return nodes
 
