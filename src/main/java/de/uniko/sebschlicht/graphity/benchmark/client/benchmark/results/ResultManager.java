@@ -70,6 +70,7 @@ public class ResultManager implements Runnable {
                 logMessage.append(ru.getIdFollowed());
                 break;
         }
+        SingleClient.LOG.info(logMessage);
     }
 
     public BenchmarkResult getResults() {

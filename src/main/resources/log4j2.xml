@@ -9,7 +9,7 @@
     </File>
     <Async name="requests-async">
       <AppenderRef ref="requests" />
-      <AppenderRef ref="stdout" />
+      <!-- <AppenderRef ref="stdout" /> -->
     </Async>
   </Appenders>
   <Loggers>

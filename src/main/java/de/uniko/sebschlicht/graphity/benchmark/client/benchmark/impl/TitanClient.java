@@ -166,28 +166,27 @@ public class TitanClient extends AbstractBenchmarkClient {
     }
 
     public static void main(String[] args) {
-        boolean exit = false;
-        String test = "{\"error\":null}";
-        ResponseBoolean responseUnfollow =
-                GSON.fromJson(test, ResponseBoolean.class);
-        System.out.println(responseUnfollow.getResponseValue());
-        if (exit) {
-            return;
-        }
-        ;
+        //boolean exit = false;
+        //        String test = "{\"error\":null}";
+        //        ResponseBoolean responseUnfollow =
+        //                GSON.fromJson(test, ResponseBoolean.class);
+        //        System.out.println(responseUnfollow.getResponseValue());
+        //        if (exit) {
+        //            return;
+        //        }
 
         ClientConfiguration config =
                 new ClientConfiguration(0, 0, 0, 0, 0, null, TargetType.TITAN,
                         null, "141.26.208.4:82/titan");
         TitanClient c = new TitanClient(config);
-        //        System.out.println(c.postStatusUpdate(1000, "blargh"));
         for (int i = 0; i < 40000; ++i) {
             int numFeeds = c.retrieveNewsFeed(i);
             if (numFeeds > 0) {
                 System.out.println(i + ": " + numFeeds);
             }
         }
-        System.out.println(c.retrieveNewsFeed(4));
+        //        System.out.println(c.postStatusUpdate(1000, "blargh"));
+        //        System.out.println(c.retrieveNewsFeed(1001));
         //        System.out.println(c.subscribe(1001, 1000));
         //        System.out.println(c.postStatusUpdate(1000, "blurgh"));
         //        System.out.println(c.subscribe(1001, 1000));
