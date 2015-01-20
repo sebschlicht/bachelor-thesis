@@ -364,6 +364,18 @@ def genNodes(startAddress, endAddress, port):
     identifier = identifier+1
   return nodes
 
+def loadNodes(filepath, port):
+  nodeLines = []
+  with open(filepath, 'r') as fNodes:
+    nodeLines = fNodes.readlines()
+  
+  nodes = []
+  identifier = 1
+  for nodeLine in nodeLines:
+    nodes.append(CircusNode(identifier, nodeLine, port))
+    identifier = identifier + 1
+  return nodes
+
 """
 config section
 """
@@ -385,6 +397,7 @@ REMOTE_DIR_CONFIG_TEMPLATES = '/usr/local/etc/templates/'
 
 # local paths
 LOCAL_DIR_RESOURCES = LOCAL_DIR_PROJECT + 'src/main/resources/'
+LOCAL_FILE_NODES = LOCAL_DIR_RESOURCES + 'nodes'
 LOCAL_DIR_CONFIG_TEMPLATES = LOCAL_DIR_RESOURCES + 'config-templates/'
 LOCAL_FILE_COMMAND_CONFIGURE = LOCAL_DIR_PROJECT + 'src/main/python/configure.py'
 LOCAL_FILE_NEO4J_PLUGIN = LOCAL_DIR_RESOURCES + 'neo4j-plugin.jar'
@@ -409,7 +422,7 @@ REMOTE_FILE_TITAN_SCRIPT = REMOTE_DIR_TITAN + 'bin/titan-circus.sh'
 
 # initial cluster
 #nodes = genNodes('127.0.0', 1, PORT)
-nodes = genNodes('192.168.56.101', '192.168.56.103', PORT)
+nodes = loadNodes(LOCAL_FILE_NODES, PORT)
 # init with auto-update
 man = CircusMan(nodes)
 man.start()
@@ -417,10 +430,14 @@ man.start()
 def printUsage(cmd):
   if cmd == 'cluster':
     print 'usage:'
+    print '\tcluster'
+    print '\tLoads the cluster from nodes file. (currently at ' + LOCAL_FILE_NODES + ')'
+    print '\tThis file contains one node address per line.'
+    print
     print '\tcluster <startAddress> <endAddress> <circusPort>'
-    print '\nexample:'
-    print '\tcluster 192.168.56.101 192.168.56.103 5555'
-    print '\nNote that start and end address must be in the same C net.'
+    print '\texample:'
+    print '\t\tcluster 192.168.56.101 192.168.56.103 5555'
+    print '\n\tNote that start and end address must be in the same C net.'
 
 try:
   print 'CircusMan console'
