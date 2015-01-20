@@ -45,6 +45,7 @@ The benchmark code will be executed from this node to reduce network latency and
 ### Software
 * `apache2`
 * `git`
+* `maven`
 * `python-django`
 * [sshpt](https://code.google.com/p/sshpt/)
 * (pip) paramiko
