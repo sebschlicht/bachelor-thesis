@@ -42,10 +42,13 @@ public class TitanClient extends AbstractBenchmarkClient {
                             .entity(jsonString).post(ClientResponse.class);
             //TODO: handle result
             String sResponse = response.getEntity(String.class);
-            System.out.println(sResponse);
             ResponseList responseFeeds =
                     GSON.fromJson(sResponse, ResponseList.class);
-            return responseFeeds.getResponseValue().size();
+            //TODO: check if JSON deserialization is working
+            if (responseFeeds.getResponseValue() != null) {
+                return responseFeeds.getResponseValue().size();
+            }
+            return 0;
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
                     .error("FEED: client thread failed due to HTTP issue");
