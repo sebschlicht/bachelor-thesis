@@ -4,6 +4,11 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.RequestType;
 import de.uniko.sebschlicht.graphity.benchmark.client.SingleClient;
+import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
+import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
+import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
+import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
+import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
 
 public class ResultManager implements Runnable {
 
@@ -25,10 +30,46 @@ public class ResultManager implements Runnable {
         }
     }
 
-    public void addResult(RequestType type, long duration) {
-        pendingResults.add(new SingleResult(type, duration));
-        SingleClient.LOG.info(type.getId() + "\t" + duration);
+    public void addResult(Request request, long duration) {
+        pendingResults.add(new SingleResult(request.getType(), duration));
+
+        //TODO: save request object including results
         // timestamp is in [0]
+        StringBuilder logMessage = new StringBuilder();
+        logMessage.append(request.getType().getId());
+        logMessage.append("\t");
+        logMessage.append(duration);
+        switch (request.getType()) {
+            case FEED:
+                RequestFeed rfe = (RequestFeed) request;
+                logMessage.append("\t");
+                logMessage.append(rfe.getId());
+                logMessage.append("\t");
+                logMessage.append(rfe.getResult());
+                break;
+
+            case FOLLOW:
+                RequestFollow rf = (RequestFollow) request;
+                logMessage.append("\t");
+                logMessage.append(rf.getIdSubscriber());
+                logMessage.append("\t");
+                logMessage.append(rf.getIdFollowed());
+                break;
+
+            case POST:
+                RequestPost rp = (RequestPost) request;
+                logMessage.append("\t");
+                logMessage.append(rp.getId());
+                break;
+
+            case UNFOLLOW:
+                RequestUnfollow ru = (RequestUnfollow) request;
+                logMessage.append("\t");
+                logMessage.append(ru.getIdSubscriber());
+                logMessage.append("\t");
+                logMessage.append(ru.getIdFollowed());
+                break;
+        }
     }
 
     public BenchmarkResult getResults() {

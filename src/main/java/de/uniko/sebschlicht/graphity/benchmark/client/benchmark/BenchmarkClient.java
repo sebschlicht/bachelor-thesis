@@ -2,7 +2,7 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 
 public interface BenchmarkClient {
 
-    boolean retrieveNewsFeed(long id);
+    int retrieveNewsFeed(long id);
 
     boolean subscribe(long idSubscriber, long idFollowed);
 

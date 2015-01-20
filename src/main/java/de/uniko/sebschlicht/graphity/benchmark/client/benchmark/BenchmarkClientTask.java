@@ -54,31 +54,33 @@ public class BenchmarkClientTask implements Callable<BenchmarkResult> {
             switch (request.getType()) {
                 case FEED:
                     requestFeed = (RequestFeed) request;
-                    benchmarkClient.retrieveNewsFeed(requestFeed.getId());
+                    requestFeed.setResult(benchmarkClient
+                            .retrieveNewsFeed(requestFeed.getId()));
                     break;
 
                 case FOLLOW:
                     requestFollow = (RequestFollow) request;
-                    benchmarkClient.subscribe(requestFollow.getIdSubscriber(),
-                            requestFollow.getIdFollowed());
+                    requestFollow.setResult(benchmarkClient.subscribe(
+                            requestFollow.getIdSubscriber(),
+                            requestFollow.getIdFollowed()));
                     break;
 
                 case POST:
                     requestPost = (RequestPost) request;
-                    benchmarkClient.postStatusUpdate(requestPost.getId(),
-                            requestPost.getMessage());
+                    requestPost.setResult(benchmarkClient.postStatusUpdate(
+                            requestPost.getId(), requestPost.getMessage()));
                     break;
 
                 case UNFOLLOW:
                     requestUnfollow = (RequestUnfollow) request;
-                    benchmarkClient.unsubscribe(
+                    requestUnfollow.setResult(benchmarkClient.unsubscribe(
                             requestUnfollow.getIdSubscriber(),
-                            requestUnfollow.getIdFollowed());
+                            requestUnfollow.getIdFollowed()));
                     break;
             }
             long msCrr = System.currentTimeMillis();
             long duration = msCrr - msStart;
-            man.addResult(request.getType(), duration);
+            man.addResult(request, duration);
         }
 
         return null;

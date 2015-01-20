@@ -6,6 +6,8 @@ public class RequestFeed extends Request {
 
     private long id;
 
+    private int resNumFeeds;
+
     public RequestFeed(
             long id) {
         super(RequestType.FEED);
@@ -14,5 +16,13 @@ public class RequestFeed extends Request {
 
     public long getId() {
         return id;
+    }
+
+    public void setResult(int numFeeds) {
+        resNumFeeds = numFeeds;
+    }
+
+    public int getResult() {
+        return resNumFeeds;
     }
 }

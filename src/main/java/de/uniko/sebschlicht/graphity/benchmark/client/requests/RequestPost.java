@@ -8,6 +8,8 @@ public class RequestPost extends Request {
 
     private String message;
 
+    private boolean resSuccess;
+
     public RequestPost(
             long id,
             String message) {
@@ -22,5 +24,13 @@ public class RequestPost extends Request {
 
     public String getMessage() {
         return message;
+    }
+
+    public void setResult(boolean success) {
+        resSuccess = success;
+    }
+
+    public boolean getResult() {
+        return resSuccess;
     }
 }

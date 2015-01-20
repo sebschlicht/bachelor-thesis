@@ -32,9 +32,9 @@ public class Neo4jClient extends AbstractBenchmarkClient {
     }
 
     @Override
-    public boolean retrieveNewsFeed(long id) {
+    public int retrieveNewsFeed(long id) {
         // TODO Auto-generated method stub
-        return false;
+        return 0;
     }
 
     @Override

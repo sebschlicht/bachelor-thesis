@@ -29,10 +29,10 @@ public class TitanClient extends AbstractBenchmarkClient {
         resFollow = resourceFromUrl(URL_EXTENSION + URL_FOLLOW);
         resPost = resourceFromUrl(URL_EXTENSION + URL_POST);
         resUnfollow = resourceFromUrl(URL_EXTENSION + URL_UNFOLLOW);
-    }
+    }//2765
 
     @Override
-    public boolean retrieveNewsFeed(long id) {
+    public int retrieveNewsFeed(long id) {
         ClientResponse response = null;
         try {
             String jsonString = "{\"reader\":\"" + id + "\"}";
@@ -41,7 +41,11 @@ public class TitanClient extends AbstractBenchmarkClient {
                             .type(MediaType.APPLICATION_JSON)
                             .entity(jsonString).post(ClientResponse.class);
             //TODO: handle result
-            System.out.println(response.getEntity(String.class));
+            String sResponse = response.getEntity(String.class);
+            System.out.println(sResponse);
+            ResponseList responseFeeds =
+                    GSON.fromJson(sResponse, ResponseList.class);
+            return responseFeeds.getResponseValue().size();
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
                     .error("FEED: client thread failed due to HTTP issue");
@@ -57,7 +61,6 @@ public class TitanClient extends AbstractBenchmarkClient {
                 // ignore
             }
         }
-        return false;
     }
 
     @Override
@@ -71,9 +74,9 @@ public class TitanClient extends AbstractBenchmarkClient {
                     resFollow.accept(MediaType.APPLICATION_JSON)
                             .type(MediaType.APPLICATION_JSON)
                             .entity(jsonString).post(ClientResponse.class);
+            String sResponse = response.getEntity(String.class);
             ResponseBoolean responseFollow =
-                    GSON.fromJson(response.getEntity(String.class),
-                            ResponseBoolean.class);
+                    GSON.fromJson(sResponse, ResponseBoolean.class);
             return responseFollow.getResponseValue();
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
@@ -104,9 +107,9 @@ public class TitanClient extends AbstractBenchmarkClient {
                     resPost.accept(MediaType.APPLICATION_JSON)
                             .type(MediaType.APPLICATION_JSON)
                             .entity(jsonString).post(ClientResponse.class);
+            String sResponse = response.getEntity(String.class);
             ResponseLong responsePost =
-                    GSON.fromJson(response.getEntity(String.class),
-                            ResponseLong.class);
+                    GSON.fromJson(sResponse, ResponseLong.class);
             return responsePost.getResponseValue() != 0;
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
@@ -137,9 +140,9 @@ public class TitanClient extends AbstractBenchmarkClient {
                     resUnfollow.accept(MediaType.APPLICATION_JSON)
                             .type(MediaType.APPLICATION_JSON)
                             .entity(jsonString).post(ClientResponse.class);
+            String sResponse = response.getEntity(String.class);
             ResponseBoolean responseUnfollow =
-                    GSON.fromJson(response.getEntity(String.class),
-                            ResponseBoolean.class);
+                    GSON.fromJson(sResponse, ResponseBoolean.class);
             return responseUnfollow.getResponseValue();
         } catch (ClientHandlerException e) {// connection failed
             SingleClient.LOG
@@ -160,14 +163,34 @@ public class TitanClient extends AbstractBenchmarkClient {
     }
 
     public static void main(String[] args) {
+        boolean exit = false;
+        String test = "{\"error\":null}";
+        ResponseBoolean responseUnfollow =
+                GSON.fromJson(test, ResponseBoolean.class);
+        System.out.println(responseUnfollow.getResponseValue());
+        if (exit) {
+            return;
+        }
+        ;
+
         ClientConfiguration config =
                 new ClientConfiguration(0, 0, 0, 0, 0, null, TargetType.TITAN,
-                        null, "192.168.56.101:8182");
+                        null, "141.26.208.4:82/titan");
         TitanClient c = new TitanClient(config);
         //        System.out.println(c.postStatusUpdate(1000, "blargh"));
-        System.out.println(c.retrieveNewsFeed(1001));
-        System.out.println(c.unsubscribe(1001, 1000));
-        //        System.out.println(c.retrieveNewsFeed(1001));
+        for (int i = 0; i < 40000; ++i) {
+            int numFeeds = c.retrieveNewsFeed(i);
+            if (numFeeds > 0) {
+                System.out.println(i + ": " + numFeeds);
+            }
+        }
+        System.out.println(c.retrieveNewsFeed(4));
         //        System.out.println(c.subscribe(1001, 1000));
+        //        System.out.println(c.postStatusUpdate(1000, "blurgh"));
+        //        System.out.println(c.subscribe(1001, 1000));
+        //        System.out.println(c.retrieveNewsFeed(1001));
+        //        System.out.println(c.unsubscribe(1001, 1000));
+        //        System.out.println(c.postStatusUpdate(1000, "blergh"));
+        //        System.out.println(c.retrieveNewsFeed(1001));
     }
 }

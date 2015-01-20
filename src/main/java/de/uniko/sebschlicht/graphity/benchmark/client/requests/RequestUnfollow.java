@@ -8,6 +8,8 @@ public class RequestUnfollow extends Request {
 
     private long idFollowed;
 
+    private boolean resSuccess;
+
     public RequestUnfollow(
             long idSubscriber,
             long idFollowed) {
@@ -22,5 +24,13 @@ public class RequestUnfollow extends Request {
 
     public long getIdFollowed() {
         return idFollowed;
+    }
+
+    public void setResult(boolean success) {
+        resSuccess = success;
+    }
+
+    public boolean getResult() {
+        return resSuccess;
     }
 }
