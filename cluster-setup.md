@@ -32,6 +32,11 @@ The cluster nodes will run Circus controlling both distributed services, Neo4j a
     $ mkfs -t ext4 /dev/vdb1
 
 `etc/fstab` mounts `/dev/vdb1` on `/media/data` where the services will store their data.
+This had to be once, each replica is configured properly.
+
+### Replica issues
+The data storage of Titan has to be empty when replicating nodes. The Cassandra nodes will have the same token otherwise which leads to problems.
+At the moment at least Titan won't start up until `/etc/hosts` redirects the hostname to the loopback. This may be due to unexpected output the startup script can't handle.
 
 ## Router Node
 The router node will be the central cluster entry point balancing the load over all nodes.
@@ -40,6 +45,8 @@ The benchmark code will be executed from this node to reduce network latency and
 ### Software
 * `apache2`
 * `git`
+* `maven`
+* `openjdk-7-jdk`
 * `python-django`
 * [sshpt](https://code.google.com/p/sshpt/)
 * (pip) paramiko
@@ -115,5 +122,7 @@ and enable both sites and the Proxy module
     $ a2enmod proxy_http proxy_html proxy_balancer xml2enc
     $ a2ensite neo4j titan
     $ service apache2 reload
+
+When using Apache 2.4 make sure to enable the module `lbmethod_byrequests` in addition.
 
 While the first endpoint balances all requests across the cluster, the second endpoint (Neo4j only) does not include any nodes other than the master. The intention is to have a separate endpoint for write requests. The cluster may perform better when using only the master node for writes: Slaves are forced to synchronize with the master in order to execute a write request.
