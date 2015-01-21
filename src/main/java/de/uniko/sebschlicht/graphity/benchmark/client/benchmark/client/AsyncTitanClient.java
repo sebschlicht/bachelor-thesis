@@ -37,7 +37,9 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     @Override
     protected BoundRequestBuilder prepareFeedRequest(RequestFeed request) {
         String jsonString = "{\"reader\":\"" + request.getId() + "\"}";
-        return _httpClient.preparePost(urlFromRelativeUrl(URL_FEED))
+        return _httpClient
+                .preparePost(
+                        urlFromRelativeUrl(request.getAddress(), URL_FEED))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }
@@ -48,7 +50,9 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
                 "{\"following\":\"" + request.getIdSubscriber()
                         + "\",\"followed\":\"" + request.getIdFollowed()
                         + "\"}";
-        return _httpClient.preparePost(urlFromRelativeUrl(URL_FOLLOW))
+        return _httpClient
+                .preparePost(
+                        urlFromRelativeUrl(request.getAddress(), URL_FOLLOW))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }
@@ -58,7 +62,9 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
         String jsonString =
                 "{\"author\":\"" + request.getId() + "\",\"message\":\""
                         + request.getMessage() + "\"}";
-        return _httpClient.preparePost(urlFromRelativeUrl(URL_POST))
+        return _httpClient
+                .preparePost(
+                        urlFromRelativeUrl(request.getAddress(), URL_POST))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }
@@ -70,7 +76,9 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
                 "{\"following\":\"" + request.getIdSubscriber()
                         + "\",\"followed\":\"" + request.getIdFollowed()
                         + "\"}";
-        return _httpClient.preparePost(urlFromRelativeUrl(URL_UNFOLLOW))
+        return _httpClient
+                .preparePost(
+                        urlFromRelativeUrl(request.getAddress(), URL_UNFOLLOW))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }

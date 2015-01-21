@@ -1,5 +1,8 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.api.TargetType;
 import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
@@ -18,6 +21,8 @@ public class AsyncBenchmarkClientTask {
 
     private long[] _startTime;
 
+    protected Queue<String> _endpoints;
+
     private AsyncBenchmarkClient _client;
 
     public AsyncBenchmarkClientTask(
@@ -27,6 +32,7 @@ public class AsyncBenchmarkClientTask {
         _owner = owner;
         _resultManager = resultManager;
         _startTime = new long[config.getNumThreads()];
+        _endpoints = new LinkedList<String>(config.getAddresses());
 
         if (config.getTargetType() == TargetType.NEO4J) {
             //TODO: implement async Neo4j client
@@ -65,6 +71,9 @@ public class AsyncBenchmarkClientTask {
 
     private void executeNextRequest(int identifier) {
         Request request = _owner.nextRequest();
+        String endpoint = _endpoints.poll();
+        _endpoints.add(endpoint);
+        request.setAddress(endpoint);
         _startTime[identifier] = System.currentTimeMillis();
         _client.executeRequest(identifier, request);
     }

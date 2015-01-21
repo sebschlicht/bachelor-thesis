@@ -6,6 +6,8 @@ public abstract class Request {
 
     protected RequestType _type;
 
+    protected String _address;
+
     protected boolean _hasFailed;
 
     public Request(
@@ -15,6 +17,14 @@ public abstract class Request {
 
     public RequestType getType() {
         return _type;
+    }
+
+    public void setAddress(String address) {
+        _address = address;
+    }
+
+    public String getAddress() {
+        return _address;
     }
 
     public void setError(boolean isError) {
