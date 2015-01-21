@@ -120,11 +120,22 @@ public class AsyncClient {
         logMessageStarted.append("will now attack ");
         logMessageStarted.append(config.getTargetType().toString());
         logMessageStarted.append(" on ");
-        logMessageStarted.append(config.getAddresses().get(0));
-        if (config.getAddresses().size() > 0) {
-            logMessageStarted.append(" (along with ");
-            logMessageStarted.append(config.getAddresses().size());
-            logMessageStarted.append(" other node[s])");
+        int numAddresses = config.getAddresses().size();
+        if (numAddresses > 1) {
+            logMessageStarted.append("cluster [ ");
+            int i = 0;
+            for (String address : config.getAddresses()) {
+                logMessageStarted.append("'");
+                logMessageStarted.append(address);
+                logMessageStarted.append("'");
+                if (i < numAddresses - 1) {
+                    logMessageStarted.append(",");
+                }
+                i += 1;
+            }
+            logMessageStarted.append(" ]");
+        } else {
+            logMessageStarted.append(config.getAddresses().get(0));
         }
         logMessageStarted.append(" with ");
         logMessageStarted.append(config.getNumThreads());
