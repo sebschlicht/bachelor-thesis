@@ -73,7 +73,7 @@ public class AsyncBenchmarkClientTask {
     private void executeNextRequest(int identifier) {
         Request request = _owner.nextRequest();
         request.setAddress(_endpoints[_iCrrEndpoint]);
-        if (++_iCrrEndpoint > _endpoints.length) {
+        if (++_iCrrEndpoint >= _endpoints.length) {
             _iCrrEndpoint = 0;
         }
         _startTime[identifier] = System.currentTimeMillis();
