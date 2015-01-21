@@ -1,5 +1,8 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -21,6 +24,8 @@ public abstract class AsyncBenchmarkClient {
 
     protected AsyncHttpClient _httpClient;
 
+    protected Queue<String> _endpoints;
+
     protected String urlFeed;
 
     protected String urlFollow;
@@ -34,6 +39,7 @@ public abstract class AsyncBenchmarkClient {
             ClientConfiguration config) {
         _client = client;
         _config = config;
+        _endpoints = new LinkedList<String>(config.getAddresses());
         AsyncHttpClientConfig httpClientConfig =
                 new AsyncHttpClientConfig.Builder().setConnectTimeout(1000)
                         .setMaxConnections(config.getNumThreads()).build();
@@ -56,7 +62,9 @@ public abstract class AsyncBenchmarkClient {
             RequestUnfollow request);
 
     protected String urlFromRelativeUrl(String url) {
-        return "http://" + _config.getTargetEndpoint() + url;
+        String endpoint = _endpoints.remove();
+        _endpoints.add(endpoint);
+        return "http://" + endpoint + _config.getTargetBase() + url;
     }
 
     public void executeRequest(int identifier, Request request) {

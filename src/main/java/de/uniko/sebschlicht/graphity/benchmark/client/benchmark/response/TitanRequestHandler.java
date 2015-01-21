@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.ning.http.client.Response;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.impl.ResponseList;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
@@ -24,11 +23,16 @@ public class TitanRequestHandler extends AsyncRequestHandler {
     @Override
     protected void handleFeedResponse(Response response) throws IOException {
         String sResponse = response.getResponseBody();
-        ResponseList lResponse = GSON.fromJson(sResponse, ResponseList.class);
-        List<JsonObject> statusUpdates = lResponse.getResponseValue();
-        ((RequestFeed) _request).setResult((statusUpdates == null)
-                ? -1
-                : statusUpdates.size());
+        TitanListResponse lResponse =
+                GSON.fromJson(sResponse, TitanListResponse.class);
+        if (lResponse.isSuccess()) {
+            List<JsonObject> statusUpdates = lResponse.getValue();
+            ((RequestFeed) _request).setResult((statusUpdates == null)
+                    ? -1
+                    : statusUpdates.size());
+        } else {
+            _request.setError(true);
+        }
     }
 
     @Override
@@ -37,8 +41,9 @@ public class TitanRequestHandler extends AsyncRequestHandler {
         TitanBooleanResponse bResponse =
                 GSON.fromJson(sResponse, TitanBooleanResponse.class);
         if (bResponse.isSuccess()) {
-            System.out.println(sResponse);
             ((RequestFollow) _request).setResult(bResponse.getValue());
+        } else {
+            _request.setError(true);
         }
     }
 
@@ -48,8 +53,9 @@ public class TitanRequestHandler extends AsyncRequestHandler {
         TitanLongResponse lResponse =
                 GSON.fromJson(sResponse, TitanLongResponse.class);
         if (lResponse.isSuccess()) {
-            System.out.println(sResponse);
             ((RequestPost) _request).setResult(lResponse.getValue() != 0L);
+        } else {
+            _request.setError(true);
         }
     }
 
@@ -59,8 +65,9 @@ public class TitanRequestHandler extends AsyncRequestHandler {
         TitanBooleanResponse bResponse =
                 GSON.fromJson(sResponse, TitanBooleanResponse.class);
         if (bResponse.isSuccess()) {
-            System.out.println(sResponse);
             ((RequestUnfollow) _request).setResult(bResponse.getValue());
+        } else {
+            _request.setError(true);
         }
     }
 }

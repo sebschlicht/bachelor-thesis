@@ -1,5 +1,12 @@
 package de.uniko.sebschlicht.graphity.benchmark.master;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.metalcon.utils.Config;
 import de.uniko.sebschlicht.graphity.benchmark.api.TargetType;
 
@@ -23,9 +30,13 @@ public class MasterConfiguration extends Config {
 
     private TargetType _targetType;
 
-    public String endpointNeo4j;
+    public String pathAddresses;
 
-    public String endpointTitan;
+    private List<String> _addresses;
+
+    public String baseNeo4j;
+
+    public String baseTitan;
 
     public long id_start;
 
@@ -56,13 +67,21 @@ public class MasterConfiguration extends Config {
                         "number of threads must be greater than zero");
             }
             _targetType = TargetType.fromString(targetType);
-            if (_targetType == TargetType.NEO4J && endpointNeo4j.equals("")) {
+            _addresses = new LinkedList<String>();
+            try {
+                BufferedReader reader =
+                        new BufferedReader(new FileReader(pathAddresses));
+                String address;
+                while ((address = reader.readLine()) != null) {
+                    _addresses.add(address.trim());
+                }
+                reader.close();
+            } catch (FileNotFoundException e) {
                 throw new IllegalArgumentException(
-                        "Neo4j cluster endpoint has to specified");
-            }
-            if (_targetType == TargetType.TITAN && endpointTitan.equals("")) {
-                throw new IllegalArgumentException(
-                        "Titan cluster endpoint has to specified");
+                        "cluster addresses file was not found at \""
+                                + pathAddresses + "\"");
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
             }
             if (id_start > id_end) {
                 throw new IllegalArgumentException(
@@ -73,5 +92,17 @@ public class MasterConfiguration extends Config {
 
     public TargetType getTargetType() {
         return _targetType;
+    }
+
+    public List<String> getAddresses() {
+        return _addresses;
+    }
+
+    public String getTargetBase() {
+        if (_targetType == TargetType.NEO4J) {
+            return baseNeo4j;
+        } else {
+            return baseTitan;
+        }
     }
 }

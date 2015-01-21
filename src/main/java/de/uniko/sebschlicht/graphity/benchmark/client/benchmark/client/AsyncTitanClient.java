@@ -15,22 +15,18 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
 
     private static final String URL_EXTENSION = "/graphs/graph/graphity/";
 
-    private static final String URL_FEED = "feeds/";
+    private static final String URL_FEED = URL_EXTENSION + "feeds/";
 
-    private static final String URL_FOLLOW = "follow/";
+    private static final String URL_FOLLOW = URL_EXTENSION + "follow/";
 
-    private static final String URL_POST = "post/";
+    private static final String URL_POST = URL_EXTENSION + "post/";
 
-    private static final String URL_UNFOLLOW = "unfollow/";
+    private static final String URL_UNFOLLOW = URL_EXTENSION + "unfollow/";
 
     public AsyncTitanClient(
             AsyncBenchmarkClientTask client,
             ClientConfiguration config) {
         super(client, config);
-        urlFeed = urlFromRelativeUrl(URL_EXTENSION + URL_FEED);
-        urlFollow = urlFromRelativeUrl(URL_EXTENSION + URL_FOLLOW);
-        urlPost = urlFromRelativeUrl(URL_EXTENSION + URL_POST);
-        urlUnfollow = urlFromRelativeUrl(URL_EXTENSION + URL_UNFOLLOW);
     }
 
     @Override
@@ -41,7 +37,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     @Override
     protected BoundRequestBuilder prepareFeedRequest(RequestFeed request) {
         String jsonString = "{\"reader\":\"" + request.getId() + "\"}";
-        return _httpClient.preparePost(urlFeed)
+        return _httpClient.preparePost(urlFromRelativeUrl(URL_FEED))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }
@@ -52,7 +48,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
                 "{\"following\":\"" + request.getIdSubscriber()
                         + "\",\"followed\":\"" + request.getIdFollowed()
                         + "\"}";
-        return _httpClient.preparePost(urlFollow)
+        return _httpClient.preparePost(urlFromRelativeUrl(URL_FOLLOW))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }
@@ -62,7 +58,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
         String jsonString =
                 "{\"author\":\"" + request.getId() + "\",\"message\":\""
                         + request.getMessage() + "\"}";
-        return _httpClient.preparePost(urlPost)
+        return _httpClient.preparePost(urlFromRelativeUrl(URL_POST))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }
@@ -74,7 +70,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
                 "{\"following\":\"" + request.getIdSubscriber()
                         + "\",\"followed\":\"" + request.getIdFollowed()
                         + "\"}";
-        return _httpClient.preparePost(urlUnfollow)
+        return _httpClient.preparePost(urlFromRelativeUrl(URL_UNFOLLOW))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }

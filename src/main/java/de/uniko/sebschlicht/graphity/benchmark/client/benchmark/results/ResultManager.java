@@ -3,7 +3,7 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.RequestType;
-import de.uniko.sebschlicht.graphity.benchmark.client.SingleClient;
+import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
@@ -38,7 +38,12 @@ public class ResultManager implements Runnable {
         StringBuilder logMessage = new StringBuilder();
         logMessage.append(request.getType().getId());
         logMessage.append("\t");
-        logMessage.append(duration);
+        if (!request.hasFailed()) {
+
+            logMessage.append(duration);
+        } else {
+            logMessage.append(-1);
+        }
         switch (request.getType()) {
             case FEED:
                 RequestFeed rfe = (RequestFeed) request;
@@ -70,7 +75,7 @@ public class ResultManager implements Runnable {
                 logMessage.append(ru.getIdFollowed());
                 break;
         }
-        SingleClient.LOG.info(logMessage);
+        AsyncClient.LOG.info(logMessage);
     }
 
     public BenchmarkResult getResults() {
@@ -110,13 +115,13 @@ public class ResultManager implements Runnable {
                     logMessage.append("\t" + container.getNumEntries());
                     // duration
                 }
-                SingleClient.LOG.info(logMessage);
+                AsyncClient.LOG.info(logMessage);
                 tsLastUpdate = System.currentTimeMillis();
             }
         }
         for (int i = 0; i < 4; ++i) {
             RequestType type = RequestType.getTypeById(i);
-            SingleClient.LOG.info(type + ": " + results[i].getNumEntries()
+            AsyncClient.LOG.info(type + ": " + results[i].getNumEntries()
                     + " requests");
         }
     }

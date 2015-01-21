@@ -108,15 +108,28 @@ public class AsyncClient {
                 new ClientConfiguration(baseConfig.id_start, baseConfig.id_end,
                         baseConfig.feed_length, baseConfig.maxThroughput,
                         baseConfig.numThreads, requestComposition,
-                        baseConfig.getTargetType(), baseConfig.endpointNeo4j,
-                        baseConfig.endpointTitan);
+                        baseConfig.getAddresses(), baseConfig.getTargetType(),
+                        baseConfig.getTargetBase());
 
         // spawn client thread
         resultManager = new ResultManager();
-        benchmarkClient = new AsyncBenchmarkClientTask(this, resultManager, config);
-        LOG.info("will now attack " + config.getTargetType() + " on "
-                + config.getTargetEndpoint() + " with "
-                + config.getNumThreads() + " client threads...");
+        benchmarkClient =
+                new AsyncBenchmarkClientTask(this, resultManager, config);
+
+        StringBuilder logMessageStarted = new StringBuilder();
+        logMessageStarted.append("will now attack ");
+        logMessageStarted.append(config.getTargetType().toString());
+        logMessageStarted.append(" on ");
+        logMessageStarted.append(config.getAddresses().get(0));
+        if (config.getAddresses().size() > 0) {
+            logMessageStarted.append(" (along with ");
+            logMessageStarted.append(config.getAddresses().size());
+            logMessageStarted.append(" other node[s])");
+        }
+        logMessageStarted.append(" with ");
+        logMessageStarted.append(config.getNumThreads());
+        logMessageStarted.append(" client threads.");
+        LOG.info(logMessageStarted.toString());
         benchmarkClient.start();
         LOG.info("benchmark started at " + System.currentTimeMillis());
     }

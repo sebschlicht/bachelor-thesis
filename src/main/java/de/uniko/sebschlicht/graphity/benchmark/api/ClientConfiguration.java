@@ -1,5 +1,7 @@
 package de.uniko.sebschlicht.graphity.benchmark.api;
 
+import java.util.List;
+
 public class ClientConfiguration {
 
     private long idStart;
@@ -14,9 +16,11 @@ public class ClientConfiguration {
 
     private RequestComposition requests;
 
+    private List<String> addresses;
+
     private TargetType targetType;
 
-    private String targetEndpoint;
+    private String targetBase;
 
     /**
      * Creates a transferable benchmark client configuration.
@@ -34,12 +38,12 @@ public class ClientConfiguration {
      *            number of threads per client
      * @param requestComposition
      *            request composition
+     * @param addresses
+     *            IP addresses forming the target cluster
      * @param targetType
      *            target cluster type
-     * @param endpointNeo4j
-     *            endpoint for Neo4j cluster
-     * @param endpointTitan
-     *            endpoint for Titan cluster
+     * @param targetBase
+     *            base path of the target application relative to the endpoints
      */
     public ClientConfiguration(
             long idStart,
@@ -48,20 +52,18 @@ public class ClientConfiguration {
             int maxThroughput,
             int numThreads,
             RequestComposition requestComposition,
+            List<String> addresses,
             TargetType targetType,
-            String endpointNeo4j,
-            String endpointTitan) {
+            String targetBase) {
         this.idStart = idStart;
         this.idEnd = idEnd;
         this.lengthFeed = lengthFeed;
         this.maxThroughput = maxThroughput;
         this.numThreads = numThreads;
         requests = requestComposition;
+        this.addresses = addresses;
         this.targetType = targetType;
-        targetEndpoint =
-                (targetType == TargetType.NEO4J)
-                        ? endpointNeo4j
-                        : endpointTitan;
+        this.targetBase = targetBase;
     }
 
     /**
@@ -103,14 +105,18 @@ public class ClientConfiguration {
         return requests;
     }
 
+    public List<String> getAddresses() {
+        return addresses;
+    }
+
     public TargetType getTargetType() {
         return targetType;
     }
 
     /**
-     * @return endpoint of the target cluster
+     * @return base path of the target application relative to the addresses
      */
-    public String getTargetEndpoint() {
-        return targetEndpoint;
+    public String getTargetBase() {
+        return targetBase;
     }
 }
