@@ -179,20 +179,21 @@ public class TitanClient extends AbstractBenchmarkClient {
                 new ClientConfiguration(0, 0, 0, 0, 0, null, TargetType.TITAN,
                         null, "141.26.208.4:82/titan");
         TitanClient c = new TitanClient(config);
-        for (int i = 0; i < 40000; ++i) {
-            int numFeeds = c.retrieveNewsFeed(i);
-            if (numFeeds > 0) {
-                System.out.println(i + ": " + numFeeds);
-            }
-        }
-        //        System.out.println(c.postStatusUpdate(1000, "blargh"));
-        //        System.out.println(c.retrieveNewsFeed(1001));
-        //        System.out.println(c.subscribe(1001, 1000));
-        //        System.out.println(c.postStatusUpdate(1000, "blurgh"));
-        //        System.out.println(c.subscribe(1001, 1000));
-        //        System.out.println(c.retrieveNewsFeed(1001));
-        //        System.out.println(c.unsubscribe(1001, 1000));
-        //        System.out.println(c.postStatusUpdate(1000, "blergh"));
-        //        System.out.println(c.retrieveNewsFeed(1001));
+        //        for (int i = 0; i < 40000; ++i) {
+        //            int numFeeds = c.retrieveNewsFeed(i);
+        //            if (numFeeds > 0) {
+        //                System.out.println(i + ": " + numFeeds);
+        //            }
+        //        }
+
+        System.out.println(c.postStatusUpdate(1000, "blargh"));
+        System.out.println(c.retrieveNewsFeed(1001));
+        System.out.println(c.subscribe(1001, 1000));
+        System.out.println(c.postStatusUpdate(1000, "blurgh"));
+        System.out.println(c.subscribe(1001, 1000));
+        System.out.println(c.retrieveNewsFeed(1001));
+        System.out.println(c.unsubscribe(1001, 1000));
+        System.out.println(c.postStatusUpdate(1000, "blergh"));
+        System.out.println(c.retrieveNewsFeed(1001));
     }
 }
