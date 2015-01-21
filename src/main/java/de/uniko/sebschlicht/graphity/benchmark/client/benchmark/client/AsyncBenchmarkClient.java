@@ -42,7 +42,7 @@ public abstract class AsyncBenchmarkClient {
         _endpoints = new LinkedList<String>(config.getAddresses());
         AsyncHttpClientConfig httpClientConfig =
                 new AsyncHttpClientConfig.Builder().setConnectTimeout(1000)
-                        .setMaxConnections(config.getNumThreads()).build();
+                        .build();
         _httpClient = new AsyncHttpClient(httpClientConfig);
     }
 
