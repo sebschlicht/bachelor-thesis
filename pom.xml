@@ -6,7 +6,7 @@
   <version>0.0.1-SNAPSHOT</version>
 
   <properties>
-    <java.exec.launcherClass>de.uniko.sebschlicht.graphity.benchmark.client.SingleClient</java.exec.launcherClass>
+    <java.exec.launcherClass>de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient</java.exec.launcherClass>
 
     <!-- version of Java compiler plugin -->
     <java.compiler-plugin.version>3.1</java.compiler-plugin.version>
