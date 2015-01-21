@@ -62,7 +62,8 @@ public abstract class AsyncRequestHandler extends AsyncCompletionHandler<Void> {
 
     @Override
     public void onThrowable(Throwable t) {
-        t.printStackTrace();
+        _request.setError(true);
+        _client.handleResponse(_identifier, _request);
     }
 
     protected abstract void handleFeedResponse(Response response)
