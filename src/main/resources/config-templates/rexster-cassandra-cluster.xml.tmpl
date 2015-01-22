@@ -42,6 +42,7 @@
             <properties>
                 <cluster.max-partitions>128</cluster.max-partitions>
                 <storage.backend>cassandra</storage.backend>
+                <storage.connection-timeout>30000</storage.connection-timeout>
                 <storage.hostname>${address}</storage.hostname>
                 <!-- did not working in a whole
                 <storage.cassandra.keyspace>test1</storage.cassandra.keyspace>
