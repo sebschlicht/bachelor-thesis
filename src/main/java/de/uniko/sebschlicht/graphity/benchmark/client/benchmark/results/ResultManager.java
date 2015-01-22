@@ -39,10 +39,11 @@ public class ResultManager implements Runnable {
         logMessage.append(request.getType().getId());
         logMessage.append("\t");
         if (!request.hasFailed()) {
-
             logMessage.append(duration);
         } else {
             logMessage.append(-1);
+            logMessage.append("\t");
+            logMessage.append(request.getError().getMessage());
         }
         switch (request.getType()) {
             case FEED:

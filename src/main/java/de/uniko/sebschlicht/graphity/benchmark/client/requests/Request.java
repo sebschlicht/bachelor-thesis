@@ -8,7 +8,7 @@ public abstract class Request {
 
     protected String _address;
 
-    protected boolean _hasFailed;
+    protected Throwable _throwable;
 
     public Request(
             RequestType type) {
@@ -27,11 +27,15 @@ public abstract class Request {
         return _address;
     }
 
-    public void setError(boolean isError) {
-        _hasFailed = isError;
+    public void setError(Throwable throwable) {
+        _throwable = throwable;
     }
 
     public boolean hasFailed() {
-        return _hasFailed;
+        return (_throwable != null);
+    }
+
+    public Throwable getError() {
+        return _throwable;
     }
 }

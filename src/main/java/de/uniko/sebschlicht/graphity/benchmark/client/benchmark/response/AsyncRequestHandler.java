@@ -62,7 +62,7 @@ public abstract class AsyncRequestHandler extends AsyncCompletionHandler<Void> {
 
     @Override
     public void onThrowable(Throwable t) {
-        _request.setError(true);
+        _request.setError(t);
         _client.handleResponse(_identifier, _request);
     }
 

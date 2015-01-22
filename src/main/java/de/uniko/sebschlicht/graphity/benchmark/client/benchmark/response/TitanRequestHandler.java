@@ -31,7 +31,7 @@ public class TitanRequestHandler extends AsyncRequestHandler {
                     ? -1
                     : statusUpdates.size());
         } else {
-            _request.setError(true);
+            _request.setError(new IllegalStateException(sResponse));
         }
     }
 
@@ -43,7 +43,7 @@ public class TitanRequestHandler extends AsyncRequestHandler {
         if (bResponse.isSuccess()) {
             ((RequestFollow) _request).setResult(bResponse.getValue());
         } else {
-            _request.setError(true);
+            _request.setError(new IllegalStateException(sResponse));
         }
     }
 
@@ -55,7 +55,7 @@ public class TitanRequestHandler extends AsyncRequestHandler {
         if (lResponse.isSuccess()) {
             ((RequestPost) _request).setResult(lResponse.getValue() != 0L);
         } else {
-            _request.setError(true);
+            _request.setError(new IllegalStateException(sResponse));
         }
     }
 
@@ -67,7 +67,7 @@ public class TitanRequestHandler extends AsyncRequestHandler {
         if (bResponse.isSuccess()) {
             ((RequestUnfollow) _request).setResult(bResponse.getValue());
         } else {
-            _request.setError(true);
+            _request.setError(new IllegalStateException(sResponse));
         }
     }
 }
