@@ -33,13 +33,6 @@ Type `help` to get a list of available commands.
 You can get the documentation of any command by passing `-h` to it. The documentation below is copied from these help texts.  
 The CircusMan console supports command history.
 
-#### Start Circus
-You can start a Circus node using the following command. It uploads the `configure` command and then executes the startup script located in `/home/node/circus/start.sh` via parallel SSH.
-
-    $ >startCircus
-
-Please note that the command does not wait for Circus to start up. It returns immediately after executing the script. You can watch the status of the node in the status HTML file generated.
-
 #### Restart Circus
 Restarts Circus on all cluster nodes where it is running. Start Circus on all cluster nodes where Circus is not running.
 Updates all scripts/service plugins/config templates at first.
