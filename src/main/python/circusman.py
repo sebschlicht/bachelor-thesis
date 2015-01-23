@@ -14,73 +14,7 @@ import zmq
 #from django.template import Template, Context
 #from django.conf import settings
 #settings.configure()
-
-class SshClient:
-  def __init__(self):
-    self.username = SSH_USER
-    self.sshArgs = [
-      './sshpt.py',
-      '-u', self.username,
-      '-s',
-      '-U', self.username,
-      '-P', SSH_USER,
-      '-f', PATH_LOCAL_SSH_NODES,
-      '-o', PATH_LOCAL_SSH_RESULTS
-    ]
-  
-  def doSsh(self, args):
-    sshArgs = self.sshArgs + args
-    return subprocess.check_output(sshArgs)
-  
-  def doScp(self, pathLocal, pathRemote):
-    scpArgs = self.sshArgs + [
-      '-c', pathLocal,
-      '-D', pathRemote
-    ]
-    result = subprocess.check_output(scpArgs)
-    f = StringIO.StringIO(result)
-    reader = csv.reader(f, delimiter=',')
-    for row in reader:
-      if len(row) != 5 or row[1] != 'SUCCESS' or row[4].startswith('[Errno'):
-       print 'failed to copy "' + pathLocal + '" @ ' + row[0]
-       return False
-    return True
-  
-  def doScpMulti(self, files):
-    # create archive file
-    zipArgs = [
-      'zip',
-      '/tmp/circusman-scp.zip'
-    ]
-    for f in files:
-      zipArgs.append(f[0])
-    if not subprocess.check_output(zipArgs):
-      return False
-    
-    # transmit archive file
-    self.doScp('/tmp/circusman-scp.zip', '/tmp/')
-    
-    # remove archive file
-    rmArgs = [
-      'rm',
-      '/tmp/circusman-scp.zip'
-    ]
-    if subprocess.check_output(rmArgs):
-      return False
-    
-    # unzip remote archive file
-    unzipArgs = [
-      'unzip -j /tmp/circusman-scp.zip -d /tmp/circusman-scp',
-      'rm /tmp/circusman-scp.zip'
-    ]
-    # move files to their destinations
-    for f in files:
-      parent, filename = ntpath.split(f[0])
-      unzipArgs.append('cp /tmp/circusman-scp/' + filename + ' ' + f[1])
-    unzipArgs.append('rm -rf /tmp/circusman-scp')
-    if not self.doSsh(unzipArgs):
-      return False
-    return True
+import argparse
 
 class CircusController:
   def __init__(self):
@@ -89,9 +23,6 @@ class CircusController:
     self.isBusy = False
     self.connected = False
     self.context = zmq.Context()
-    self.key = None
-    #with open(PATH_LOCAL_TMPL_HTML, 'r') as templateFile:
-    #  self.template = Template(templateFile.read())
   
   def disconnect(self):
     if self.connected:
@@ -204,97 +135,6 @@ class CircusController:
     client.doSsh([
       REMOTE_DIR_WORKING + 'reset.sh'
     ])
-
-class CircusNode:
-  def __init__(self, identifier, address, port):
-    self.identifier = identifier
-    self.address = address
-    self.port = int(port)
-    self.sending = False
-    self.isMaster = False
-    if identifier == 1:
-      self.isMaster = True
-  
-  def getDict(self):
-    return {
-      'address': self.address,
-      'identifier': self.identifier,
-      'status': self.status
-    }
-    
-  def connect(self, context):
-    self.socket = context.socket(zmq.PAIR)
-    self.socket.setsockopt(zmq.LINGER, 0)
-    self.socket.connect("tcp://{host}:{port}".format(host=self.address,port=self.port))
-    self.poller = zmq.Poller()
-    self.poller.register(self.socket, zmq.POLLIN)
-    
-  def close(self):
-    self.socket.close(0)
-    
-  def sendJson(self, jsonValue):
-    self.socket.send_json(jsonValue)
-    self.sending = True
-    socks = dict(self.poller.poll(TIMEOUT_POLL))
-    if self.socket in socks and socks[self.socket] == zmq.POLLIN:
-      reply = self.socket.recv_json()
-    else:
-      reply = False
-    self.sending = False
-    return reply
-  
-  def getStats(self):
-    stats = self.sendJson({"command":"stats"})
-    if stats:
-      apps = []
-      if 'infos' in stats.keys():
-        for app in stats['infos']:
-          running = False
-          for process in stats['infos'][app]:
-            running = True
-            break
-          if running:
-            apps.append(app)
-      self.status = apps
-    else:
-      self.status = 'offline'
-  
-  def start(self, name):
-    cmdStart = {
-      'command': 'start'
-    }
-    if not name is None:
-      cmdStart['properties'] = {
-        'name': name
-      }
-    self.sendJson(cmdStart)
-  
-  def stop(self, name):
-    cmdStop = {
-      'command': 'stop'
-    }
-    if not name is None:
-      cmdStop['properties'] = {
-        'name': name
-      }
-    self.sendJson(cmdStop)
-  
-  def configure(self, cluster):
-    cmdConfigure = {
-      'command': 'configure',
-      'properties': {
-        'address': self.address,
-        'cluster': cluster,
-        'identifier': self.identifier,
-        'isMaster': self.isMaster
-      }
-    }
-    reply = self.sendJson(cmdConfigure)
-    if not reply:
-      print self.address + ' is not responding'
-    elif not 'success' in reply:
-      print 'failed to configure ' + self.address + ':'
-      print reply
 
 class CircusMan:
   def __init__(self, nodes):
@@ -428,16 +268,20 @@ man = CircusMan(nodes)
 man.start()
 
 def printUsage(cmd):
-  if cmd == 'cluster':
-    print 'usage:'
-    print '\tcluster'
-    print '\tLoads the cluster from nodes file. (currently at ' + LOCAL_FILE_NODES + ')'
-    print '\tThis file contains one node address per line.'
-    print
-    print '\tcluster <startAddress> <endAddress> <circusPort>'
-    print '\texample:'
-    print '\t\tcluster 192.168.56.101 192.168.56.103 5555'
-    print '\n\tNote that start and end address must be in the same C net.'
+  if cmd == 'clear':
+    print 'clear [OPTION] [data|log]'
+    print '\tClears all remote service data and/or log files.'
+    print '\tBy default both data and log files are cleared. You will be prompted to confirm your selection.'
+    print '\nOptions:'
+    print '\n\t-b <backupLocation>'
+    print '\t\tWhen clearing remote log files you can pass a local directory where the log files will be backed up first. The log files will be suffixed with the address of their source node.'
+  elif cmd == 'cluster [OPTION] <port>':
+    print '\tRedefines the cluster IP addresses and the Circus port.'
+    print '\nOptions:'
+    print '\n\t-f <filePath>'
+    print '\t\tLoad the cluster addresses from a file. Each line must contain one node address.'
+    print '\n\t-r <startAddress> <endAddress>'
+    print '\t\tLoad the cluster addresses from an IP address range. Start and end address must be in the same C net.'
 
 try:
   print 'CircusMan console'
