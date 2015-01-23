@@ -222,15 +222,15 @@ cmdCluster.add_argument('filePath', nargs='?', default=LOCAL_FILE_NODES,
 cmdCluster.add_argument('port', type=int, nargs='?', default=PORT_CIRCUS,
   help='remote Circus port (default: ' + str(PORT_CIRCUS) + ')')
 # (circus) configure
-cmdConfigure = newCommand('configure', 'Configures Neo4j and Titan on all cluster nodes. In order to use this command Circus must be running on the nodes.')
+cmdConfigure = newCommand('configure', 'Configures Neo4j and Titan on all cluster nodes. Circus must be running on the nodes in order to use this command.')
 # circus restart
 cmdRestartCircus = newCommand('restartCircus', 'Restarts Circus on all cluster nodes where it is running. Start Circus on all cluster nodes where Circus is not running. Updates all scripts/service plugins/config templates at first.')
 # (circus) start
-cmdStart = newCommand('start', 'Starts the Circus arbiter/a Circus watcher on all cluster nodes.')
+cmdStart = newCommand('start', 'Starts the Circus arbiter/a Circus watcher on all cluster nodes. Circus must be running on the nodes in order to use this command.')
 cmdStart.add_argument('watcher', nargs='?', metavar='name',
   help='Start a certain watcher only. By default the arbiter is started.')
 # (circus) stop
-cmdStop = newCommand('stop', 'Stops the Circus arbiter/a Circus watcher on all cluster nodes.')
+cmdStop = newCommand('stop', 'Stops the Circus arbiter/a Circus watcher on all cluster nodes. Circus must be running on the nodes in order to use this command.')
 cmdStop.add_argument('watcher', nargs='?', metavar='name',
   help='Stop a certain watcher only. By default the arbiter is stopped.')
 

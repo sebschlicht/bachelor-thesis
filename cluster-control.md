@@ -26,9 +26,12 @@ Circus allows to define own commands and we will define a `configure` command th
 #### Startup
 
     $ cd src/main/python
-    $ python circusman.py
+    $ ./CircusMan.py
 
 will bring you into the controller console.
+Type `help` to get a list of available commands.
+You can get the documentation of any command by passing `-h` to it. The documentation below is copied from these help texts.  
+The CircusMan console supports command history.
 
 #### Start Circus
 You can start a Circus node using the following command. It uploads the `configure` command and then executes the startup script located in `/home/node/circus/start.sh` via parallel SSH.
@@ -38,60 +41,68 @@ You can start a Circus node using the following command. It uploads the `configu
 Please note that the command does not wait for Circus to start up. It returns immediately after executing the script. You can watch the status of the node in the status HTML file generated.
 
 #### Restart Circus
-You can restart a Circus node using the following command. It uploads the `configure` command and then executes the restart script located in `/home/node/circus/restart.sh` via parallel SSH.
-
-    $ >restartCircus
-
-Please note that the command does not wait for Circus to shutdown or start up. It returns immediately after executing the script. You can watch the status of the node in the status HTML file generated.
-
-#### Upload configuration file templates
-If you made changes to the configuration file templates, e.g. updated a port that will effect all nodes, you can upload the templates again via parallel SSH.
-
-    $ >upload
+Restarts Circus on all cluster nodes where it is running. Start Circus on all cluster nodes where Circus is not running.
+Updates all scripts/service plugins/config templates at first.
+    
+    $ restartCircus
 
 #### Start watchers
+Starts the Circus arbiter/a Circus watcher on all cluster nodes. Circus must be running on the nodes in order to use this command.
+The command does not block until the arbiter/watcher is actually running but returns immediately.
 
-    $ >start [watcher_name]
-
-Please note that the command does not wait for the watcher startup. It returns immediately after getting a response from the Circus node. You can watch the status of each watcher in the status HTML file generated.
+    $ start -h
+    usage: start [-h] [name]
+    
+    Starts the Circus arbiter/a Circus watcher on all cluster nodes. Circus must be
+    running on the nodes in order to use this command.
+    
+    positional arguments:
+      name        Start a certain watcher only. By default the arbiter is started.
 
 #### Stop watchers
+Stops the Circus arbiter/a Circus watcher on all cluster nodes. Circus must be running on the nodes in order to use this command.
+The command does not block until the arbiter/watcher has stopped but returns immediately.
 
-    $ >stop [watcher_name]
+    $ stop -h
+    usage: stop [-h] [name]
+    
+    Stops the Circus arbiter/a Circus watcher on all cluster nodes. Circus must be
+    running on the nodes in order to use this command.
+    
+    positional arguments:
+      name        Stop a certain watcher only. By default the arbiter is stopped.
 
-Please note that the command does not wait for the watcher shutdown. It returns immediately after getting a response from the Circus node. You can watch the status of each watcher in the status HTML file generated.
+#### Update the cluster
+The cluster is loaded from a specific file. If you changed the cluster file or
+want to use another file you can use this command in order to redefine the cluster.
 
-#### Change the cluster range
-The default cluster contains your local machine only. You can change the cluster, e.g. when adding/removing nodes. Specify a network and the number of nodes.
-
-    $ >cluster network numNodes
-
-The IP addresses start with 1 and increase up to 254. The identifier equal the last part of the IP address.  
-For instance
-
-    $ >cluster 192.168.0 32
-
-will lead to a cluster from 192.168.0.1 to 192.168.0.32.
-
-More than 254 nodes is not supported, since only the last portion of the IP address is altered by the script.
+    $ cluster -h
+    usage: cluster [-h] [filePath] [port]
+    
+    Redefines the cluster addresses and the Circus port.
+    
+    positional arguments:
+      filePath    Path to the cluster file. Each line must contain one node
+                  address. (default: <repository-dir>/src/main/resources/nodes)
+      port        remote Circus port (default: 5555)
 
 #### Configure watchers
 Whenever a node was added/removed or we want to change a configuration option we 
 * stop all nodes,
 
-  `$ >stop`
+  `$ stop`
 
-* (only if nodes were added/removed:) define the new IP address range,
+* (only if nodes were added/removed:) reload the cluster,
 
-  `$ >cluster <network> <numNodes>`
+  `$ cluster`
 
 * re-configure all nodes using our [Circus command `configure`](#circus-command-configure) and
 
-  `$ >configure`
+  `$ configure`
 
 * bring them up again
 
-  `$ >start`
+  `$ start`
 
 ### Circus node configuration
 Two watchers are necessary to control the cluster:
@@ -101,17 +112,10 @@ Two watchers are necessary to control the cluster:
 The watchers will be started by the cluster controller on request.
 This ensures that the services were configured properly before started.
 
-    [circus]
-    TODO
-    [watcher:titan]
-    TODO
-    [watcher:neo4j]
-    TODO
-
 ### Circus command (configure)
 To update the configuration of the cluster nodes we define a new `circus` command, the [configure command](src/main/python/CommandConfigure.py). After [adding the command](../../wiki/HowTo:-Create-a-custom-circus-command) to the Circus nodes it can be called using the controller:
 
-    $>configure
+    $ configure
 
 but before executing the command on the node, the controller updates the configuration file templates via parallel SSH.
 
@@ -158,3 +162,4 @@ It would be nice to have a webapp that supports to start/stop a certain/all watc
 
 However for me it is acceptable, because a heartbeat of 1s is not too bad.
 Based on this script I could now collect statistics from each node.
+
