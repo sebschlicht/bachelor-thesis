@@ -85,6 +85,10 @@ Whenever a node was added/removed or we want to change a configuration option we
 
   `$ stop`
 
+* (only if changes were made to the configuration file templates:) restart Circus,
+
+  `$ restartCircus`
+
 * (only if nodes were added/removed:) reload the cluster,
 
   `$ cluster`
