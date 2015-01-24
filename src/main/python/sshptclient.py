@@ -36,14 +36,15 @@ class SshClient:
        return False
     return True
   
+  # assumes that temporary directory equals on local and remote machine(s)
   def doScpMulti(self, files):
     # create archive file
-    tmpFile = {}
-    tmpFile[1] = tempfile.mktemp('.zip', 'sshpt-multiscp_tmp')
-    tmp, tmpFilename = os.path.split(tmpFile[1])
+    tmpDir = tempfile.mktemp('', 'sshpt-multiscp_tmp')
+    tmpFile = tmpDir + '.zip'
+    tmp, tmpFilename = os.path.split(tmpFile)
     zipArgs = [
       'zip',
-      tmpFile[1]
+      tmpFile
     ]
     for f in files:
       zipArgs.append(f[0])
@@ -51,22 +52,20 @@ class SshClient:
       return False
     
     # transmit archive file
-    self.doScp(tmpFile[1], '/tmp/')
+    self.doScp(tmpFile, '/tmp/')
     
     # remove archive file
-    # WARNING: assumes that temporary directory equals on local and remote machine(s)
     rmArgs = [
       'rm',
-      tmpFile[1]
+      tmpFile
     ]
     if subprocess.check_output(rmArgs):
       return False
     
     # unzip remote archive file
-    tmpDir = tempfile.mkdtemp()
     unzipArgs = [
-      'unzip -j ' + tmpFile[1] + ' -d ' + tmpDir,
-      'rm ' + tmpFile[1]
+      'unzip -j ' + tmpFile + ' -d ' + tmpDir,
+      'rm ' + tmpFile
     ]
     # move files to their destinations
     for f in files:
