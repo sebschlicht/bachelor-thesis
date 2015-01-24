@@ -10,7 +10,7 @@ class SshClient:
       '-u', self.username,
       '-s',
       '-U', self.username,
-      '-P', SSH_USER,
+      '-P', self.username,
       '-f', fAddresses,
       '-o', fResults
     ]
