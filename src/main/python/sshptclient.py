@@ -36,7 +36,7 @@ class SshClient:
   def doScpMulti(self, files):
     # create archive file
     tmpFile = tempfile.mkstemp('.zip', 'sshpt-multiscp_tmp')
-    tmp, tmpFilename = os.path.split(tmpFile)    
+    tmp, tmpFilename = os.path.split(tmpFile[1])
     zipArgs = [
       'zip',
       tmpFile[1]
