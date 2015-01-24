@@ -128,21 +128,16 @@ class CircusController:
       files.append((LOCAL_DIR_CONFIG_TEMPLATES + filename, REMOTE_DIR_CONFIG_TEMPLATES + filename))
     return files
   
+  def getSshClient(self):
+    return SshClient(SSH_USER, PATH_LOCAL_SSH_NODES, PATH_LOCAL_SSH_RESULTS)
+  
   def restartCircus(self):
-    # upload resources, stop and restart Circus
-    client = SshClient()
+    # upload resources, [stop and] restart Circus
+    client = self.getSshClient()
     client.doScpMulti(self.getResources())
     client.doSsh([
       REMOTE_DIR_WORKING + 'restart.sh &'
     ])
-    
-  def upload(self):
-    files = []
-    # upload configuration file templates
-    for filename in FILENAMES_CONFIG_TEMPLATES:
-      files.append((LOCAL_DIR_CONFIG_TEMPLATES + filename, REMOTE_DIR_CONFIG_TEMPLATES + filename))
-    client = SshClient()
-    client.doScpMulti(files)
   
   def configure(self):
     self.isBusy = True
@@ -161,7 +156,7 @@ class CircusController:
     self.isBusy = False
   
   def update(self):
-    stats = self.getStats()
+    self.getStats()
     node_list = []
     for node in self.nodes:
       node_list.append(node.getDict())
