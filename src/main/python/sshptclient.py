@@ -1,5 +1,6 @@
 import ntpath
 import os
+import subprocess
 import tempfile
 
 class SshClient:
