@@ -1,5 +1,6 @@
 import ntpath
 import os
+import StringIO
 import subprocess
 import tempfile
 
