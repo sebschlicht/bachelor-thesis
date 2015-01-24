@@ -5,4 +5,3 @@ if [ ${p} ]; then
   while ps -p ${p} 1>/dev/null; do sleep 1; done;
 fi
 ~/circus/start.sh
-
