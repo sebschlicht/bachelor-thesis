@@ -115,7 +115,8 @@ class Configure(Command):
     self.writeConfig(PATH_TMPL_TITAN_CASSANDRA_RACKDC, PATH_CONF_TITAN_CASSANDRA_RACKDC, {
     })
     self.writeConfig(PATH_TMPL_TITAN_REXSTER, PATH_CONF_TITAN_REXSTER, {
-      'address': props[OPT_ADDRESS]
+      'address': props[OPT_ADDRESS],
+      'identifier': props[OPT_IDENTIFIER]
     })
 
 # testing separate from circus usage

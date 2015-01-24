@@ -20,7 +20,7 @@ bin/
 .mtj.tmp/
 
 # Python compiled files
-.pyc
+*.pyc
 
 # backup files
 *~
