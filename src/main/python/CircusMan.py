@@ -108,7 +108,7 @@ class CircusController:
     node.connect(self.context)
   
   def getResources(self):
-    return [
+    files = [
       # remote shell scripts
       (LOCAL_DIR_RESOURCES + 'start.sh', REMOTE_DIR_WORKING + 'start.sh'),
       (LOCAL_DIR_RESOURCES + 'restart.sh', REMOTE_DIR_WORKING + 'restart.sh'),
@@ -123,14 +123,10 @@ class CircusController:
       (LOCAL_FILE_NEO4J_PLUGIN, REMOTE_FILE_NEO4J_PLUGIN),
       (LOCAL_FILE_TITAN_EXTENSION, REMOTE_FILE_TITAN_EXTENSION)
     ]
-  
-  def startCircus(self):
-    # upload resources, start Circus
-    client = SshClient()
-    client.doScpMulti(self.getResources())
-    client.doSsh([
-      REMOTE_DIR_WORKING + 'start.sh'
-    ])
+    # service configuration file templates
+    for filename in FILENAMES_CONFIG_TEMPLATES:
+      files.append((LOCAL_DIR_CONFIG_TEMPLATES + filename, REMOTE_DIR_CONFIG_TEMPLATES + filename))
+    return files
   
   def restartCircus(self):
     # upload resources, stop and restart Circus
