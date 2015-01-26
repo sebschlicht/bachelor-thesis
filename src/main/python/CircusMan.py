@@ -112,7 +112,7 @@ class CircusController:
       # remote shell scripts
       (LOCAL_DIR_RESOURCES + 'start.sh', REMOTE_DIR_WORKING + 'start.sh'),
       (LOCAL_DIR_RESOURCES + 'restart.sh', REMOTE_DIR_WORKING + 'restart.sh'),
-      (LOCAL_DIR_RESOURCES + 'reset.sh', REMOTE_DIR_WORKING + 'reset.sh'),
+      (LOCAL_DIR_RESOURCES + 'clear.sh', REMOTE_DIR_WORKING + 'clear.sh'),
       # remote service scripts
       (LOCAL_FILE_NEO4J_SCRIPT, REMOTE_FILE_NEO4J_SCRIPT),
       (LOCAL_FILE_TITAN_SCRIPT, REMOTE_FILE_TITAN_SCRIPT),
@@ -178,12 +178,15 @@ class CircusController:
       node.stop(name)
     self.isBusy = False
   
-  def reset(self):
-    # reset the data files of a watcher
-    client = SshClient()
-    client.doSsh([
-      REMOTE_DIR_WORKING + 'reset.sh'
-    ])
+  def clear(self, clearType):
+    # clear service data and/or log files
+    sshCommands = []
+    sClearType = ''
+    if not (clearType is None):
+      sClearType = ' ' + clearType
+    sshCommands.append(REMOTE_DIR_WORKING + 'clear.sh' + sClearType)
+    client = self.getSshClient()
+    client.doSsh(sshCommands)
 
 # command dict
 commands = {}
@@ -202,10 +205,8 @@ def printUsage():
 
 # clear
 cmdClear = newCommand('clear', 'Clears all remote service data and/or log files.')
-cmdClear.add_argument('-t', '--type', choices=['data', 'log'],
+cmdClear.add_argument('type', nargs='?', choices=['data', 'log'],
   help='Limits the deletion to a type. By default both remote service data and log files will be deleted.')
-cmdClear.add_argument('-b', '--backup', metavar='backupLocation',
-  help='When clearing remote log files you can pass a local directory where the log files will be backed up first. The log files will be suffixed with the address of their source node.')
 # cluster
 cmdCluster = newCommand('cluster', 'Redefines the cluster addresses and the Circus port.')
 cmdCluster.add_argument('filePath', nargs='?', default=LOCAL_FILE_NODES,
@@ -261,8 +262,7 @@ try:
       continue
     
     if cmd == 'clear':
-      #TODO
-      print 'not implemented'
+      controller.clear(args.type)
       continue
     elif cmd == 'cluster':
       controller.disconnect()
