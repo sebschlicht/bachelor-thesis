@@ -5,25 +5,26 @@ import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.AsyncRequestHandler;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.TitanRequestHandler;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.Neo4jRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
 
-public class AsyncTitanClient extends AsyncBenchmarkClient {
+public class AsyncNeo4jClient extends AsyncBenchmarkClient {
 
-    private static final String URL_EXTENSION = "/graphs/graph/graphity/";
+    private static final String URL_PLUGIN =
+            "/db/data/ext/GraphityBaselinePlugin/graphdb/";
 
-    private static final String URL_FEED = URL_EXTENSION + "feeds/";
+    private static final String URL_FEED = URL_PLUGIN + "feeds/";
 
-    private static final String URL_FOLLOW = URL_EXTENSION + "follow/";
+    private static final String URL_FOLLOW = URL_PLUGIN + "follow/";
 
-    private static final String URL_POST = URL_EXTENSION + "post/";
+    private static final String URL_POST = URL_PLUGIN + "post/";
 
-    private static final String URL_UNFOLLOW = URL_EXTENSION + "unfollow/";
+    private static final String URL_UNFOLLOW = URL_PLUGIN + "unfollow/";
 
-    public AsyncTitanClient(
+    public AsyncNeo4jClient(
             AsyncBenchmarkClientTask client,
             ClientConfiguration config) {
         super(client, config);
@@ -31,7 +32,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
 
     @Override
     protected AsyncRequestHandler getRequestHandler(int identifier) {
-        return new TitanRequestHandler(_client, identifier);
+        return new Neo4jRequestHandler(_client, identifier);
     }
 
     @Override

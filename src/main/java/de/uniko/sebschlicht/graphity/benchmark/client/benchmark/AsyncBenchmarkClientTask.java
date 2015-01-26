@@ -4,6 +4,7 @@ import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.api.TargetType;
 import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client.AsyncBenchmarkClient;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client.AsyncNeo4jClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client.AsyncTitanClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
@@ -36,7 +37,7 @@ public class AsyncBenchmarkClientTask {
                         new String[config.getAddresses().size()]);
 
         if (config.getTargetType() == TargetType.NEO4J) {
-            //TODO: implement async Neo4j client
+            _client = new AsyncNeo4jClient(this, config);
         } else {
             _client = new AsyncTitanClient(this, config);
         }
