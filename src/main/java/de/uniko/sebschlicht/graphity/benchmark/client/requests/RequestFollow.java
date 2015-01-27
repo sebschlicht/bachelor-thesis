@@ -37,7 +37,8 @@ public class RequestFollow extends Request {
     @Override
     public String[] toStringArray() {
         return new String[] {
-            String.valueOf(idSubscriber), String.valueOf(idFollowed)
+            String.valueOf(_type.getId()), String.valueOf(idSubscriber),
+            String.valueOf(idFollowed)
         };
     }
 }

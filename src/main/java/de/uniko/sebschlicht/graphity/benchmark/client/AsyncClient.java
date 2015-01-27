@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -93,9 +92,7 @@ public class AsyncClient {
             crrProp += bucket.getKey() * bucket.getValue().size();
             propabilities.put(crrProp, new ArrayList<Long>(bucket.getValue()));
         }
-    }
 
-    public void start() {
         // load config
         MasterConfiguration baseConfig = new MasterConfiguration(PATH_CONFIG);
         if (!baseConfig.isLoaded()) {
@@ -112,7 +109,9 @@ public class AsyncClient {
                         baseConfig.numThreads, requestComposition,
                         baseConfig.getAddresses(), baseConfig.getTargetType(),
                         baseConfig.getTargetBase());
+    }
 
+    public void start() {
         // spawn client thread
         resultManager = new ResultManager();
         benchmarkClient =
@@ -163,6 +162,9 @@ public class AsyncClient {
         for (int i = 0; i < numEntries; ++i) {
             entries.add(nextRequest(nextRequestType()));
         }
+        resultManager = new ResultManager();
+        benchmarkClient =
+                new AsyncBenchmarkClientTask(this, resultManager, config);
         BootstrapRequestHandler requestHandler =
                 new BootstrapRequestHandler(benchmarkClient, entries);
         requestHandler.startBootstrap();
@@ -280,12 +282,15 @@ public class AsyncClient {
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(System.in));
         String cmd;
+        String[] cmdArgs;
 
         System.out.println("starting async client...");
         AsyncClient client = new AsyncClient();
         System.out.println("client ready.");
 
         while ((cmd = reader.readLine()) != null) {
+            cmdArgs = cmd.split(" ");
+            cmd = cmdArgs[0];
             switch (cmd) {
                 case "start":
                     client.start();
@@ -299,17 +304,13 @@ public class AsyncClient {
                     client.stop();
                     return;
 
-                case "foo":
-                    PrintWriter writer = new PrintWriter("/tmp/test-s");
-                    for (long i = 0; i < 10000000; ++i) {
-                        List<Long> bucket =
-                                client.propabilities.higherEntry(
-                                        RANDOM.nextInt(client.propabilities
-                                                .lastKey())).getValue();
-                        long id = bucket.get(RANDOM.nextInt(bucket.size()));
-                        writer.println(id);
+                case "bootstrap":
+                    if (cmdArgs.length > 1) {
+                        int numEntries = Integer.valueOf(cmdArgs[1]);
+                        client.bootstrap(numEntries);
+                    } else {
+                        System.err.println("usage: bootstrap <numEntries>");
                     }
-                    writer.close();
                     break;
             }
         }

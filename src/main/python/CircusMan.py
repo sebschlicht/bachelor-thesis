@@ -14,7 +14,7 @@ from sshptclient import SshClient
 """
 config section
 """
-SSH_USER = 'ubuntu'
+SSH_USER = 'node'
 PORT_CIRCUS = 5555
 TIMEOUT_POLL = 200
 

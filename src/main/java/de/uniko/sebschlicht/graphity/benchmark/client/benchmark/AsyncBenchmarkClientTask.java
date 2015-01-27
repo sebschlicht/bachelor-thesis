@@ -69,6 +69,7 @@ public class AsyncBenchmarkClientTask {
     public void bootstrap(
             BootstrapRequestHandler requestHandler,
             Queue<Request> requests) {
+        requests.peek().setAddress(_endpoints[0]);
         _client.bootstrap(requests, requestHandler);
     }
 

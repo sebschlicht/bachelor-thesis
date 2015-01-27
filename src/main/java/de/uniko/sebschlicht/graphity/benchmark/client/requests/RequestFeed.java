@@ -29,7 +29,7 @@ public class RequestFeed extends Request {
     @Override
     public String[] toStringArray() {
         return new String[] {
-            String.valueOf(id)
+            String.valueOf(_type.getId()), String.valueOf(id)
         };
     }
 }

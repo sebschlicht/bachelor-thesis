@@ -24,11 +24,15 @@ public class BootstrapRequestHandler extends AsyncCompletionHandler<Void> {
 
     private void bootstrapNextBlock() {
         Queue<Request> block = new LinkedList<Request>();
-        for (int i = 0; i < 1000 && !_requests.isEmpty(); ++i) {
+        for (int i = 0; i < 10000 && !_requests.isEmpty(); ++i) {
             block.add(_requests.remove());
         }
         if (!block.isEmpty()) {
+            System.out
+                    .println("Bootstrapping " + block.size() + " elements...");
             _client.bootstrap(this, block);
+        } else {
+            System.out.println("done.");
         }
     }
 
@@ -37,8 +41,18 @@ public class BootstrapRequestHandler extends AsyncCompletionHandler<Void> {
     }
 
     @Override
-    public Void onCompleted(Response arg0) throws Exception {
-        bootstrapNextBlock();
+    public Void onCompleted(Response response) throws Exception {
+        String sResponse = response.getResponseBody();
+        if ("\"true\"".equals(sResponse)) {
+            bootstrapNextBlock();
+        } else {
+            throw new IllegalStateException(sResponse);
+        }
         return null;
+    }
+
+    @Override
+    public void onThrowable(Throwable t) {
+        t.printStackTrace();
     }
 }

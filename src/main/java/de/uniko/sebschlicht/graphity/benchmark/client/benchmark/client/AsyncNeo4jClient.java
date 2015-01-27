@@ -105,9 +105,10 @@ public class AsyncNeo4jClient extends AsyncBenchmarkClient {
             }
         }
         body.add("entries", entries);
+        System.out.println(body);
         return _httpClient
-                .preparePut(urlFromRelativeUrl(address, URL_BOOTSTRAP))
+                .preparePost(urlFromRelativeUrl(address, URL_BOOTSTRAP))
                 .setHeader("Content-Type", "application/json")
-                .setBody("{" + entries.toString() + "}");
+                .setBody(body.toString());
     }
 }
