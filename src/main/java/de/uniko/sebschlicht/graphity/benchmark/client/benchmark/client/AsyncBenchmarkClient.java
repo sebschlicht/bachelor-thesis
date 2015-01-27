@@ -1,6 +1,6 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client;
 
-import java.util.List;
+import java.util.Queue;
 
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -91,10 +91,10 @@ public abstract class AsyncBenchmarkClient {
     }
 
     abstract protected BoundRequestBuilder prepareBootstrapRequest(
-            List<Request> requests);
+            Queue<Request> requests);
 
     public void bootstrap(
-            List<Request> requests,
+            Queue<Request> requests,
             AsyncHandler<Void> requestHandler) {
         BoundRequestBuilder httpRequest = prepareBootstrapRequest(requests);
         httpRequest.execute(requestHandler);

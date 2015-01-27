@@ -23,14 +23,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.Response;
 
 import de.uniko.sebschlicht.graphity.benchmark.analyse.WikidumpInfo;
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.api.RequestComposition;
 import de.uniko.sebschlicht.graphity.benchmark.api.RequestType;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.BootstrapRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
@@ -164,27 +163,9 @@ public class AsyncClient {
         for (int i = 0; i < numEntries; ++i) {
             entries.add(nextRequest(nextRequestType()));
         }
-
-        AsyncCompletionHandler<Void> requestHandler =
-                new AsyncCompletionHandler<Void>() {
-
-                    public void bootstrapNextBlock() {
-                        Queue<Request> queue = new LinkedList<Request>();
-                        for (int i = 0; i < 1000 && !entries.isEmpty(); ++i) {
-                            queue.add(entries.remove());
-                        }
-                        if (!queue.isEmpty()) {
-                            benchmarkClient.bootstrap(this, queue);
-                        }
-                    }
-
-                    @Override
-                    public Void onCompleted(Response response) throws Exception {
-                        bootstrapNextBlock();
-                        return null;
-                    }
-                };
-        requestHandler.bootstrapNextBlock();
+        BootstrapRequestHandler requestHandler =
+                new BootstrapRequestHandler(benchmarkClient, entries);
+        requestHandler.startBootstrap();
     }
 
     public synchronized Request nextRequest() {

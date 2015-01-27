@@ -1,11 +1,14 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 
+import java.util.Queue;
+
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.api.TargetType;
 import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client.AsyncBenchmarkClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client.AsyncNeo4jClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client.AsyncTitanClient;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.BootstrapRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 
@@ -61,6 +64,12 @@ public class AsyncBenchmarkClientTask {
         _isRunning = false;
         //TODO: can we store the futures and cancel them to have sync stop?
         return true;
+    }
+
+    public void bootstrap(
+            BootstrapRequestHandler requestHandler,
+            Queue<Request> requests) {
+        _client.bootstrap(requests, requestHandler);
     }
 
     public void handleResponse(int identifier, Request request) {

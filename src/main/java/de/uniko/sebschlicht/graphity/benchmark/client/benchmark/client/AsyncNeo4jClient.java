@@ -1,6 +1,6 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client;
 
-import java.util.List;
+import java.util.Queue;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -91,8 +91,8 @@ public class AsyncNeo4jClient extends AsyncBenchmarkClient {
     }
 
     @Override
-    protected BoundRequestBuilder
-        prepareBootstrapRequest(List<Request> requests) {
+    protected BoundRequestBuilder prepareBootstrapRequest(
+            Queue<Request> requests) {
         JsonObject body = new JsonObject();
         JsonArray entries = new JsonArray();
         String address = null;
