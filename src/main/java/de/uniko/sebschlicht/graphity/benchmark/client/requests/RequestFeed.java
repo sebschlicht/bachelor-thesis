@@ -25,4 +25,11 @@ public class RequestFeed extends Request {
     public int getResult() {
         return resNumFeeds;
     }
+
+    @Override
+    public String[] toStringArray() {
+        return new String[] {
+            String.valueOf(id)
+        };
+    }
 }

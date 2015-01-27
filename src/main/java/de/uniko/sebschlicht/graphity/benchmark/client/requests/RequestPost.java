@@ -33,4 +33,11 @@ public class RequestPost extends Request {
     public boolean getResult() {
         return resSuccess;
     }
+
+    @Override
+    public String[] toStringArray() {
+        return new String[] {
+            String.valueOf(id), message
+        };
+    }
 }

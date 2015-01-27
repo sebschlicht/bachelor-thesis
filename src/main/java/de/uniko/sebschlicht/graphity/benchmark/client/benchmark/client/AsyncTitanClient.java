@@ -1,11 +1,17 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client;
 
+import java.util.List;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.AsyncRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.TitanRequestHandler;
+import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
@@ -22,6 +28,8 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     private static final String URL_POST = URL_EXTENSION + "post/";
 
     private static final String URL_UNFOLLOW = URL_EXTENSION + "unfollow/";
+
+    private static final String URL_BOOTSTRAP = URL_EXTENSION + "bootstrap/";
 
     public AsyncTitanClient(
             AsyncBenchmarkClientTask client,
@@ -79,5 +87,26 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
                         urlFromRelativeUrl(request.getAddress(), URL_UNFOLLOW))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
+    }
+
+    @Override
+    protected BoundRequestBuilder
+        prepareBootstrapRequest(List<Request> requests) {
+        JsonObject body = new JsonObject();
+        JsonArray entries = new JsonArray();
+        String address = null;
+        for (Request request : requests) {
+            if (address == null) {
+                address = request.getAddress();
+            }
+            for (String element : request.toStringArray()) {
+                entries.add(new JsonPrimitive(element));
+            }
+        }
+        body.add("entries", entries);
+        return _httpClient
+                .preparePut(urlFromRelativeUrl(address, URL_BOOTSTRAP))
+                .setHeader("Content-Type", "application/json")
+                .setBody("{" + entries.toString() + "}");
     }
 }

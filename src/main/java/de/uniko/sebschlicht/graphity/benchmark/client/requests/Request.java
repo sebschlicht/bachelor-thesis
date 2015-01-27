@@ -38,4 +38,6 @@ public abstract class Request {
     public Throwable getError() {
         return _throwable;
     }
+
+    abstract public String[] toStringArray();
 }

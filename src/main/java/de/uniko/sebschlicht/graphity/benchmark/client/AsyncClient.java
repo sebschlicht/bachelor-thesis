@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -22,6 +23,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.Response;
 
 import de.uniko.sebschlicht.graphity.benchmark.analyse.WikidumpInfo;
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
@@ -156,6 +159,34 @@ public class AsyncClient {
         return false;
     }
 
+    public void bootstrap(int numEntries) {
+        final Queue<Request> entries = new LinkedList<Request>();
+        for (int i = 0; i < numEntries; ++i) {
+            entries.add(nextRequest(nextRequestType()));
+        }
+
+        AsyncCompletionHandler<Void> requestHandler =
+                new AsyncCompletionHandler<Void>() {
+
+                    public void bootstrapNextBlock() {
+                        Queue<Request> queue = new LinkedList<Request>();
+                        for (int i = 0; i < 1000 && !entries.isEmpty(); ++i) {
+                            queue.add(entries.remove());
+                        }
+                        if (!queue.isEmpty()) {
+                            benchmarkClient.bootstrap(this, queue);
+                        }
+                    }
+
+                    @Override
+                    public Void onCompleted(Response response) throws Exception {
+                        bootstrapNextBlock();
+                        return null;
+                    }
+                };
+        requestHandler.bootstrapNextBlock();
+    }
+
     public synchronized Request nextRequest() {
         RequestType type = nextRequestType();
         return nextRequest(type);
@@ -223,7 +254,6 @@ public class AsyncClient {
                         // no subscriptions available, request not possible atm.
                         return nextRequest();
                     }
-                    idUser = nextUserId();
                     // get random subscription
                     int iSubscription = RANDOM.nextInt(numSubscriptions);
                     Iterator<Subscription> iter = subscriptions.iterator();
