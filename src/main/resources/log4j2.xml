@@ -11,10 +11,19 @@
       <AppenderRef ref="requests" />
       <!-- <AppenderRef ref="stdout" /> -->
     </Async>
+    <File name="bootstrap" fileName="bootstrap.log">
+      <PatternLayout pattern="%m%n" />
+    </File>
+    <Async name="bootstrap-async">
+      <AppenderRef ref="bootstrap" />
+    </Async>
   </Appenders>
   <Loggers>
-    <Root level="info">
+    <Logger name="requests" level="info">
       <AppenderRef ref="requests-async" />
-    </Root>
+    </Logger>
+    <Logger name="bootstrap" level="info">
+      <AppenderRef ref="bootstrap-async" />
+    </Logger>
   </Loggers>
 </Configuration>

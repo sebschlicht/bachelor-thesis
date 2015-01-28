@@ -3,6 +3,7 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response;
 import java.io.IOException;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.json.simple.parser.JSONParser;
 
 import com.google.gson.Gson;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -14,6 +15,8 @@ import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
 public abstract class AsyncRequestHandler extends AsyncCompletionHandler<Void> {
 
     protected static final Gson GSON = new Gson();
+
+    protected final JSONParser jsonParser = new JSONParser();
 
     protected AsyncBenchmarkClientTask _client;
 

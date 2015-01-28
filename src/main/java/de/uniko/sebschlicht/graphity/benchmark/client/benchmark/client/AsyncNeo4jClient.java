@@ -9,6 +9,7 @@ import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap.BootstrapManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.AsyncRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.Neo4jRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
@@ -105,7 +106,8 @@ public class AsyncNeo4jClient extends AsyncBenchmarkClient {
             }
         }
         body.add("entries", entries);
-        System.out.println(body);
+        BootstrapManager.addRequests(requests);
+        //System.out.println(body); //~6MB
         return _httpClient
                 .preparePost(urlFromRelativeUrl(address, URL_BOOTSTRAP))
                 .setHeader("Content-Type", "application/json")

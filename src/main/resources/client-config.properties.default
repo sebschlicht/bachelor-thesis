@@ -4,7 +4,7 @@ request_follow=45.79
 request_unfollow=21.54
 request_post=32.67
 # maximum number of requests per second
-maxThroughput=2500
+maxThroughput=0
 # number of threads
 numThreads=50
 # target cluster

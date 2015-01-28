@@ -2,11 +2,13 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.ParseException;
 
 import com.ning.http.client.Response;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
+import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
@@ -21,9 +23,19 @@ public class Neo4jRequestHandler extends AsyncRequestHandler {
 
     @Override
     protected void handleFeedResponse(Response response) throws IOException {
-        // TODO Auto-generated method stub
-        throw new NotImplementedException(
-                "handling of Neo4j FEED responses is not implemented");
+        String sResponse = response.getResponseBody();
+        if (sResponse.length() > 2) {// remove "s in Neo4j response and escaping of "
+            sResponse =
+                    sResponse.substring(1, sResponse.length() - 1).replace(
+                            "\\", "");
+        }
+        try {
+            JSONArray activities = (JSONArray) jsonParser.parse(sResponse);
+            ((RequestFeed) _request).setResult(activities.size());
+        } catch (ParseException e) {
+            System.err.println(sResponse);
+            _request.setError(new IllegalStateException(e));
+        }
     }
 
     @Override

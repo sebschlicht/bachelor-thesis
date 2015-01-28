@@ -15,16 +15,20 @@ public class BootstrapRequestHandler extends AsyncCompletionHandler<Void> {
 
     private final Queue<Request> _requests;
 
+    private int _blockSize;
+
     public BootstrapRequestHandler(
             AsyncBenchmarkClientTask client,
-            Queue<Request> requests) {
+            Queue<Request> requests,
+            int blockSize) {
         _client = client;
         _requests = requests;
+        _blockSize = blockSize;
     }
 
     private void bootstrapNextBlock() {
         Queue<Request> block = new LinkedList<Request>();
-        for (int i = 0; i < 10000 && !_requests.isEmpty(); ++i) {
+        for (int i = 0; i < _blockSize && !_requests.isEmpty(); ++i) {
             block.add(_requests.remove());
         }
         if (!block.isEmpty()) {

@@ -18,6 +18,7 @@
 
     <log4j.version>2.1</log4j.version>
     <json.gson.version>2.3.1</json.gson.version>
+    <json.simple.version>1.1</json.simple.version>
     <jetty.version>9.2.6.v20141205</jetty.version>
     <jersey.version>1.9</jersey.version>
     <async-http-client.version>1.9.6</async-http-client.version>
@@ -36,11 +37,16 @@
       <artifactId>log4j-core</artifactId>
       <version>${log4j.version}</version>
     </dependency>
-    <!-- JSON library -->
+    <!-- JSON libraries -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>${json.gson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>${json.simple.version}</version>
     </dependency>
     <!-- HTTP server -->
     <dependency>

@@ -58,9 +58,9 @@ public class MasterConfiguration extends Config {
                 throw new IllegalArgumentException(
                         "request composition: percentages must add to 100.0");
             }
-            if (maxThroughput <= 0) {
+            if (maxThroughput < 0) {
                 throw new IllegalArgumentException(
-                        "maximum throughput must be greater than zero");
+                        "maximum throughput must be greater than zero or zero to indicate unlimited throughput");
             }
             if (numThreads <= 0) {
                 throw new IllegalArgumentException(

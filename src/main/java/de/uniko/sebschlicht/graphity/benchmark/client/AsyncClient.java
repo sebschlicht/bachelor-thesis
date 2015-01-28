@@ -28,10 +28,10 @@ import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.api.RequestComposition;
 import de.uniko.sebschlicht.graphity.benchmark.api.RequestType;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap.BootstrapManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.BootstrapRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
@@ -39,7 +39,7 @@ import de.uniko.sebschlicht.graphity.benchmark.master.MasterConfiguration;
 
 public class AsyncClient {
 
-    public static final Logger LOG = LogManager.getLogger("requests-async");
+    public static final Logger LOG = LogManager.getLogger("requests");
 
     private static final String PATH_CONFIG =
             "src/main/resources/client-config.properties";
@@ -109,6 +109,11 @@ public class AsyncClient {
                         baseConfig.numThreads, requestComposition,
                         baseConfig.getAddresses(), baseConfig.getTargetType(),
                         baseConfig.getTargetBase());
+
+        // load bootstrap manager if necessary
+        if (requestComposition.getFeed() > 0) {
+            BootstrapManager.loadRequests("bootstrap.log");
+        }
     }
 
     public void start() {
@@ -166,7 +171,7 @@ public class AsyncClient {
         benchmarkClient =
                 new AsyncBenchmarkClientTask(this, resultManager, config);
         BootstrapRequestHandler requestHandler =
-                new BootstrapRequestHandler(benchmarkClient, entries);
+                new BootstrapRequestHandler(benchmarkClient, entries, 100000);
         requestHandler.startBootstrap();
     }
 
@@ -174,6 +179,8 @@ public class AsyncClient {
         RequestType type = nextRequestType();
         return nextRequest(type);
     }
+
+    private long numRetries = 0;
 
     /**
      * CURRENT APPROACH:
@@ -196,10 +203,9 @@ public class AsyncClient {
             switch (type) {
                 case FEED:
                     /*
-                     * retrieve news feed for random user
+                     * retrieve news feed for random existing user
                      */
-                    idUser = nextUserId();
-                    return new RequestFeed(idUser);
+                    return BootstrapManager.getFeedRequest();
 
                 case POST:
                     /*
@@ -225,7 +231,6 @@ public class AsyncClient {
 
                     subscription = new Subscription(idUser, idFollowed);
                     subscriptions.add(subscription);
-
                     return new RequestFollow(idUser, idFollowed);
 
                 case UNFOLLOW:
@@ -235,10 +240,11 @@ public class AsyncClient {
                     int numSubscriptions = subscriptions.size();
                     if (numSubscriptions == 0) {
                         // no subscriptions available, request not possible atm.
+                        numRetries++;
                         return nextRequest();
                     }
-                    // get random subscription
-                    int iSubscription = RANDOM.nextInt(numSubscriptions);
+                    // get oldest subscription (-> number of status updates per FEED grows slowly)
+                    int iSubscription = 0;//RANDOM.nextInt(numSubscriptions);
                     Iterator<Subscription> iter = subscriptions.iterator();
                     for (int i = 0; i < iSubscription; i++) {
                         iter.next();
