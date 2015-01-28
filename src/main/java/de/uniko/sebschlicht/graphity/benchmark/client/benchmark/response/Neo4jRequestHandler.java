@@ -3,6 +3,7 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response;
 import java.io.IOException;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 import com.ning.http.client.Response;
@@ -24,13 +25,9 @@ public class Neo4jRequestHandler extends AsyncRequestHandler {
     @Override
     protected void handleFeedResponse(Response response) throws IOException {
         String sResponse = response.getResponseBody();
-        if (sResponse.length() > 2) {// remove "s in Neo4j response and escaping of "
-            sResponse =
-                    sResponse.substring(1, sResponse.length() - 1).replace(
-                            "\\", "");
-        }
         try {
-            JSONArray activities = (JSONArray) jsonParser.parse(sResponse);
+            JSONObject jsonResponse = (JSONObject) jsonParser.parse(sResponse);
+            JSONArray activities = (JSONArray) jsonResponse.get("feeds");
             ((RequestFeed) _request).setResult(activities.size());
         } catch (ParseException e) {
             System.err.println(sResponse);

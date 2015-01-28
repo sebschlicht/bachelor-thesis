@@ -25,5 +25,7 @@
     <Logger name="bootstrap" level="info">
       <AppenderRef ref="bootstrap-async" />
     </Logger>
+    <Root level="error">
+    </Root>
   </Loggers>
 </Configuration>

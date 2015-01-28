@@ -41,7 +41,6 @@ public class BootstrapManager {
             }
             LOG.info(sRequest);
         }
-        mergeRequests(requests);
     }
 
     public static void loadRequests(String filePath) throws IOException {
