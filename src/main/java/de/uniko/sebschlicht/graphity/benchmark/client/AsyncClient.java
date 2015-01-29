@@ -62,7 +62,8 @@ public class AsyncClient {
 
     private AsyncBenchmarkClientTask benchmarkClient;
 
-    public AsyncClient() throws IOException {
+    public AsyncClient(
+            String configPath) throws IOException {
         subscriptions = new TreeSet<Subscription>();
         // load statistics
         FileReader dumpFileReader = new FileReader(PATH_WIKI_DUMP);
@@ -94,7 +95,7 @@ public class AsyncClient {
         }
 
         // load config
-        MasterConfiguration baseConfig = new MasterConfiguration(PATH_CONFIG);
+        MasterConfiguration baseConfig = new MasterConfiguration(configPath);
         if (!baseConfig.isLoaded()) {
             System.err.println("configuration file invalid");
             return;
@@ -172,6 +173,8 @@ public class AsyncClient {
                 new AsyncBenchmarkClientTask(this, resultManager, config);
         BootstrapRequestHandler requestHandler =
                 new BootstrapRequestHandler(benchmarkClient, entries, 100000);
+        System.out.println("will not bootstrap against "
+                + config.getAddresses().get(0));
         requestHandler.startBootstrap();
     }
 
@@ -291,7 +294,13 @@ public class AsyncClient {
         String[] cmdArgs;
 
         System.out.println("starting async client...");
-        AsyncClient client = new AsyncClient();
+        String configPath;
+        if (args.length > 0) {
+            configPath = args[0];
+        } else {
+            configPath = PATH_CONFIG;
+        }
+        AsyncClient client = new AsyncClient(configPath);
         System.out.println("client ready.");
 
         while ((cmd = reader.readLine()) != null) {

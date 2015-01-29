@@ -107,6 +107,7 @@ public class AsyncNeo4jClient extends AsyncBenchmarkClient {
         }
         body.add("entries", entries);
         BootstrapManager.addRequests(requests);
+        System.out.println(body);
         //System.out.println(body); //~6MB
         return _httpClient
                 .preparePost(urlFromRelativeUrl(address, URL_BOOTSTRAP))
