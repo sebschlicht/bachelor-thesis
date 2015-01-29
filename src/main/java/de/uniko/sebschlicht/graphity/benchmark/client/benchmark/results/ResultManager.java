@@ -26,14 +26,17 @@ public class ResultManager {
         switch (request.getType()) {
             case FEED:
                 RequestFeed rfe = (RequestFeed) request;
-                if (rfe.getResult() == BootstrapManager
-                        .getFeedSize(rfe.getId())) {
+                if (rfe.getResult() == Math.min(
+                        BootstrapManager.getFeedSize(rfe.getId()), 15)) {
                     logMessage.append("\t");
                     logMessage.append(rfe.getId());
                     logMessage.append("\t");
                     logMessage.append(rfe.getResult());
                 } else {
-                    System.err.println("unexpected feed size");
+                    System.err.println("unexpected feed size: expected "
+                            + BootstrapManager.getFeedSize(rfe.getId())
+                            + " but was " + rfe.getResult() + " for user "
+                            + rfe.getId());
                     throw new IllegalStateException("unexpected feed size");
                 }
                 break;

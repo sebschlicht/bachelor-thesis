@@ -57,23 +57,23 @@ public class BootstrapManager {
         /** we know that user id is in Integer range */
         // expand user array
         long highestId = 0;
-        long crrId = 0;
+        long userId = 0;
         for (Request request : requests) {
             switch (request.getType()) {
                 case FOLLOW:
-                    crrId = ((RequestFollow) request).getIdSubscriber();
+                    userId = ((RequestFollow) request).getIdSubscriber();
                     break;
 
                 case POST:
-                    crrId = ((RequestPost) request).getId();
+                    userId = ((RequestPost) request).getId();
                     break;
 
                 case UNFOLLOW:
-                    crrId = ((RequestUnfollow) request).getIdSubscriber();
+                    userId = ((RequestUnfollow) request).getIdSubscriber();
                     break;
             }
-            if (crrId > highestId) {
-                highestId = crrId;
+            if (userId > highestId) {
+                highestId = userId;
             }
         }
         int capacity = (int) (highestId / 0.75) + 1;
@@ -86,7 +86,6 @@ public class BootstrapManager {
             USERS.add(null);
         }
         // load current subscription state
-        int userId = 0;
         BootstrapUser user;
         for (int i = 0; i < USERS.size(); ++i) {
             userId = i + 1;
@@ -106,25 +105,21 @@ public class BootstrapManager {
         Subscription subscription;
         for (Request request : requests) {
             switch (request.getType()) {
-                case FEED:
-                    // nothing to merge
-                    break;
-
                 case FOLLOW:
                     rfo = (RequestFollow) request;
                     subscription =
                             new Subscription(rfo.getIdSubscriber(),
                                     rfo.getIdFollowed());
                     subscriptions.add(subscription);
+                    user = loadUserById(rfo.getIdSubscriber());
+                    user.addStatusUpdate();
+                    user = loadUserById(rfo.getIdFollowed());
+                    user.addStatusUpdate();
                     break;
 
                 case POST:
                     rp = (RequestPost) request;
-                    user = getUserById(rp.getId());
-                    if (user == null) {
-                        user = new BootstrapUser(rp.getId());
-                        USERS.set((int) rp.getId() - 1, user);
-                    }
+                    user = loadUserById(rp.getId());
                     user.addStatusUpdate();
                     break;
 
@@ -134,6 +129,10 @@ public class BootstrapManager {
                             new Subscription(ru.getIdSubscriber(),
                                     ru.getIdFollowed());
                     subscriptions.remove(subscription);
+                    user = loadUserById(ru.getIdSubscriber());
+                    user.addStatusUpdate();
+                    user = loadUserById(ru.getIdFollowed());
+                    user.addStatusUpdate();
             }
         }
         // set new subscription state
@@ -155,6 +154,15 @@ public class BootstrapManager {
 
     private static BootstrapUser getUserById(long id) {
         return USERS.get((int) id - 1);
+    }
+
+    private static BootstrapUser loadUserById(long id) {
+        BootstrapUser user = getUserById(id);
+        if (user == null) {
+            user = new BootstrapUser(id);
+            USERS.set((int) id - 1, user);
+        }
+        return user;
     }
 
     public static RequestFeed getFeedRequest() {
@@ -180,5 +188,16 @@ public class BootstrapManager {
             }
         }
         return feedSize;
+    }
+
+    public static void main(String[] args) throws IOException {
+        loadRequests("bootstrap.log");
+        int maxFeedSize = 0;
+        for (BootstrapUser user : USERS) {
+            if (user != null && user.getNumStatusUpdates() > maxFeedSize) {
+                maxFeedSize = user.getNumStatusUpdates();
+            }
+        }
+        System.out.println("max feed length: " + maxFeedSize);
     }
 }
