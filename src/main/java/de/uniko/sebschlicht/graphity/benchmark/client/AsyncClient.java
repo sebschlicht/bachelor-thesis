@@ -298,6 +298,7 @@ public class AsyncClient {
         if (args.length > 0) {
             configPath = args[0];
         } else {
+            System.out.println("[INFO] loading default configuration");
             configPath = PATH_CONFIG;
         }
         AsyncClient client = new AsyncClient(configPath);
