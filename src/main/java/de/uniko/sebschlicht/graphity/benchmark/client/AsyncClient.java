@@ -172,7 +172,8 @@ public class AsyncClient {
         benchmarkClient =
                 new AsyncBenchmarkClientTask(this, resultManager, config);
         BootstrapRequestHandler requestHandler =
-                new BootstrapRequestHandler(benchmarkClient, entries, 100000);
+                new BootstrapRequestHandler(benchmarkClient,
+                        config.getTargetType(), entries, 100000);
         System.out.println("will now bootstrap against "
                 + config.getAddresses().get(0));
         requestHandler.startBootstrap();

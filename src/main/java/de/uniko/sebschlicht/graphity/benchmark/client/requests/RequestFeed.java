@@ -1,5 +1,7 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.requests;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import de.uniko.sebschlicht.graphity.benchmark.api.RequestType;
 
 public class RequestFeed extends Request {
@@ -28,8 +30,7 @@ public class RequestFeed extends Request {
 
     @Override
     public String[] toStringArray() {
-        return new String[] {
-            String.valueOf(_type.getId()), String.valueOf(id)
-        };
+        throw new NotImplementedException(
+                "Read requests not intended for bootstrapping at the moment.");
     }
 }
