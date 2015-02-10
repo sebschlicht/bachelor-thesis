@@ -9,6 +9,7 @@ import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
+import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap.BootstrapManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.AsyncRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.TitanRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
@@ -104,6 +105,8 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
             }
         }
         body.add("entries", new JsonPrimitive(entries.toString()));
+        BootstrapManager.addRequests(requests);
+        //System.out.println(body); //~6MB
         return _httpClient
                 .preparePut(urlFromRelativeUrl(address, URL_BOOTSTRAP))
                 .setHeader("Content-Type", "application/json")
