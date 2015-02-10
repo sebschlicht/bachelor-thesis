@@ -9,7 +9,8 @@ if [ "$1" = '' ] || [ "$1" = 'data' ]; then
   rm -rf /var/lib/titan/db/*
 fi
 if [ "$1" = '' ] || [ "$1" = 'log' ]; then
-  >/var/log/neo4j/console.log
+  # Neo4j log located in data directory...
+  #>/var/log/neo4j/console.log
   >/var/log/titan/cassandra.log
   >/var/log/titan/rexstitan.log
 fi

@@ -62,12 +62,19 @@ public class BootstrapRequestHandler extends AsyncCompletionHandler<Void> {
                 throw new IllegalStateException(sResponse);
             }
         } else {
-            TitanBooleanResponse bResponse =
-                    GSON.fromJson(sResponse, TitanBooleanResponse.class);
-            if (bResponse.isSuccess() && bResponse.getValue()) {
-                bootstrapNextBlock();
-            } else {
-                throw new IllegalStateException(sResponse);
+            try {
+                TitanBooleanResponse bResponse =
+                        GSON.fromJson(sResponse, TitanBooleanResponse.class);
+                if (bResponse.isSuccess() && bResponse.getValue()) {
+                    bootstrapNextBlock();
+                    return null;
+                } else {
+                    throw new IllegalStateException("invalid response: "
+                            + sResponse);
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException("invalid response: "
+                        + sResponse, e);
             }
         }
         return null;
