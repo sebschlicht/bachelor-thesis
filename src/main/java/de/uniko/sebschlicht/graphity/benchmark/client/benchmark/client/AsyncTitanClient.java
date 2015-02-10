@@ -3,7 +3,6 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client;
 import java.util.Queue;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 
@@ -92,7 +91,6 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     @Override
     protected BoundRequestBuilder prepareBootstrapRequest(
             Queue<Request> requests) {
-        JsonObject body = new JsonObject();
         JsonArray entries = new JsonArray();
         String address = null;
         for (Request request : requests) {
@@ -103,10 +101,9 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
                 entries.add(new JsonPrimitive(element));
             }
         }
-        body.add("entries", entries);
         return _httpClient
                 .preparePut(urlFromRelativeUrl(address, URL_BOOTSTRAP))
                 .setHeader("Content-Type", "application/json")
-                .setBody("{" + entries.toString() + "}");
+                .setBody("{\"entries\":\"" + entries.toString() + "\"}");
     }
 }
