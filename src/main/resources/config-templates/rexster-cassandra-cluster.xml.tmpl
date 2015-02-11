@@ -41,21 +41,33 @@
             <graph-read-only>false</graph-read-only>
             <properties>
                 <cluster.max-partitions>128</cluster.max-partitions>
+                <query.fast-property>true</query.fast-property>
+                <query.force-index>true</query.force-index>
+                <schema.default>none</schema.default>
                 <storage.backend>cassandra</storage.backend>
-                <storage.connection-timeout>60000</storage.connection-timeout>
+                <storage.batch-loading>false</storage.batch-loading>
                 <storage.hostname>${address}</storage.hostname>
-                <!-- did not working in a whole
+                <!-- did not work in a whole
                 <storage.cassandra.keyspace>test1</storage.cassandra.keyspace>
-                <storage.replication-factor>3</storage.replication-factor>
-                <storage.read-consistency-level>ONE</storage.read-consistency-level>
-                <storage.write-consistency-level>QUORUM</storage.write-consistency-level>
+                <storage.cassandra.read-consistency-level>2</storage.cassandra.read-consistency-level>
+                <storage.cassandra.replication-factor>3</storage.cassandra.replication-factor>
+                <storage.cassandra.write-consistency-level>2</storage.cassandra.write-consistency-level>
                 -->
             </properties>
             <extensions>
               <allows>
-                <!-- TODO: allow Graphity extension -->
-                <allow>*:*</allow>
+                <!-- allow Graphity extension -->
+                <allow>graphity:*</allow>
               </allows>
+              <!-- TODO: make template parameter `sourceId` available
+              <extension>
+                <namespace>graphity</namespace>
+                <name>graphity</name>
+                <configuration>
+                  <sourceId>${sourceId}</sourceId>
+                </configuration>
+              </extension>
+              -->
             </extensions>
         </graph>
     </graphs>
