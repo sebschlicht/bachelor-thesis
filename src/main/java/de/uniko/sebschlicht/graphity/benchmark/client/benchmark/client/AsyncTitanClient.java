@@ -104,7 +104,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
                 entries.add(new JsonPrimitive(element));
             }
         }
-        body.add("entries", new JsonPrimitive(entries.toString()));
+        body.add("entries", entries);
         BootstrapManager.addRequests(requests);
         //System.out.println(body); //~6MB
         return _httpClient
