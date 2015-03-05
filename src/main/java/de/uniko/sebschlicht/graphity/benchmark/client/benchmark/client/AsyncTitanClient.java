@@ -100,8 +100,4 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
                 .setHeader("Content-Type", "application/json")
                 .setBody(body.toString());
     }
-
-    private JsonObject prepareBootstrapRequestBody(MutableState state) {
-        //TODO
-    }
 }

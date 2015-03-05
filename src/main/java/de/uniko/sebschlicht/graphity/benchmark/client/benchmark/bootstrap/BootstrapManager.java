@@ -10,8 +10,8 @@ import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.uniko.sebschlicht.graphity.benchmark.client.Subscription;
 import de.uniko.sebschlicht.graphity.bootstrap.load.BootstrapFileLoader;
+import de.uniko.sebschlicht.socialnet.Subscription;
 import de.uniko.sebschlicht.socialnet.requests.Request;
 import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
 import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
