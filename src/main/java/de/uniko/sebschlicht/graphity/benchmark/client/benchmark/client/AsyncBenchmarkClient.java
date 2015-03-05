@@ -1,7 +1,5 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client;
 
-import java.util.Queue;
-
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -10,11 +8,12 @@ import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.AsyncRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.BootstrapRequestHandler;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
+import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
+import de.uniko.sebschlicht.socialnet.requests.Request;
+import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
+import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestPost;
+import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
 
 public abstract class AsyncBenchmarkClient {
 
@@ -91,12 +90,12 @@ public abstract class AsyncBenchmarkClient {
     }
 
     abstract protected BoundRequestBuilder prepareBootstrapRequest(
-            Queue<Request> requests);
+            MutableState state);
 
     public void bootstrap(
-            Queue<Request> requests,
+            MutableState state,
             BootstrapRequestHandler requestHandler) {
-        BoundRequestBuilder httpRequest = prepareBootstrapRequest(requests);
+        BoundRequestBuilder httpRequest = prepareBootstrapRequest(state);
         httpRequest.execute(requestHandler);
     }
 }

@@ -2,11 +2,11 @@ package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap.BootstrapManager;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
+import de.uniko.sebschlicht.socialnet.requests.Request;
+import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
+import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestPost;
+import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
 
 public class ResultManager {
 

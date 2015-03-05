@@ -81,6 +81,12 @@
       <artifactId>commons-lang3</artifactId>
       <version>${commons.lang.version}</version>
     </dependency>
+    <!-- Graphity@Neo4j bootstrap API -->
+    <dependency>
+      <groupId>de.uniko.sebschlicht</groupId>
+      <artifactId>graphity-neo4j</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>

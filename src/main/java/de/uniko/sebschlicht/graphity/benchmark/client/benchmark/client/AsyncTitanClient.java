@@ -1,10 +1,6 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client;
 
-import java.util.Queue;
-
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
@@ -12,11 +8,12 @@ import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkCl
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap.BootstrapManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.AsyncRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.TitanRequestHandler;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
+import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
+import de.uniko.sebschlicht.socialnet.requests.Request;
+import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
+import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestPost;
+import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
 
 public class AsyncTitanClient extends AsyncBenchmarkClient {
 
@@ -91,25 +88,20 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     }
 
     @Override
-    protected BoundRequestBuilder prepareBootstrapRequest(
-            Queue<Request> requests) {
-        JsonObject body = new JsonObject();
-        JsonArray entries = new JsonArray();
+    protected BoundRequestBuilder prepareBootstrapRequest(MutableState state) {
+        JsonObject body = prepareBootstrapRequestBody(state);
         String address = null;
-        for (Request request : requests) {
-            if (address == null) {
-                address = request.getAddress();
-            }
-            for (String element : request.toStringArray()) {
-                entries.add(new JsonPrimitive(element));
-            }
-        }
-        body.add("entries", entries);
-        BootstrapManager.addRequests(requests);
+        Request firstRequest = state.getRequests().element();
+        address = firstRequest.getAddress();
+        BootstrapManager.addRequests(state.getRequests());
         //System.out.println(body); //~6MB
         return _httpClient
                 .preparePut(urlFromRelativeUrl(address, URL_BOOTSTRAP))
                 .setHeader("Content-Type", "application/json")
                 .setBody(body.toString());
+    }
+
+    private JsonObject prepareBootstrapRequestBody(MutableState state) {
+        //TODO
     }
 }

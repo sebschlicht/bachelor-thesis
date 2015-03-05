@@ -1,7 +1,5 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark;
 
-import java.util.Queue;
-
 import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.api.TargetType;
 import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
@@ -10,7 +8,8 @@ import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client.AsyncNeo4
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.client.AsyncTitanClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.BootstrapRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
+import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
+import de.uniko.sebschlicht.socialnet.requests.Request;
 
 public class AsyncBenchmarkClientTask {
 
@@ -68,9 +67,9 @@ public class AsyncBenchmarkClientTask {
 
     public void bootstrap(
             BootstrapRequestHandler requestHandler,
-            Queue<Request> requests) {
-        requests.peek().setAddress(_endpoints[0]);
-        _client.bootstrap(requests, requestHandler);
+            MutableState state) {
+        state.getRequests().peek().setAddress(_endpoints[0]);
+        _client.bootstrap(state, requestHandler);
     }
 
     public void handleResponse(int identifier, Request request) {

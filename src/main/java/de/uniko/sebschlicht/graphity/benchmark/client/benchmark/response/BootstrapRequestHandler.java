@@ -1,15 +1,12 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 import com.google.gson.Gson;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Response;
 
 import de.uniko.sebschlicht.graphity.benchmark.api.TargetType;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
+import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
 
 public class BootstrapRequestHandler extends AsyncCompletionHandler<Void> {
 
@@ -19,56 +16,33 @@ public class BootstrapRequestHandler extends AsyncCompletionHandler<Void> {
 
     private final AsyncBenchmarkClientTask _client;
 
-    private final Queue<Request> _requests;
-
-    private int _blockSize;
+    private final MutableState _state;
 
     public BootstrapRequestHandler(
             AsyncBenchmarkClientTask client,
             TargetType targetType,
-            Queue<Request> requests,
-            int blockSize) {
+            MutableState state) {
         _client = client;
         _targetType = targetType;
-        _requests = requests;
-        _blockSize = blockSize;
+        _state = state;
     }
 
-    private void bootstrapNextBlock() {
-        Queue<Request> block = new LinkedList<Request>();
-        for (int i = 0; i < _blockSize && !_requests.isEmpty(); ++i) {
-            block.add(_requests.remove());
-        }
-        if (!block.isEmpty()) {
-            System.out
-                    .println("Bootstrapping " + block.size() + " elements...");
-            _client.bootstrap(this, block);
-        } else {
-            System.out.println("done.");
-        }
-    }
-
-    public void startBootstrap() {
-        bootstrapNextBlock();
+    public void bootstrap() {
+        _client.bootstrap(this, _state);
     }
 
     @Override
     public Void onCompleted(Response response) throws Exception {
         String sResponse = response.getResponseBody();
         if (_targetType == TargetType.NEO4J) {
-            if ("\"true\"".equals(sResponse)) {
-                bootstrapNextBlock();
-            } else {
+            if (!"\"true\"".equals(sResponse)) {
                 throw new IllegalStateException(sResponse);
             }
         } else {
             try {
                 TitanBooleanResponse bResponse =
                         GSON.fromJson(sResponse, TitanBooleanResponse.class);
-                if (bResponse.isSuccess() && bResponse.getValue()) {
-                    bootstrapNextBlock();
-                    return null;
-                } else {
+                if (!bResponse.isSuccess() || !bResponse.getValue()) {
                     throw new IllegalStateException("invalid response: "
                             + sResponse);
                 }
@@ -77,6 +51,7 @@ public class BootstrapRequestHandler extends AsyncCompletionHandler<Void> {
                         + sResponse, e);
             }
         }
+        System.out.println("bootstrap finished.");
         return null;
     }
 

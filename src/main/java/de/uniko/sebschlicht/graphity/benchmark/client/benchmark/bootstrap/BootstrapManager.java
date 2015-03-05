@@ -11,11 +11,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.Subscription;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
+import de.uniko.sebschlicht.graphity.bootstrap.load.BootstrapFileLoader;
+import de.uniko.sebschlicht.socialnet.requests.Request;
+import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
+import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestPost;
+import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
 
 public class BootstrapManager {
 
@@ -44,7 +45,7 @@ public class BootstrapManager {
     }
 
     public static void loadRequests(String filePath) throws IOException {
-        BootstrapLoader loader = new BootstrapLoader(filePath);
+        BootstrapFileLoader loader = new BootstrapFileLoader(filePath);
         Queue<Request> requests = loader.loadRequests();
         System.out.println(requests.size() + " requests loaded from file.");
         mergeRequests(requests);

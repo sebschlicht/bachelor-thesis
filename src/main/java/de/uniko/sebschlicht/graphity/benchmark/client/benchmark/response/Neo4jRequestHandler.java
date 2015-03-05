@@ -9,10 +9,10 @@ import org.json.simple.parser.ParseException;
 import com.ning.http.client.Response;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFeed;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
+import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestPost;
+import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
 
 public class Neo4jRequestHandler extends AsyncRequestHandler {
 

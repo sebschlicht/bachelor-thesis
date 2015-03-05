@@ -31,11 +31,12 @@ import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkCl
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap.BootstrapManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.BootstrapRequestHandler;
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestFollow;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestPost;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.RequestUnfollow;
 import de.uniko.sebschlicht.graphity.benchmark.master.MasterConfiguration;
+import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
+import de.uniko.sebschlicht.socialnet.requests.Request;
+import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestPost;
+import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
 
 public class AsyncClient {
 
@@ -168,15 +169,18 @@ public class AsyncClient {
         for (int i = 0; i < numEntries; ++i) {
             entries.add(nextRequest(nextRequestType()));
         }
+        MutableState state = new MutableState();
+        state.setRequests(entries, true);
+
         resultManager = new ResultManager();
         benchmarkClient =
                 new AsyncBenchmarkClientTask(this, resultManager, config);
         BootstrapRequestHandler requestHandler =
                 new BootstrapRequestHandler(benchmarkClient,
-                        config.getTargetType(), entries, 100000);
+                        config.getTargetType(), state);
         System.out.println("will now bootstrap against "
                 + config.getAddresses().get(0));
-        requestHandler.startBootstrap();
+        requestHandler.bootstrap();
     }
 
     public synchronized Request nextRequest() {

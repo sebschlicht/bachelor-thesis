@@ -10,7 +10,7 @@ import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Response;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
-import de.uniko.sebschlicht.graphity.benchmark.client.requests.Request;
+import de.uniko.sebschlicht.socialnet.requests.Request;
 
 public abstract class AsyncRequestHandler extends AsyncCompletionHandler<Void> {
 
