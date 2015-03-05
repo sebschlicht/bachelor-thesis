@@ -1,8 +1,6 @@
 package de.uniko.sebschlicht.graphity.benchmark.client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -103,16 +101,6 @@ public class AsyncClient {
         LOG.info("benchmark started at " + System.currentTimeMillis());
     }
 
-    public boolean stop() {
-        if (benchmarkClient != null) {
-            benchmarkClient.stop();
-            benchmarkClient = null;
-            System.out.println("client stopped.");
-            return true;
-        }
-        return false;
-    }
-
     public void bootstrap(int numEntries) throws IOException {
         // load wikidump and create bootstrap request generator
         _requestGenerator =
@@ -141,48 +129,42 @@ public class AsyncClient {
         return _requestGenerator.nextRequest();
     }
 
+    private static void printUsage() {
+        System.out
+                .println("usage: AsyncClient {bootstrap|start} <numRequests> [<configPath>]");
+    }
+
     public static void main(String[] args) throws IOException {
-        BufferedReader reader =
-                new BufferedReader(new InputStreamReader(System.in));
-        String cmd;
-        String[] cmdArgs;
+        int type = 0;//0: bootstrap, 1: start
+        if (args.length > 0) {
+            if ("bootstrap".equals(args[0])) {
+                type = 0;
+            } else if ("start".equals(args[0])) {
+                type = 1;
+            }
+        } else {
+            printUsage();
+        }
+        int numRequests = 0;
+        if (args.length > 1) {
+            numRequests = Integer.valueOf(args[1]);
+        } else {
+            printUsage();
+        }
 
         System.out.println("starting async client...");
         String configPath;
-        if (args.length > 0) {
-            configPath = args[0];
+        if (args.length > 2) {
+            configPath = args[2];
         } else {
             System.out.println("[INFO] loading default configuration");
             configPath = PATH_CONFIG;
         }
         AsyncClient client = new AsyncClient(configPath);
-        System.out.println("client ready.");
-
-        while ((cmd = reader.readLine()) != null) {
-            cmdArgs = cmd.split(" ");
-            cmd = cmdArgs[0];
-            switch (cmd) {
-                case "start":
-                    client.start();
-                    break;
-
-                case "stop":
-                    client.stop();
-                    break;
-
-                case "exit":
-                    client.stop();
-                    return;
-
-                case "bootstrap":
-                    if (cmdArgs.length > 1) {
-                        int numEntries = Integer.valueOf(cmdArgs[1]);
-                        client.bootstrap(numEntries);
-                    } else {
-                        System.err.println("usage: bootstrap <numEntries>");
-                    }
-                    break;
-            }
+        if (type == 0) {
+            client.bootstrap(numRequests);
+        } else {
+            client.start();
         }
     }
 }

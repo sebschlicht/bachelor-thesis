@@ -11,7 +11,6 @@ import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
 public class ResultManager {
 
     public void addResult(Request request, long duration) {
-        //TODO: save request object including results
         // timestamp is in [0]
         StringBuilder logMessage = new StringBuilder();
         logMessage.append(request.getType().getId());
