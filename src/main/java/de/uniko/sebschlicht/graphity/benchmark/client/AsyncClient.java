@@ -106,6 +106,7 @@ public class AsyncClient {
         _requestGenerator =
                 new BootstrapRequestGenerator(PATH_WIKI_DUMP,
                         new MutableState(), config);
+        BootstrapManager.clearLog();
 
         final Queue<Request> entries = new LinkedList<Request>();
         for (int i = 0; i < numEntries; ++i) {

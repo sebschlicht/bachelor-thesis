@@ -1,6 +1,9 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Queue;
@@ -20,11 +23,28 @@ import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
 
 public class BootstrapManager {
 
+    private static final String PATH_BOOTSTRAP_LOG = "bootstrap.log";
+
     public static final Logger LOG = LogManager.getLogger("bootstrap");
 
     private static final Random RANDOM = new Random();
 
     private static ArrayList<BootstrapUser> USERS;
+
+    public static void clearLog() {
+        File fBootstrapLog = new File(PATH_BOOTSTRAP_LOG);
+        if (fBootstrapLog.exists()) {
+            FileChannel outChan;
+            try {
+                outChan =
+                        new FileOutputStream(fBootstrapLog, true).getChannel();
+                outChan.truncate(0);
+                outChan.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public static void addRequests(Collection<Request> requests) {
         StringBuilder sRequest;
