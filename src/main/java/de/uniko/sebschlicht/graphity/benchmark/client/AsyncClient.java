@@ -1,12 +1,15 @@
 package de.uniko.sebschlicht.graphity.benchmark.client;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.uniko.sebschlicht.graphity.benchmark.MasterConfiguration;
 import de.uniko.sebschlicht.graphity.benchmark.client.bootstrap.BootstrapManager;
+import de.uniko.sebschlicht.graphity.benchmark.client.bootstrap.BootstrapRequestGenerator;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.RequestComposition;
 import de.uniko.sebschlicht.graphity.benchmark.client.results.ResultManager;
@@ -96,32 +99,73 @@ public class AsyncClient {
         LOG.info("benchmark started at " + System.currentTimeMillis());
     }
 
+    public void bootstrap(int numEntries) throws IOException {
+        // load wikidump and create bootstrap request generator
+        _requestGenerator =
+                new BootstrapRequestGenerator(PATH_WIKI_DUMP,
+                        new MutableState(), config);
+        BootstrapManager.clearLog();
+
+        final Queue<Request> entries = new LinkedList<Request>();
+        for (int i = 0; i < numEntries; ++i) {
+            entries.add(_requestGenerator.nextRequest());
+        }
+        BootstrapManager.addRequests(entries);
+    }
+
     public synchronized Request nextRequest() {
         return _requestGenerator.nextRequest();
     }
 
     private static void printUsage() {
         System.out
-                .println("usage: AsyncClient {bootstrap|start} <numRequests> [<configPath>]");
+                .println("usage: AsyncClient [{bootstrap|start}] <numRequests> [<configPath>]");
+    }
+
+    private static boolean isNumber(String string) {
+        return string.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
     }
 
     public static void main(String[] args) throws IOException {
+        int i = 0;
+        boolean bootstrap = false;
+        if (args.length > i) {
+            String type = args[i];
+            if ("bootstrap".equals(type)) {
+                bootstrap = true;
+                i += 1;
+            } else if ("start".equals(type)) {
+                i += 1;
+            } else {
+                if (!isNumber(type)) {// illegal type identifier
+                    printUsage();
+                    return;
+                }// is numRequests
+            }
+        }// optional
+
         int numRequests = 0;
-        if (args.length > 0) {
-            numRequests = Integer.valueOf(args[0]);
-        } else {
+        if (args.length > i) {
+            numRequests = Integer.valueOf(args[i]);
+            i += 1;
+        } else {// mandatory
             printUsage();
+            return;
         }
 
         System.out.println("starting async client...");
         String configPath;
-        if (args.length > 1) {
-            configPath = args[1];
+        if (args.length > i) {
+            configPath = args[i];
         } else {
             System.out.println("[INFO] loading default configuration");
             configPath = PATH_CONFIG;
         }
         AsyncClient client = new AsyncClient(configPath);
-        client.start(numRequests);
+        if (bootstrap) {
+            client.bootstrap(numRequests);
+        } else {
+            client.start(numRequests);
+        }
     }
 }
