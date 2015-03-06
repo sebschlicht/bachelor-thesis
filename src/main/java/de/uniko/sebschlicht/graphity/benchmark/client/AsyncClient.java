@@ -1,21 +1,16 @@
 package de.uniko.sebschlicht.graphity.benchmark.client;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.uniko.sebschlicht.graphity.benchmark.api.ClientConfiguration;
-import de.uniko.sebschlicht.graphity.benchmark.api.RequestComposition;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.AsyncBenchmarkClientTask;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap.BootstrapManager;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.bootstrap.BootstrapRequestGenerator;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.response.BootstrapRequestHandler;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.results.ResultManager;
-import de.uniko.sebschlicht.graphity.benchmark.client.benchmark.write.RequestGenerator;
-import de.uniko.sebschlicht.graphity.benchmark.master.MasterConfiguration;
+import de.uniko.sebschlicht.graphity.benchmark.MasterConfiguration;
+import de.uniko.sebschlicht.graphity.benchmark.client.bootstrap.BootstrapManager;
+import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
+import de.uniko.sebschlicht.graphity.benchmark.client.config.RequestComposition;
+import de.uniko.sebschlicht.graphity.benchmark.client.results.ResultManager;
+import de.uniko.sebschlicht.graphity.benchmark.client.write.RequestGenerator;
 import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
 import de.uniko.sebschlicht.socialnet.requests.Request;
 
@@ -28,7 +23,7 @@ public class AsyncClient {
 
     private static final String PATH_WIKI_DUMP = "wikidump";
 
-    private ClientConfiguration config;
+    private Configuration config;
 
     private RequestComposition requestComposition;
 
@@ -51,14 +46,14 @@ public class AsyncClient {
                         baseConfig.request_follow, baseConfig.request_unfollow,
                         baseConfig.request_post);
         config =
-                new ClientConfiguration(baseConfig.id_start, baseConfig.id_end,
+                new Configuration(baseConfig.id_start, baseConfig.id_end,
                         baseConfig.feed_length, baseConfig.maxThroughput,
                         baseConfig.numThreads, requestComposition,
                         baseConfig.getAddresses(), baseConfig.getTargetType(),
                         baseConfig.getTargetBase());
     }
 
-    public void start() throws IOException {
+    public void start(int numRequests) throws IOException {
         // load wikidump and create request generator
         _requestGenerator =
                 new RequestGenerator(PATH_WIKI_DUMP, new MutableState(), config);
@@ -97,33 +92,8 @@ public class AsyncClient {
         logMessageStarted.append(config.getNumThreads());
         logMessageStarted.append(" client threads.");
         LOG.info(logMessageStarted.toString());
-        benchmarkClient.start();
+        benchmarkClient.start(numRequests);
         LOG.info("benchmark started at " + System.currentTimeMillis());
-    }
-
-    public void bootstrap(int numEntries) throws IOException {
-        // load wikidump and create bootstrap request generator
-        _requestGenerator =
-                new BootstrapRequestGenerator(PATH_WIKI_DUMP,
-                        new MutableState(), config);
-        BootstrapManager.clearLog();
-
-        final Queue<Request> entries = new LinkedList<Request>();
-        for (int i = 0; i < numEntries; ++i) {
-            entries.add(_requestGenerator.nextRequest());
-        }
-        MutableState state = new MutableState();
-        state.setRequests(entries, true);
-
-        resultManager = new ResultManager();
-        benchmarkClient =
-                new AsyncBenchmarkClientTask(this, resultManager, config);
-        BootstrapRequestHandler requestHandler =
-                new BootstrapRequestHandler(benchmarkClient,
-                        config.getTargetType(), state);
-        System.out.println("will now bootstrap against "
-                + config.getAddresses().get(0));
-        requestHandler.bootstrap();
     }
 
     public synchronized Request nextRequest() {
@@ -136,36 +106,22 @@ public class AsyncClient {
     }
 
     public static void main(String[] args) throws IOException {
-        int type = 0;//0: bootstrap, 1: start
-        if (args.length > 0) {
-            if ("bootstrap".equals(args[0])) {
-                type = 0;
-            } else if ("start".equals(args[0])) {
-                type = 1;
-            }
-        } else {
-            printUsage();
-        }
         int numRequests = 0;
-        if (args.length > 1) {
-            numRequests = Integer.valueOf(args[1]);
+        if (args.length > 0) {
+            numRequests = Integer.valueOf(args[0]);
         } else {
             printUsage();
         }
 
         System.out.println("starting async client...");
         String configPath;
-        if (args.length > 2) {
-            configPath = args[2];
+        if (args.length > 1) {
+            configPath = args[1];
         } else {
             System.out.println("[INFO] loading default configuration");
             configPath = PATH_CONFIG;
         }
         AsyncClient client = new AsyncClient(configPath);
-        if (type == 0) {
-            client.bootstrap(numRequests);
-        } else {
-            client.start();
-        }
+        client.start(numRequests);
     }
 }

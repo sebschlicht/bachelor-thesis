@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uniko.sebschlicht.graphity.bootstrap.load.CsvParser;
+
 public class WikidumpReader extends CsvParser<WikidumpInfo> {
 
     public WikidumpReader(
