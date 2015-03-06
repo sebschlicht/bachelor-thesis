@@ -79,7 +79,6 @@ public class AsyncBenchmarkClientTask {
     public void handleResponse(int identifier, Request request) {
         long duration = System.nanoTime() - _startTime[identifier];
         _resultManager.addResult(request, duration);
-        _numRequests += 1;
         if (_numRequests >= _numMaxRequests) {
             _isRunning = false;
             String message = "request limit reached.";
@@ -91,6 +90,7 @@ public class AsyncBenchmarkClientTask {
     }
 
     private void executeNextRequest(int identifier) {
+        _numRequests += 1;
         Request request = _owner.nextRequest();
         String address = getNextTargetEndpoint();
         request.setAddress(address);
@@ -98,6 +98,12 @@ public class AsyncBenchmarkClientTask {
         _client.executeRequest(identifier, request);
     }
 
+    /**
+     * Retrieves the target endpoint for the next request.
+     * Default implementation does a round-robin across all endpoints specified.
+     * 
+     * @return target endpoint for next request
+     */
     protected String getNextTargetEndpoint() {
         String address = _endpoints[_iCrrEndpoint];
         if (++_iCrrEndpoint >= _endpoints.length) {
