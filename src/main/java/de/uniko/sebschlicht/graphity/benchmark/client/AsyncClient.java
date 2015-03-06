@@ -106,11 +106,13 @@ public class AsyncClient {
                         new MutableState(), config);
         BootstrapManager.clearLog();
 
+        System.out.println("generating " + numEntries + " requests...");
         final Queue<Request> entries = new LinkedList<Request>();
         for (int i = 0; i < numEntries; ++i) {
             entries.add(_requestGenerator.nextRequest());
         }
         BootstrapManager.addRequests(entries);
+        System.out.println("request generation finished.");
     }
 
     public synchronized Request nextRequest() {
