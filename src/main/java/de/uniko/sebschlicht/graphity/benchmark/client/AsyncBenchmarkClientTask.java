@@ -5,7 +5,7 @@ import de.uniko.sebschlicht.graphity.benchmark.client.client.AsyncNeo4jClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.client.AsyncTitanClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.TargetType;
-import de.uniko.sebschlicht.graphity.benchmark.client.results.ResultManager;
+import de.uniko.sebschlicht.graphity.benchmark.client.responses.ResultManager;
 import de.uniko.sebschlicht.socialnet.requests.Request;
 
 /**

@@ -12,7 +12,7 @@ import de.uniko.sebschlicht.graphity.benchmark.client.bootstrap.BootstrapManager
 import de.uniko.sebschlicht.graphity.benchmark.client.bootstrap.BootstrapRequestGenerator;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.RequestComposition;
-import de.uniko.sebschlicht.graphity.benchmark.client.results.ResultManager;
+import de.uniko.sebschlicht.graphity.benchmark.client.responses.ResultManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.write.RequestGenerator;
 import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
 import de.uniko.sebschlicht.socialnet.requests.Request;

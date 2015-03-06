@@ -1,4 +1,4 @@
-package de.uniko.sebschlicht.graphity.benchmark.client.results;
+package de.uniko.sebschlicht.graphity.benchmark.client.responses;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.bootstrap.BootstrapManager;
@@ -25,17 +25,17 @@ public class ResultManager {
         switch (request.getType()) {
             case FEED:
                 RequestFeed rfe = (RequestFeed) request;
-                if (rfe.getResult() == Math.min(
-                        BootstrapManager.getFeedSize(rfe.getId()), 15)) {
+                int expectedFeedSize =
+                        Math.min(BootstrapManager.getFeedSize(rfe.getId()), 15);
+                if (rfe.getResult() == expectedFeedSize) {
                     logMessage.append("\t");
                     logMessage.append(rfe.getId());
                     logMessage.append("\t");
                     logMessage.append(rfe.getResult());
                 } else {
                     System.err.println("unexpected feed size: expected "
-                            + BootstrapManager.getFeedSize(rfe.getId())
-                            + " but was " + rfe.getResult() + " for user "
-                            + rfe.getId());
+                            + expectedFeedSize + " but was " + rfe.getResult()
+                            + " for user " + rfe.getId());
                     throw new IllegalStateException("unexpected feed size");
                 }
                 break;
