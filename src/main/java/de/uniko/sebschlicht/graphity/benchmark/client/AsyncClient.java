@@ -62,6 +62,7 @@ public class AsyncClient {
                 new RequestGenerator(PATH_WIKI_DUMP, new MutableState(), config);
         // load bootstrap manager if necessary
         if (requestComposition.getFeed() > 0) {
+            System.out.println("loading bootstrap log...");
             BootstrapManager.loadRequests("bootstrap.log");
         }
 
@@ -155,7 +156,6 @@ public class AsyncClient {
             return;
         }
 
-        System.out.println("starting async client...");
         String configPath;
         if (args.length > i) {
             configPath = args[i];

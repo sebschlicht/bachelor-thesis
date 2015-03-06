@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.TreeSet;
@@ -173,6 +174,10 @@ public class BootstrapManager {
         }
     }
 
+    public static List<BootstrapUser> getUsers() {
+        return USERS;
+    }
+
     private static BootstrapUser getUserById(long id) {
         return USERS.get((int) id - 1);
     }
@@ -198,6 +203,9 @@ public class BootstrapManager {
 
     public static int getFeedSize(long idReader) {
         BootstrapUser reader = getUserById(idReader);
+        if (reader == null) {
+            return -1;
+        }
         int feedSize = 0;
         BootstrapUser followed;
         if (reader.getSubscriptions() != null) {

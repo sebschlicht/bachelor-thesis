@@ -16,7 +16,7 @@ public class ResultManager {
         logMessage.append(request.getType().getId());
         logMessage.append("\t");
         if (!request.hasFailed()) {
-            logMessage.append(duration);
+            logMessage.append(duration / 1000000);// nanoTime -> ms
         } else {
             logMessage.append(-1);
             logMessage.append("\t");
