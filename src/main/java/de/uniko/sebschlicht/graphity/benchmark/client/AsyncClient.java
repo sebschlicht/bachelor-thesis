@@ -96,8 +96,8 @@ public class AsyncClient {
         logMessageStarted.append(config.getNumThreads());
         logMessageStarted.append(" client threads.");
         LOG.info(logMessageStarted.toString());
-        benchmarkClient.start(numRequests);
         LOG.info("benchmark started at " + System.currentTimeMillis());
+        benchmarkClient.start(numRequests);
     }
 
     public void bootstrap(int numEntries) throws IOException {
