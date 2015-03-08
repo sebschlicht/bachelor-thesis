@@ -15,28 +15,31 @@ public class ResultManager {
         StringBuilder logMessage = new StringBuilder();
         logMessage.append(request.getType().getId());
         logMessage.append("\t");
-        if (!request.hasFailed()) {
-            logMessage.append(duration / 1000000);// nanoTime -> ms
-        } else {
+        logMessage.append(duration / 1000000);// nanoTime -> ms
+        if (request.hasFailed()) {
             logMessage.append(-1);
             logMessage.append("\t");
             logMessage.append(request.getError().getMessage());
+            AsyncClient.LOG.info(logMessage);
+            return;
         }
         switch (request.getType()) {
             case FEED:
                 RequestFeed rfe = (RequestFeed) request;
                 int expectedFeedSize =
                         Math.min(BootstrapManager.getFeedSize(rfe.getId()), 15);
-                if (rfe.getResult() == expectedFeedSize) {
-                    logMessage.append("\t");
-                    logMessage.append(rfe.getId());
-                    logMessage.append("\t");
-                    logMessage.append(rfe.getResult());
-                } else {
-                    System.err.println("unexpected feed size: expected "
-                            + expectedFeedSize + " but was " + rfe.getResult()
-                            + " for user " + rfe.getId());
-                    throw new IllegalStateException("unexpected feed size");
+                logMessage.append("\t");
+                logMessage.append(rfe.getId());
+                logMessage.append("\t");
+                logMessage.append(rfe.getResult());
+                if (rfe.getResult() != expectedFeedSize) {
+                    String errorMessage =
+                            "unexpected feed size, expected "
+                                    + expectedFeedSize;
+                    logMessage.append("\n");
+                    logMessage.append(errorMessage);
+                    AsyncClient.LOG.info(logMessage);
+                    throw new IllegalStateException(errorMessage);
                 }
                 break;
 
