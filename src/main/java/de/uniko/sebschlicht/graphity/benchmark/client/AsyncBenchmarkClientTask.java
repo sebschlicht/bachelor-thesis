@@ -79,7 +79,7 @@ public class AsyncBenchmarkClientTask {
     public void handleResponse(int identifier, Request request) {
         long duration = System.nanoTime() - _startTime[identifier];
         _resultManager.addResult(request, duration);
-        if (_numRequests >= _numMaxRequests) {
+        if (_numRequests >= _numMaxRequests && _isRunning) {
             _isRunning = false;
             String message = "request limit reached.";
             System.out.println(message);

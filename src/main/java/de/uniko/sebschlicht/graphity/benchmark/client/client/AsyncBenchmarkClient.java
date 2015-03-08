@@ -43,16 +43,14 @@ public abstract class AsyncBenchmarkClient {
     //TODO: make public and reuse request handlers
     abstract protected AsyncRequestHandler getRequestHandler(int identifier);
 
-    abstract protected BoundRequestBuilder prepareFeedRequest(
-            RequestFeed request);
+    abstract public BoundRequestBuilder createFeedRequest(RequestFeed request);
 
-    abstract protected BoundRequestBuilder prepareFollowRequest(
+    abstract public BoundRequestBuilder createFollowRequest(
             RequestFollow request);
 
-    abstract protected BoundRequestBuilder preparePostRequest(
-            RequestPost request);
+    abstract public BoundRequestBuilder createPostRequest(RequestPost request);
 
-    abstract protected BoundRequestBuilder prepareUnfollowRequest(
+    abstract public BoundRequestBuilder createUnfollowRequest(
             RequestUnfollow request);
 
     protected String urlFromRelativeUrl(String address, String url) {
@@ -66,22 +64,22 @@ public abstract class AsyncBenchmarkClient {
         BoundRequestBuilder httpRequest;
         switch (request.getType()) {
             case FEED:
-                httpRequest = prepareFeedRequest((RequestFeed) request);
+                httpRequest = createFeedRequest((RequestFeed) request);
                 httpRequest.execute(requestHandler);
                 break;
 
             case FOLLOW:
-                httpRequest = prepareFollowRequest((RequestFollow) request);
+                httpRequest = createFollowRequest((RequestFollow) request);
                 httpRequest.execute(requestHandler);
                 break;
 
             case POST:
-                httpRequest = preparePostRequest((RequestPost) request);
+                httpRequest = createPostRequest((RequestPost) request);
                 httpRequest.execute(requestHandler);
                 break;
 
             case UNFOLLOW:
-                httpRequest = prepareUnfollowRequest((RequestUnfollow) request);
+                httpRequest = createUnfollowRequest((RequestUnfollow) request);
                 httpRequest.execute(requestHandler);
                 break;
         }

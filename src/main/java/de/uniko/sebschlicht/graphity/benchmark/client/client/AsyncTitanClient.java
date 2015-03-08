@@ -35,7 +35,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     }
 
     @Override
-    protected BoundRequestBuilder prepareFeedRequest(RequestFeed request) {
+    public BoundRequestBuilder createFeedRequest(RequestFeed request) {
         String jsonString = "{\"reader\":\"" + request.getId() + "\"}";
         return _httpClient
                 .preparePost(urlFromRelativeUrl(request.getAddress(), URL_FEED))
@@ -44,7 +44,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     }
 
     @Override
-    protected BoundRequestBuilder prepareFollowRequest(RequestFollow request) {
+    public BoundRequestBuilder createFollowRequest(RequestFollow request) {
         String jsonString =
                 "{\"following\":\"" + request.getIdSubscriber()
                         + "\",\"followed\":\"" + request.getIdFollowed()
@@ -57,7 +57,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     }
 
     @Override
-    protected BoundRequestBuilder preparePostRequest(RequestPost request) {
+    public BoundRequestBuilder createPostRequest(RequestPost request) {
         String jsonString =
                 "{\"author\":\"" + request.getId() + "\",\"message\":\""
                         + request.getMessage() + "\"}";
@@ -68,8 +68,7 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     }
 
     @Override
-    protected BoundRequestBuilder
-        prepareUnfollowRequest(RequestUnfollow request) {
+    public BoundRequestBuilder createUnfollowRequest(RequestUnfollow request) {
         String jsonString =
                 "{\"following\":\"" + request.getIdSubscriber()
                         + "\",\"followed\":\"" + request.getIdFollowed()

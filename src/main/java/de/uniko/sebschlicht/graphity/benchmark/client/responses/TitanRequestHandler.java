@@ -23,7 +23,6 @@ public class TitanRequestHandler extends AsyncRequestHandler {
     @Override
     protected void handleFeedResponse(Response response) throws IOException {
         String sResponse = response.getResponseBody();
-        System.out.println(sResponse);
         TitanListResponse lResponse =
                 GSON.fromJson(sResponse, TitanListResponse.class);
         if (lResponse.isSuccess()) {
