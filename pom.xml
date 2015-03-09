@@ -23,6 +23,7 @@
     <jersey.version>1.9</jersey.version>
     <async-http-client.version>1.9.6</async-http-client.version>
     <commons.lang.version>3.3.2</commons.lang.version>
+    <socialnet.version>0.3.0-SNAPSHOT</socialnet.version>
   </properties>
 
   <dependencies>
@@ -81,11 +82,11 @@
       <artifactId>commons-lang3</artifactId>
       <version>${commons.lang.version}</version>
     </dependency>
-    <!-- Graphity@Neo4j bootstrap API -->
+    <!-- Graphity socialnet -->
     <dependency>
       <groupId>de.uniko.sebschlicht</groupId>
-      <artifactId>graphity-neo4j</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <artifactId>socialnet</artifactId>
+      <version>${socialnet.version}</version>
     </dependency>
   </dependencies>
 

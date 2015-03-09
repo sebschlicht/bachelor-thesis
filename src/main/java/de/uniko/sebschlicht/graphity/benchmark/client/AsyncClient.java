@@ -26,6 +26,8 @@ public class AsyncClient {
 
     private static final String PATH_WIKI_DUMP = "wikidump";
 
+    private Object _sync;
+
     private Configuration config;
 
     private RequestComposition requestComposition;
@@ -44,6 +46,7 @@ public class AsyncClient {
             System.err.println("configuration file invalid");
             return;
         }
+        _sync = new Object();
         requestComposition =
                 new RequestComposition(baseConfig.request_feed,
                         baseConfig.request_follow, baseConfig.request_unfollow,
@@ -116,8 +119,25 @@ public class AsyncClient {
         System.out.println("request generation finished.");
     }
 
-    public synchronized Request nextRequest() {
-        return _requestGenerator.nextRequest();
+    public Request nextRequest() {
+        synchronized (_sync) {
+            return _requestGenerator.nextRequest();
+        }
+    }
+
+    /**
+     * Updates the social network state after a request was executed.
+     * 
+     * @param request
+     *            request executed
+     */
+    public void handleResponse(Request request) {
+        if (request.hasFailed()) {
+            return;
+        }
+        synchronized (_sync) {
+            _requestGenerator.mergeRequest(request);
+        }
     }
 
     private static void printUsage() {

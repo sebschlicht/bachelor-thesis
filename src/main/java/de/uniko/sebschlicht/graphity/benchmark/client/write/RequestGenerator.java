@@ -172,6 +172,10 @@ public class RequestGenerator {
         return nextRequest(type);
     }
 
+    public void mergeRequest(Request request) {
+        _state.mergeRequest(request, false);
+    }
+
     protected long nextUserId() {
         return _config.getIdStart()
                 + RANDOM.nextInt((int) (_config.getIdEnd() - _config
