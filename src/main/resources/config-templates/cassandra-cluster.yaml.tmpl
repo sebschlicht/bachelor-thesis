@@ -55,7 +55,7 @@ hinted_handoff_throttle_in_kb: 1024
 # Number of threads with which to deliver hints;
 # Consider increasing this number when you have multi-dc deployments, since
 # cross-dc handoff tends to be slower
-max_hints_delivery_threads: 2
+max_hints_delivery_threads: 4
 
 # Maximum throttle in KBs per second, total. This will be
 # reduced proportionally to the number of nodes in the cluster.
