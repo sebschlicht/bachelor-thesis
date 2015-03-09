@@ -133,8 +133,8 @@ public class RequestGenerator {
                     List<Long> bucket = entry.getValue();
                     long idFollowed = bucket.get(RANDOM.nextInt(bucket.size()));
 
-                    subscription = new Subscription(idUser, idFollowed);
-                    _state.addSubscription(subscription);
+                    //subscription = new Subscription(idUser, idFollowed);
+                    //_state.addSubscription(subscription);
                     return new RequestFollow(idUser, idFollowed);
 
                 case UNFOLLOW:
@@ -155,7 +155,7 @@ public class RequestGenerator {
                         iter.next();
                     }
                     subscription = iter.next();
-                    _state.removeSubscription(subscription);
+                    //_state.removeSubscription(subscription);
                     return new RequestUnfollow(subscription.getIdSubscriber(),
                             subscription.getIdFollowed());
             }
