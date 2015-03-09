@@ -16,6 +16,7 @@ import de.uniko.sebschlicht.graphity.benchmark.client.responses.ResultManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.write.RequestGenerator;
 import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
 import de.uniko.sebschlicht.socialnet.requests.Request;
+import de.uniko.sebschlicht.socialnet.requests.RequestType;
 
 public class AsyncClient {
 
@@ -132,7 +133,7 @@ public class AsyncClient {
      *            request executed
      */
     public void handleResponse(Request request) {
-        if (request.hasFailed()) {
+        if (request.hasFailed() || request.getType() == RequestType.FEED) {
             return;
         }
         synchronized (_sync) {
