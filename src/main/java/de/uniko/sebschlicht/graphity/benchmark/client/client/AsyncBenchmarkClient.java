@@ -35,7 +35,7 @@ public abstract class AsyncBenchmarkClient {
         _client = client;
         _config = config;
         AsyncHttpClientConfig httpClientConfig =
-                new AsyncHttpClientConfig.Builder().setConnectTimeout(1000)
+                new AsyncHttpClientConfig.Builder().setConnectTimeout(10000)
                         .setRequestTimeout(-1).setIOThreadMultiplier(1).build();
         _httpClient = new AsyncHttpClient(httpClientConfig);
     }
