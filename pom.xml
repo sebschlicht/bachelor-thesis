@@ -23,7 +23,7 @@
     <jersey.version>1.9</jersey.version>
     <async-http-client.version>1.9.6</async-http-client.version>
     <commons.lang.version>3.3.2</commons.lang.version>
-    <socialnet.version>0.3.0-SNAPSHOT</socialnet.version>
+    <socialnet.version>0.5.0-SNAPSHOT</socialnet.version>
   </properties>
 
   <dependencies>
