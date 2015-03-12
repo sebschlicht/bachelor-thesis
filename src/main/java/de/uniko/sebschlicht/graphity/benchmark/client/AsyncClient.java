@@ -122,7 +122,9 @@ public class AsyncClient {
 
     public Request nextRequest() {
         synchronized (_sync) {
-            return _requestGenerator.nextRequest();
+            Request request = _requestGenerator.nextRequest();
+            _requestGenerator.mergeRequest(request);
+            return request;
         }
     }
 
@@ -136,9 +138,9 @@ public class AsyncClient {
         if (request.hasFailed() || request.getType() == RequestType.FEED) {
             return;
         }
-        synchronized (_sync) {
-            _requestGenerator.mergeRequest(request);
-        }
+        //synchronized (_sync) {
+        //_requestGenerator.mergeRequest(request);
+        //}
     }
 
     private static void printUsage() {
