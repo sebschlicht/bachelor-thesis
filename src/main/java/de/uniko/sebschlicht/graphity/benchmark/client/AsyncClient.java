@@ -123,7 +123,9 @@ public class AsyncClient {
     public Request nextRequest() {
         synchronized (_sync) {
             Request request = _requestGenerator.nextRequest();
-            _requestGenerator.mergeRequest(request);
+            if (request.getType() != RequestType.FEED) {
+                _requestGenerator.mergeRequest(request);
+            }
             return request;
         }
     }
