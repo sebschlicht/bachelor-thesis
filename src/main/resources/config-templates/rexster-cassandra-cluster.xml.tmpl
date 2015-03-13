@@ -46,13 +46,11 @@
                 <schema.default>none</schema.default>
                 <storage.backend>cassandra</storage.backend>
                 <storage.batch-loading>false</storage.batch-loading>
-                <storage.buffer-size>10000</storage.buffer-size>
+                <storage.buffer-size>1024</storage.buffer-size>
                 <storage.hostname>${address}</storage.hostname>
-                <!-- did not work in a whole
-                <storage.cassandra.read-consistency-level>2</storage.cassandra.read-consistency-level>
                 <storage.cassandra.replication-factor>3</storage.cassandra.replication-factor>
+                <storage.cassandra.read-consistency-level>2</storage.cassandra.read-consistency-level>
                 <storage.cassandra.write-consistency-level>2</storage.cassandra.write-consistency-level>
-                -->
             </properties>
             <extensions>
               <allows>
