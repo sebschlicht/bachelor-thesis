@@ -143,7 +143,7 @@ public class RequestGenerator {
                     if (idUser == 0) {
                         return nextRequest();
                     }
-                    long idFollowed = getFollowedUser();
+                    long idFollowed = getFollowedUserExisting();
 
                     //_state.addSubscription(idUser, idFollowed);
                     return new RequestFollow(idUser, idFollowed);
