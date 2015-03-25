@@ -2,8 +2,6 @@ package de.uniko.sebschlicht.graphity.benchmark.client.bootstrap;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
 import de.uniko.sebschlicht.graphity.benchmark.client.write.RequestGenerator;
@@ -57,10 +55,10 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                     /*
                      * let random user post a fixed-length alphanumeric feed
                      */
-                    idUser = getRandomUser();
-                    if (idUser == 0) {
+                    if (_uId - 1 < 1) {
                         return nextRequest();
                     }
+                    idUser = getRandomUser();
                     return new RequestPost(idUser, null);
 
                 case FOLLOW:
@@ -68,15 +66,11 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                      * let random user follow another user according to longtail
                      * distribution
                      */
-                    idUser = getRandomUser();
-                    if (idUser == 0) {
+                    if (_uId - 1 < 2) {
                         return nextRequest();
                     }
-                    int iBucket = RANDOM.nextInt(_propabilities.lastKey());
-                    Entry<Integer, List<Long>> entry =
-                            _propabilities.ceilingEntry(iBucket);
-                    List<Long> bucket = entry.getValue();
-                    long idFollowed = bucket.get(RANDOM.nextInt(bucket.size()));
+                    idUser = getRandomUser();
+                    long idFollowed = getFollowedUserExisting();
 
                     subscription = new Subscription(idUser, idFollowed);
                     _state.addSubscription(subscription);

@@ -143,15 +143,9 @@ public class RequestGenerator {
                     if (idUser == 0) {
                         return nextRequest();
                     }
+                    long idFollowed = getFollowedUser();
 
-                    int iBucket = RANDOM.nextInt(_propabilities.lastKey());
-                    Entry<Integer, List<Long>> entry =
-                            _propabilities.ceilingEntry(iBucket);
-                    List<Long> bucket = entry.getValue();
-                    long idFollowed = bucket.get(RANDOM.nextInt(bucket.size()));
-
-                    //subscription = new Subscription(idUser, idFollowed);
-                    //_state.addSubscription(subscription);
+                    //_state.addSubscription(idUser, idFollowed);
                     return new RequestFollow(idUser, idFollowed);
 
                 case UNFOLLOW:
@@ -172,7 +166,7 @@ public class RequestGenerator {
                         iter.next();
                     }
                     subscription = iter.next();
-                    //_state.removeSubscription(subscription);
+                    //_state.removeSubscription(subscription.getIdSubscriber(), subscription.getIdFollowed());
                     return new RequestUnfollow(subscription.getIdSubscriber(),
                             subscription.getIdFollowed());
 
@@ -205,6 +199,21 @@ public class RequestGenerator {
             return 0;
         }
         return RANDOM.nextInt((int) _uId - 1) + 1;
+    }
+
+    protected long getFollowedUser() {
+        int iBucket = RANDOM.nextInt(_propabilities.lastKey());
+        Entry<Integer, List<Long>> entry = _propabilities.ceilingEntry(iBucket);
+        List<Long> bucket = entry.getValue();
+        return bucket.get(RANDOM.nextInt(bucket.size()));
+    }
+
+    protected long getFollowedUserExisting() {
+        long id;
+        do {
+            id = getFollowedUser();
+        } while (id > _uId - 1);
+        return id;
     }
 
     protected RequestType nextRequestType() {
