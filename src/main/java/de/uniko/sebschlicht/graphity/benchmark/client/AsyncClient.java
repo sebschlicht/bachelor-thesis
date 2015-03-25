@@ -51,13 +51,12 @@ public class AsyncClient {
         requestComposition =
                 new RequestComposition(baseConfig.request_feed,
                         baseConfig.request_follow, baseConfig.request_unfollow,
-                        baseConfig.request_post);
+                        baseConfig.request_post, baseConfig.request_user);
         config =
-                new Configuration(baseConfig.id_start, baseConfig.id_end,
-                        baseConfig.feed_length, baseConfig.maxThroughput,
-                        baseConfig.numThreads, requestComposition,
-                        baseConfig.getAddresses(), baseConfig.getTargetType(),
-                        baseConfig.getTargetBase());
+                new Configuration(baseConfig.feed_length,
+                        baseConfig.maxThroughput, baseConfig.numThreads,
+                        requestComposition, baseConfig.getAddresses(),
+                        baseConfig.getTargetType(), baseConfig.getTargetBase());
     }
 
     public void start(int numRequests) throws IOException {

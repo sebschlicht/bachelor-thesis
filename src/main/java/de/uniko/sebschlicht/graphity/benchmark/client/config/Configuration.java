@@ -2,7 +2,6 @@ package de.uniko.sebschlicht.graphity.benchmark.client.config;
 
 import java.util.List;
 
-
 /**
  * Configuration for the Graphity benchmark client.
  * 
@@ -10,10 +9,6 @@ import java.util.List;
  * 
  */
 public class Configuration {
-
-    private long idStart;
-
-    private long idEnd;
 
     private int lengthFeed;
 
@@ -32,10 +27,6 @@ public class Configuration {
     /**
      * Creates a benchmark client configuration.
      * 
-     * @param idStart
-     *            first user id handled
-     * @param idEnd
-     *            last user id handled
      * @param lengthFeed
      *            number of characters used in feeds created by request type
      *            FEED
@@ -53,8 +44,6 @@ public class Configuration {
      *            base path of the target application relative to the endpoints
      */
     public Configuration(
-            long idStart,
-            long idEnd,
             int lengthFeed,
             int maxThroughput,
             int numThreads,
@@ -62,8 +51,6 @@ public class Configuration {
             List<String> addresses,
             TargetType targetType,
             String targetBase) {
-        this.idStart = idStart;
-        this.idEnd = idEnd;
         this.lengthFeed = lengthFeed;
         this.maxThroughput = maxThroughput;
         this.numThreads = numThreads;
@@ -71,14 +58,6 @@ public class Configuration {
         this.addresses = addresses;
         this.targetType = targetType;
         this.targetBase = targetBase;
-    }
-
-    public long getIdEnd() {
-        return idEnd;
-    }
-
-    public long getIdStart() {
-        return idStart;
     }
 
     public int getFeedLength() {

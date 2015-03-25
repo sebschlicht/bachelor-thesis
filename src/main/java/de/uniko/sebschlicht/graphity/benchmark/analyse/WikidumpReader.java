@@ -14,6 +14,29 @@ public class WikidumpReader extends CsvParser<WikidumpInfo> {
         super(filePath);
     }
 
+    public long[] loadRequestDistribution(long numMaxRequests)
+            throws IOException {
+        String[] entry;
+        boolean loadAll = (numMaxRequests == 0);
+
+        long[] counts = new long[4];
+        while ((loadAll || (counts[0] < numMaxRequests))
+                && ((entry = getEntry()) != null)) {
+            if (entry.length == 3 && "U".equals(entry[1])) {
+                counts[2] += 1;
+            } else if (entry.length == 4 && "A".equals(entry[1])) {
+                counts[1] += 1;
+            } else if (entry.length == 4 && "R".equals(entry[1])) {
+                counts[3] += 1;
+            } else {
+                throw new IllegalArgumentException("unknown entry of length "
+                        + entry.length + ": " + entry[1]);
+            }
+            counts[0] += 1;
+        }
+        return counts;
+    }
+
     public WikidumpInfo loadCommands(int numCommands) throws IOException {
         String[] entry;
         Map<Long, Integer> numFollowers = new HashMap<Long, Integer>();
@@ -23,7 +46,8 @@ public class WikidumpReader extends CsvParser<WikidumpInfo> {
         long numPost = 0;
 
         int numParsed = 0;
-        while (numParsed < numCommands && ((entry = getEntry()) != null)) {
+
+        while ((numParsed < numCommands) && ((entry = getEntry()) != null)) {
             if (entry.length == 3 && "U".equals(entry[1])) {
                 // update
                 numTotalWrites += 1;

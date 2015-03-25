@@ -14,6 +14,7 @@ import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
 import de.uniko.sebschlicht.socialnet.requests.RequestPost;
 import de.uniko.sebschlicht.socialnet.requests.RequestType;
 import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestUser;
 
 public class BootstrapRequestGenerator extends RequestGenerator {
 
@@ -26,6 +27,10 @@ public class BootstrapRequestGenerator extends RequestGenerator {
             throw new IllegalArgumentException(
                     "can not bootstrap feed requests!");
         }
+        System.out.println(_requestComposition.getUser());
+        System.out.println(_requestComposition.getFollow());
+        System.out.println(_requestComposition.getPost());
+        System.out.println(_requestComposition.getUnfollow());
     }
 
     /**
@@ -52,7 +57,10 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                     /*
                      * let random user post a fixed-length alphanumeric feed
                      */
-                    idUser = nextUserId();
+                    idUser = getRandomUser();
+                    if (idUser == 0) {
+                        return nextRequest();
+                    }
                     return new RequestPost(idUser, null);
 
                 case FOLLOW:
@@ -60,7 +68,10 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                      * let random user follow another user according to longtail
                      * distribution
                      */
-                    idUser = nextUserId();
+                    idUser = getRandomUser();
+                    if (idUser == 0) {
+                        return nextRequest();
+                    }
                     int iBucket = RANDOM.nextInt(_propabilities.lastKey());
                     Entry<Integer, List<Long>> entry =
                             _propabilities.ceilingEntry(iBucket);
@@ -79,6 +90,10 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                     if (numSubscriptions == 0) {
                         // no subscriptions available, request not possible atm.
                         _numSkipsSubscriptionRemoval++;
+                        if (_numSkipsSubscriptionRemoval % 1000 == 0) {
+                            System.out.println(_numSkipsSubscriptionRemoval
+                                    + " U skipped!");
+                        }
                         return nextRequest();
                     }
                     // get oldest subscription (-> number of status updates per FEED grows slowly)
@@ -92,6 +107,13 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                     _state.removeSubscription(subscription);
                     return new RequestUnfollow(subscription.getIdSubscriber(),
                             subscription.getIdFollowed());
+
+                case USER:
+                    /*
+                     * create a user
+                     */
+                    _state.addUser(_uId);
+                    return new RequestUser(_uId++);
             }
             throw new IllegalStateException("unknown request type");
         } catch (Exception e) {
@@ -112,6 +134,10 @@ public class BootstrapRequestGenerator extends RequestGenerator {
         if (rt < 0) {
             return RequestType.FOLLOW;
         }
-        return RequestType.UNFOLLOW;
+        rt -= _requestComposition.getUnfollow();
+        if (rt < 0) {
+            return RequestType.UNFOLLOW;
+        }
+        return RequestType.USER;
     }
 }

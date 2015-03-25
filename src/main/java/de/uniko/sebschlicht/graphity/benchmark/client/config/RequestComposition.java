@@ -17,11 +17,13 @@ public class RequestComposition {
 
     private float post;
 
+    private float user;
+
     /**
      * Creates a request composition object holding the percentage of the
      * probability of each request type during the benchmark.
      * 
-     * @example new RequestComposition(0, 30.0, 20.0, 50.0);
+     * @example new RequestComposition(0, 30.0, 10.0, 50.0, 10.0);
      * 
      * @param feed
      *            percentage of news feed retrieval requests
@@ -31,16 +33,20 @@ public class RequestComposition {
      *            percentage of unfollow requests
      * @param post
      *            percentage of status update post requests
+     * @param user
+     *            percentage of add user requests
      */
     public RequestComposition(
             float feed,
             float follow,
             float unfollow,
-            float post) {
+            float post,
+            float user) {
         this.feed = feed;
         this.follow = follow;
         this.unfollow = unfollow;
         this.post = post;
+        this.user = user;
     }
 
     /**
@@ -69,5 +75,12 @@ public class RequestComposition {
      */
     public float getPost() {
         return post;
+    }
+
+    /**
+     * @return percentage of add user requests
+     */
+    public float getUser() {
+        return user;
     }
 }

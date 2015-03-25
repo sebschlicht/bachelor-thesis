@@ -22,6 +22,8 @@ public class MasterConfiguration extends Config {
 
     public float request_post;
 
+    public float request_user;
+
     public int maxThroughput;
 
     public int numThreads;
@@ -38,10 +40,6 @@ public class MasterConfiguration extends Config {
 
     public String baseTitan;
 
-    public long id_start;
-
-    public long id_end;
-
     public int feed_length;
 
     public MasterConfiguration(
@@ -50,11 +48,12 @@ public class MasterConfiguration extends Config {
 
         if (isLoaded()) {
             if (request_feed < 0 || request_follow < 0 || request_unfollow < 0
-                    || request_post < 0) {
+                    || request_post < 0 || request_user < 0) {
                 throw new IllegalArgumentException(
                         "request composition: percentages can not be less than zero");
             }
-            if (request_feed + request_follow + request_unfollow + request_post != 100.0) {
+            if (request_feed + request_follow + request_unfollow + request_post
+                    + request_user != 100.0) {
                 throw new IllegalArgumentException(
                         "request composition: percentages must add to 100.0");
             }
@@ -82,10 +81,6 @@ public class MasterConfiguration extends Config {
                                 + pathAddresses + "\"");
             } catch (IOException e) {
                 throw new IllegalArgumentException(e);
-            }
-            if (id_start > id_end) {
-                throw new IllegalArgumentException(
-                        "lower ID range border (start ID) is higher than upper ID range border (end ID)");
             }
         }
     }

@@ -38,6 +38,8 @@ public class RequestGenerator {
 
     protected MutableState _state;
 
+    protected long _uId;
+
     protected int _numSkipsSubscriptionRemoval;
 
     protected Configuration _config;
@@ -49,6 +51,7 @@ public class RequestGenerator {
             MutableState state,
             Configuration config) throws IOException {
         _state = state;
+        _uId = 1;
         _numSkipsSubscriptionRemoval = 0;
         _config = config;
         _requestComposition = config.getRequestComposition();
@@ -109,13 +112,23 @@ public class RequestGenerator {
                     /*
                      * retrieve news feed for random existing user
                      */
+                    idUser = getRandomUser();
+                    if (idUser == 0) {
+                        return nextRequest();
+                    }
+                    //FIXME get feed request for this user
+
                     return BootstrapManager.getFeedRequest();
 
                 case POST:
                     /*
                      * let random user post a fixed-length alphanumeric feed
                      */
-                    idUser = nextUserId();
+                    idUser = getRandomUser();
+                    if (idUser == 0) {
+                        return nextRequest();
+                    }
+
                     int feedLength = _config.getFeedLength();
                     String message =
                             RandomStringUtils.randomAlphanumeric(feedLength);
@@ -126,7 +139,11 @@ public class RequestGenerator {
                      * let random user follow another user according to longtail
                      * distribution
                      */
-                    idUser = nextUserId();
+                    idUser = getRandomUser();
+                    if (idUser == 0) {
+                        return nextRequest();
+                    }
+
                     int iBucket = RANDOM.nextInt(_propabilities.lastKey());
                     Entry<Integer, List<Long>> entry =
                             _propabilities.ceilingEntry(iBucket);
@@ -158,6 +175,13 @@ public class RequestGenerator {
                     //_state.removeSubscription(subscription);
                     return new RequestUnfollow(subscription.getIdSubscriber(),
                             subscription.getIdFollowed());
+
+                case USER:
+                    /*
+                     * create a user
+                     */
+                    _state.addUser(_uId);
+                    _uId += 1;
             }
             throw new IllegalStateException("unknown request type");
         } catch (Exception e) {
@@ -176,10 +200,11 @@ public class RequestGenerator {
         _state.mergeRequest(request, false);
     }
 
-    protected long nextUserId() {
-        return _config.getIdStart()
-                + RANDOM.nextInt((int) (_config.getIdEnd() - _config
-                        .getIdStart()) + 1);
+    protected long getRandomUser() {
+        if (_uId == 1) {
+            return 0;
+        }
+        return RANDOM.nextInt((int) _uId - 1) + 1;
     }
 
     protected RequestType nextRequestType() {
@@ -196,6 +221,10 @@ public class RequestGenerator {
         if (rt < 0) {
             return RequestType.FOLLOW;
         }
-        return RequestType.UNFOLLOW;
+        rt -= _requestComposition.getUnfollow();
+        if (rt < 0) {
+            return RequestType.UNFOLLOW;
+        }
+        return RequestType.USER;
     }
 }
