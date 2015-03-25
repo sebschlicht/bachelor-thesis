@@ -17,12 +17,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import com.google.gson.Gson;
 
 import de.uniko.sebschlicht.graphity.benchmark.analyse.WikidumpInfo;
+import de.uniko.sebschlicht.graphity.benchmark.client.bootstrap.BootstrapManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.RequestComposition;
 import de.uniko.sebschlicht.graphity.bootstrap.generate.MutableState;
 import de.uniko.sebschlicht.socialnet.Subscription;
 import de.uniko.sebschlicht.socialnet.requests.Request;
-import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
 import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
 import de.uniko.sebschlicht.socialnet.requests.RequestPost;
 import de.uniko.sebschlicht.socialnet.requests.RequestType;
@@ -112,12 +112,14 @@ public class RequestGenerator {
                     /*
                      * retrieve news feed for random existing user
                      */
-                    //return BootstrapManager.getFeedRequest();
-                    idUser = getRandomUser();
-                    if (idUser == 0) {
-                        return nextRequest();
-                    }
-                    return new RequestFeed(idUser);
+                    return BootstrapManager.getFeedRequest();
+                    /*
+                     * idUser = getRandomUser();
+                     * if (idUser == 0) {
+                     * return nextRequest();
+                     * }
+                     * return new RequestFeed(idUser);
+                     */
 
                 case POST:
                     /*
