@@ -93,6 +93,11 @@ public class BootstrapManager {
                 case UNFOLLOW:
                     userId = ((RequestUnfollow) request).getIdSubscriber();
                     break;
+
+                default:
+                    throw new IllegalArgumentException(
+                            "Unsupported request type \"" + request.getType()
+                                    + "\"!");
             }
             if (userId > highestId) {
                 highestId = userId;
