@@ -28,7 +28,7 @@ public class TitanRequestHandler extends AsyncRequestHandler {
         if (lResponse.isSuccess()) {
             List<JsonObject> statusUpdates = lResponse.getValue();
             ((RequestFeed) _request).setResult((statusUpdates == null)
-                    ? -1
+                    ? 0
                     : statusUpdates.size());
         } else {
             _request.setError(new IllegalStateException(sResponse));
