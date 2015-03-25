@@ -94,6 +94,10 @@ public class BootstrapManager {
                     userId = ((RequestUnfollow) request).getIdSubscriber();
                     break;
 
+                case USER:
+                    // nothing to do, covered by FOLLOW and POST
+                    break;
+
                 default:
                     throw new IllegalArgumentException(
                             "Unsupported request type \"" + request.getType()
