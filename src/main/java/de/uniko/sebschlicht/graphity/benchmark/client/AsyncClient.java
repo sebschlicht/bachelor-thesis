@@ -67,7 +67,6 @@ public class AsyncClient {
         if (requestComposition.getFeed() > 0) {
             System.out.println("loading bootstrap log...");
             BootstrapManager.loadRequests("bootstrap.log");
-            BootstrapManager.printStats();
         }
 
         // spawn client thread
