@@ -142,6 +142,7 @@ public class AsyncClient {
         if (request.hasFailed() || request.getType() == RequestType.FEED) {
             return;
         }
+        // we handle state changes onStart
         //synchronized (_sync) {
         //_requestGenerator.mergeRequest(request);
         //}

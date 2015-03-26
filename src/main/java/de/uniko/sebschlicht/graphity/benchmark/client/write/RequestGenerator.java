@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -27,6 +28,7 @@ import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
 import de.uniko.sebschlicht.socialnet.requests.RequestPost;
 import de.uniko.sebschlicht.socialnet.requests.RequestType;
 import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestUser;
 
 public class RequestGenerator {
 
@@ -46,6 +48,8 @@ public class RequestGenerator {
 
     protected RequestComposition _requestComposition;
 
+    protected Map<Long, User> _users;
+
     public RequestGenerator(
             String pathWikiDump,
             MutableState state,
@@ -55,6 +59,7 @@ public class RequestGenerator {
         _numSkipsSubscriptionRemoval = 0;
         _config = config;
         _requestComposition = config.getRequestComposition();
+        _users = new HashMap<>();
         loadWikiDump(pathWikiDump);
     }
 
@@ -104,6 +109,7 @@ public class RequestGenerator {
      */
     public Request nextRequest(RequestType type) {
         long idUser;
+        User user;
         Subscription subscription;
 
         try {
@@ -140,13 +146,24 @@ public class RequestGenerator {
                      * let random user follow another user according to longtail
                      * distribution
                      */
-                    idUser = getRandomUser();
-                    if (idUser == 0) {
-                        return nextRequest();
+                    if (_uId - 1 < 2) {
+                        return nextRequest(RequestType.USER);
                     }
+                    idUser = getRandomUser();
                     long idFollowed = getFollowedUserExisting();
-
-                    //_state.addSubscription(idUser, idFollowed);
+                    int numSkips = 0;
+                    do {
+                        idUser = getRandomUser();
+                        user = getUser(idUser);
+                        if (numSkips > 1000) {// we need more users
+                            return nextRequest(RequestType.USER);
+                        }
+                        numSkips += 1;
+                    } while (idUser == idFollowed
+                            || user.hasSubscription(idFollowed));
+                    // we update the state when request was fired, may throw exceptions if server too slow
+                    user.addSubscription(idFollowed);
+                    _state.addSubscription(new Subscription(idUser, idFollowed));
                     return new RequestFollow(idUser, idFollowed);
 
                 case UNFOLLOW:
@@ -167,7 +184,9 @@ public class RequestGenerator {
                         iter.next();
                     }
                     subscription = iter.next();
-                    //_state.removeSubscription(subscription.getIdSubscriber(), subscription.getIdFollowed());
+                    user = getUser(subscription.getIdSubscriber());
+                    user.removeSubscription(subscription.getIdFollowed());
+                    _state.removeSubscription(subscription);
                     return new RequestUnfollow(subscription.getIdSubscriber(),
                             subscription.getIdFollowed());
 
@@ -177,6 +196,7 @@ public class RequestGenerator {
                      */
                     _state.addUser(_uId);
                     _uId += 1;
+                    return new RequestUser(_uId - 1);
             }
             throw new IllegalStateException("unknown request type");
         } catch (Exception e) {
@@ -236,5 +256,34 @@ public class RequestGenerator {
             return RequestType.UNFOLLOW;
         }
         return RequestType.USER;
+    }
+
+    protected User getUser(long id) {
+        return _users.get(id);
+    }
+
+    protected class User {
+
+        private TreeSet<Long> _subscriptions;
+
+        public User() {
+            _subscriptions = new TreeSet<>();
+        }
+
+        public boolean addSubscription(long idFollowed) {
+            return _subscriptions.add(idFollowed);
+        }
+
+        public boolean removeSubscription(long idFollowed) {
+            return _subscriptions.remove(idFollowed);
+        }
+
+        public TreeSet<Long> getSubscriptions() {
+            return _subscriptions;
+        }
+
+        public boolean hasSubscription(long idFollowed) {
+            return _subscriptions.contains(idFollowed);
+        }
     }
 }

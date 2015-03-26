@@ -1,10 +1,7 @@
 package de.uniko.sebschlicht.graphity.benchmark.client.bootstrap;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeSet;
 
 import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
 import de.uniko.sebschlicht.graphity.benchmark.client.write.RequestGenerator;
@@ -19,8 +16,6 @@ import de.uniko.sebschlicht.socialnet.requests.RequestUser;
 
 public class BootstrapRequestGenerator extends RequestGenerator {
 
-    protected Map<Long, User> _users;
-
     public BootstrapRequestGenerator(
             String pathWikiDump,
             MutableState state,
@@ -30,7 +25,6 @@ public class BootstrapRequestGenerator extends RequestGenerator {
             throw new IllegalArgumentException(
                     "can not bootstrap feed requests!");
         }
-        _users = new HashMap<>();
         System.out.println(_requestComposition.getUser());
         System.out.println(_requestComposition.getFollow());
         System.out.println(_requestComposition.getPost());
@@ -152,30 +146,5 @@ public class BootstrapRequestGenerator extends RequestGenerator {
             return RequestType.UNFOLLOW;
         }
         return RequestType.USER;
-    }
-
-    protected User getUser(long id) {
-        return _users.get(id);
-    }
-
-    protected class User {
-
-        private TreeSet<Long> _subscriptions;
-
-        public User() {
-            _subscriptions = new TreeSet<>();
-        }
-
-        public boolean addSubscription(long idFollowed) {
-            return _subscriptions.add(idFollowed);
-        }
-
-        public boolean removeSubscription(long idFollowed) {
-            return _subscriptions.remove(idFollowed);
-        }
-
-        public TreeSet<Long> getSubscriptions() {
-            return _subscriptions;
-        }
     }
 }

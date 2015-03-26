@@ -7,6 +7,7 @@ import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.TargetType;
 import de.uniko.sebschlicht.graphity.benchmark.client.responses.ResultManager;
 import de.uniko.sebschlicht.socialnet.requests.Request;
+import de.uniko.sebschlicht.socialnet.requests.RequestType;
 
 /**
  * Client wrapper to measure latencies and handle target endpoints of
@@ -93,6 +94,11 @@ public class AsyncBenchmarkClientTask {
     private void executeNextRequest(int identifier) {
         _numRequests += 1;
         Request request = _owner.nextRequest();
+        if (request.getType() == RequestType.USER) {
+            // we create users lazily on server side
+            executeNextRequest(identifier);
+            return;
+        }
         String address = getNextTargetEndpoint();
         request.setAddress(address);
         _startTime[identifier] = System.nanoTime();
