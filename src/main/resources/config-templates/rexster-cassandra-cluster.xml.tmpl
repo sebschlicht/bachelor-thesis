@@ -40,7 +40,7 @@
             <!-- <graph-location>/tmp/titan</graph-location> -->
             <graph-read-only>false</graph-read-only>
             <properties>
-            	<cache.db-cache>true</cache.db-cache>
+            	<cache.db-cache>false</cache.db-cache>
             	<cache.db-cache-size>0.3</cache.db-cache-size>
             	<cache.db-cache-time>10000</cache.db-cache-time>
                 <cluster.max-partitions>128</cluster.max-partitions>
@@ -48,9 +48,9 @@
                 <query.force-index>true</query.force-index>
                 <schema.default>none</schema.default>
                 <storage.backend>cassandra</storage.backend>
-                <storage.buffer-size>1024</storage.buffer-size>
+                <storage.buffer-size>1</storage.buffer-size>
                 <storage.hostname>${address}</storage.hostname>
-            	<storage.page-size>1024</storage.page-size>
+            	<storage.page-size>100</storage.page-size>
                 <storage.cassandra.replication-factor>3</storage.cassandra.replication-factor>
                 <storage.cassandra.read-consistency-level>2</storage.cassandra.read-consistency-level>
                 <storage.cassandra.write-consistency-level>2</storage.cassandra.write-consistency-level>
