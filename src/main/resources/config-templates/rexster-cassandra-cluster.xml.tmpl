@@ -51,9 +51,9 @@
                 <storage.buffer-size>1</storage.buffer-size>
                 <storage.hostname>${address}</storage.hostname>
             	<storage.page-size>100</storage.page-size>
-                <storage.cassandra.replication-factor>3</storage.cassandra.replication-factor>
-                <storage.cassandra.read-consistency-level>2</storage.cassandra.read-consistency-level>
-                <storage.cassandra.write-consistency-level>2</storage.cassandra.write-consistency-level>
+                <storage.cassandra.replication-factor>1</storage.cassandra.replication-factor>
+                <storage.cassandra.read-consistency-level>QUORUM</storage.cassandra.read-consistency-level>
+                <storage.cassandra.write-consistency-level>QUORUM</storage.cassandra.write-consistency-level>
             </properties>
             <extensions>
               <allows>
