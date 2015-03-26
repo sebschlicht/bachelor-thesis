@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
 import de.uniko.sebschlicht.graphity.bootstrap.load.BootstrapFileLoader;
 import de.uniko.sebschlicht.socialnet.Subscription;
 import de.uniko.sebschlicht.socialnet.requests.Request;
@@ -255,9 +256,9 @@ public class BootstrapManager {
                 }
             }
         }
-        System.out.println("|A| = " + numUsers);
-        System.out.println("|C| = " + numPosts);
-        System.out.println("E_A = " + (numSubscriptions / (float) numUsers));
-        System.out.println("E_A>k = " + (numPowerUsers / (float) numUsers));
+        AsyncClient.LOG.info("|A| = " + numUsers);
+        AsyncClient.LOG.info("|C| = " + numPosts);
+        AsyncClient.LOG.info("E_A = " + (numSubscriptions / (float) numUsers));
+        AsyncClient.LOG.info("E_A>k = " + (numPowerUsers / (float) numUsers));
     }
 }

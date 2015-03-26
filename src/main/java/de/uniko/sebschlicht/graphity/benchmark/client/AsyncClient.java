@@ -100,6 +100,9 @@ public class AsyncClient {
         logMessageStarted.append(config.getNumThreads());
         logMessageStarted.append(" client threads.");
         LOG.info(logMessageStarted.toString());
+        if (requestComposition.getFeed() > 0) {
+            BootstrapManager.printStats();
+        }
         LOG.info("benchmark started at " + System.currentTimeMillis());
         benchmarkClient.start(numRequests);
     }
