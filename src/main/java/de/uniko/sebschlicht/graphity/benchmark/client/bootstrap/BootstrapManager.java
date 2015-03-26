@@ -238,4 +238,26 @@ public class BootstrapManager {
         }
         System.out.println("max feed length: " + maxFeedSize);
     }
+
+    public static void printStats() {
+        int numUsers = 0, numSubscriptions = 0, feedSize, numPowerUsers = 0;
+        long numPosts = 0;
+        for (BootstrapUser user : USERS) {
+            if (user != null) {
+                numUsers += 1;
+                numPosts += user.getNumStatusUpdates();
+                if (user.getSubscriptions() != null) {
+                    numSubscriptions += user.getSubscriptions().size();
+                }
+                feedSize = getFeedSize(user.getId());
+                if (feedSize > 15) {
+                    numPowerUsers += 1;
+                }
+            }
+        }
+        System.out.println("|A| = " + numUsers);
+        System.out.println("|C| = " + numPosts);
+        System.out.println("E_A = " + (numSubscriptions / (float) numUsers));
+        System.out.println("E_A>k = " + (numPowerUsers / (float) numUsers));
+    }
 }
