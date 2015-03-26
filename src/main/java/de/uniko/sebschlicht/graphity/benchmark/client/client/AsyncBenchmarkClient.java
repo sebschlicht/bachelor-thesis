@@ -12,6 +12,7 @@ import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
 import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
 import de.uniko.sebschlicht.socialnet.requests.RequestPost;
 import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestUser;
 
 public abstract class AsyncBenchmarkClient {
 
@@ -53,6 +54,8 @@ public abstract class AsyncBenchmarkClient {
     abstract public BoundRequestBuilder createUnfollowRequest(
             RequestUnfollow request);
 
+    abstract public BoundRequestBuilder createUserRequest(RequestUser request);
+
     protected String urlFromRelativeUrl(String address, String url) {
         return "http://" + address + _config.getTargetBase() + url;
     }
@@ -82,6 +85,15 @@ public abstract class AsyncBenchmarkClient {
                 httpRequest = createUnfollowRequest((RequestUnfollow) request);
                 httpRequest.execute(requestHandler);
                 break;
+
+            case USER:
+                httpRequest = createUserRequest((RequestUser) request);
+                httpRequest.execute(requestHandler);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown request type \""
+                        + request.getType() + "\"!");
         }
     }
 }

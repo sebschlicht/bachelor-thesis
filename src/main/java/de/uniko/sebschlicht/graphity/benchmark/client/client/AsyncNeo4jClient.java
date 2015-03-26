@@ -10,6 +10,7 @@ import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
 import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
 import de.uniko.sebschlicht.socialnet.requests.RequestPost;
 import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestUser;
 
 public class AsyncNeo4jClient extends AsyncBenchmarkClient {
 
@@ -23,6 +24,8 @@ public class AsyncNeo4jClient extends AsyncBenchmarkClient {
     private static final String URL_POST = URL_PLUGIN + "post/";
 
     private static final String URL_UNFOLLOW = URL_PLUGIN + "unfollow/";
+
+    private static final String URL_USER = URL_PLUGIN + "user/";
 
     public AsyncNeo4jClient(
             AsyncBenchmarkClientTask client,
@@ -77,6 +80,15 @@ public class AsyncNeo4jClient extends AsyncBenchmarkClient {
         return _httpClient
                 .preparePost(
                         urlFromRelativeUrl(request.getAddress(), URL_UNFOLLOW))
+                .setHeader("Content-Type", "application/json")
+                .setBody(jsonString);
+    }
+
+    @Override
+    public BoundRequestBuilder createUserRequest(RequestUser request) {
+        String jsonString = "{\"id\":\"" + request.getId() + "\"}";
+        return _httpClient
+                .preparePost(urlFromRelativeUrl(request.getAddress(), URL_USER))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }

@@ -10,6 +10,7 @@ import de.uniko.sebschlicht.socialnet.requests.RequestFeed;
 import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
 import de.uniko.sebschlicht.socialnet.requests.RequestPost;
 import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
+import de.uniko.sebschlicht.socialnet.requests.RequestUser;
 
 public class AsyncTitanClient extends AsyncBenchmarkClient {
 
@@ -22,6 +23,8 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
     private static final String URL_POST = URL_EXTENSION + "post/";
 
     private static final String URL_UNFOLLOW = URL_EXTENSION + "unfollow/";
+
+    private static final String URL_USER = URL_EXTENSION + "user/";
 
     public AsyncTitanClient(
             AsyncBenchmarkClientTask client,
@@ -76,6 +79,15 @@ public class AsyncTitanClient extends AsyncBenchmarkClient {
         return _httpClient
                 .preparePost(
                         urlFromRelativeUrl(request.getAddress(), URL_UNFOLLOW))
+                .setHeader("Content-Type", "application/json")
+                .setBody(jsonString);
+    }
+
+    @Override
+    public BoundRequestBuilder createUserRequest(RequestUser request) {
+        String jsonString = "{\"id\":\"" + request.getId() + "\"}";
+        return _httpClient
+                .preparePost(urlFromRelativeUrl(request.getAddress(), URL_USER))
                 .setHeader("Content-Type", "application/json")
                 .setBody(jsonString);
     }
