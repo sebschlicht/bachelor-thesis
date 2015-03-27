@@ -159,7 +159,7 @@ public class RequestGenerator {
                             return nextRequest(RequestType.USER);
                         }
                         numSkips += 1;
-                    } while (idUser == idFollowed
+                    } while (idUser == idFollowed || user == null
                             || user.hasSubscription(idFollowed));
                     // we update the state when request was fired, may throw exceptions if server too slow
                     user.addSubscription(idFollowed);
