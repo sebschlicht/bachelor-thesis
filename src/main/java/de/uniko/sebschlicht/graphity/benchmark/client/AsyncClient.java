@@ -63,6 +63,8 @@ public class AsyncClient {
         // load wikidump and create request generator
         _requestGenerator =
                 new RequestGenerator(PATH_WIKI_DUMP, new MutableState(), config);
+        _requestGenerator.setUserRange((int) (numRequests
+                * config.getRequestComposition().getUser() / 100));
         // load bootstrap manager if necessary
         if (requestComposition.getFeed() > 0) {
             System.out.println("loading bootstrap log...");

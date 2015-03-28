@@ -29,7 +29,6 @@ import de.uniko.sebschlicht.socialnet.requests.RequestFollow;
 import de.uniko.sebschlicht.socialnet.requests.RequestPost;
 import de.uniko.sebschlicht.socialnet.requests.RequestType;
 import de.uniko.sebschlicht.socialnet.requests.RequestUnfollow;
-import de.uniko.sebschlicht.socialnet.requests.RequestUser;
 
 public class RequestGenerator {
 
@@ -137,11 +136,9 @@ public class RequestGenerator {
                      * let random user post a fixed-length alphanumeric feed
                      */
                     idUser = getRandomUserId();
-                    if (idUser == 0) {
-                        System.out.println("POST force user");
-                        return nextRequest(RequestType.USER);
+                    if (!_users.containsKey(idUser)) {
+                        createUser(idUser);
                     }
-                    createUser(idUser);
 
                     int feedLength = _config.getFeedLength();
                     String message =
@@ -153,11 +150,6 @@ public class RequestGenerator {
                      * let random user follow another user according to longtail
                      * distribution
                      */
-                    if (_users.size() < 2) {
-                        System.out.println("FOLLOW force user");
-                        return nextRequest(RequestType.USER);
-                    }
-                    // TODO select any user?
                     long idFollowed = getRandomUserToFollow();
                     int numSkips = 0;
                     do {
@@ -167,9 +159,10 @@ public class RequestGenerator {
                             user = createUser(idUser);
                         }
 
-                        if (numSkips > _maxId) {// we need more users
-                            System.out.println("FOLLOW2 force user");
-                            return nextRequest(RequestType.USER);
+                        if (numSkips > _maxId) {// we need to subscribe to another user
+                            System.out.println("[FOLLOW] " + idFollowed
+                                    + " too highly connected.");
+                            return nextRequest(RequestType.FOLLOW);
                         }
                         numSkips += 1;
                     } while (idUser == idFollowed || user == null
@@ -204,12 +197,8 @@ public class RequestGenerator {
                             subscription.getIdFollowed());
 
                 case USER:
-                    /*
-                     * create a user
-                     */
-                    //long id = createUser();
-                    //_state.addUser(id);
-                    return new RequestUser(0);
+                    // we do this lazily
+                    return nextRequest();
             }
             throw new IllegalStateException("unknown request type");
         } catch (Exception e) {
@@ -331,8 +320,8 @@ public class RequestGenerator {
         RequestGenerator gen =
                 new RequestGenerator(AsyncClient.PATH_WIKI_DUMP,
                         new MutableState(), config);
-        int numUsers = 800000;
-        gen.setUserRange((int) (numUsers * requestComposition.getUser() / 100 * 2));
+        int numUsers = 1000000;
+        gen.setUserRange((int) (numUsers * requestComposition.getUser() / 100));
 
         int[] req = new int[5];
         for (int i = 0; i < numUsers; ++i) {
@@ -342,5 +331,6 @@ public class RequestGenerator {
         for (int i : req) {
             System.out.println(i);
         }
+        System.out.println(gen._users.size());
     }
 }
