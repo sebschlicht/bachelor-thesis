@@ -16,6 +16,8 @@ import de.uniko.sebschlicht.socialnet.requests.RequestUser;
 
 public class BootstrapRequestGenerator extends RequestGenerator {
 
+    protected long _uId;
+
     public BootstrapRequestGenerator(
             String pathWikiDump,
             MutableState state,
@@ -25,10 +27,7 @@ public class BootstrapRequestGenerator extends RequestGenerator {
             throw new IllegalArgumentException(
                     "can not bootstrap feed requests!");
         }
-        System.out.println(_requestComposition.getUser());
-        System.out.println(_requestComposition.getFollow());
-        System.out.println(_requestComposition.getPost());
-        System.out.println(_requestComposition.getUnfollow());
+        _uId = 0;
     }
 
     /**
@@ -56,10 +55,10 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                     /*
                      * let random user post a fixed-length alphanumeric feed
                      */
-                    if (_uId - 1 < 1) {
+                    if (_uId < 1) {
                         return nextRequest(RequestType.USER);
                     }
-                    idUser = getRandomUser();
+                    idUser = getRandomExistingUser();
                     return new RequestPost(idUser, null);
 
                 case FOLLOW:
@@ -67,15 +66,14 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                      * let random user follow another user according to longtail
                      * distribution
                      */
-                    if (_uId - 1 < 2) {
+                    if (_uId < 2) {
                         return nextRequest(RequestType.USER);
                     }
                     //FIXME implement this in RequestGenerator if working
-                    idUser = getRandomUser();
                     long idFollowed = getExistingUserToFollow();
                     int numSkips = 0;
                     do {
-                        idUser = getRandomUser();
+                        idUser = getRandomExistingUser();
                         user = getUser(idUser);
                         if (numSkips > 1000) {// we need more users
                             return nextRequest(RequestType.USER);
@@ -119,7 +117,7 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                      * create a user
                      */
                     _state.addUser(_uId);
-                    _users.put(_uId, new User());
+                    _users.put(_uId, new User(_uId));
                     return new RequestUser(_uId++);
             }
             throw new IllegalStateException("unknown request type");
@@ -128,6 +126,13 @@ public class BootstrapRequestGenerator extends RequestGenerator {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    protected long getRandomExistingUser() {
+        if (_uId == 0) {
+            return 0;
+        }
+        return RANDOM.nextInt((int) _uId) + 1;
     }
 
     @Override

@@ -41,8 +41,6 @@ public class RequestGenerator {
 
     protected MutableState _state;
 
-    protected long _uId;
-
     protected long _maxId;
 
     protected int _numSkipsSubscriptionRemoval;
@@ -58,8 +56,7 @@ public class RequestGenerator {
             MutableState state,
             Configuration config) throws IOException {
         _state = state;
-        _uId = 1;
-        _maxId = _uId;
+        _maxId = 1;
         _numSkipsSubscriptionRemoval = 0;
         _config = config;
         _requestComposition = config.getRequestComposition();
