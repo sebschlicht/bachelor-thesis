@@ -72,7 +72,7 @@ public class BootstrapRequestGenerator extends RequestGenerator {
                     }
                     //FIXME implement this in RequestGenerator if working
                     idUser = getRandomUser();
-                    long idFollowed = getFollowedUserExisting();
+                    long idFollowed = getExistingUserToFollow();
                     int numSkips = 0;
                     do {
                         idUser = getRandomUser();
@@ -128,6 +128,19 @@ public class BootstrapRequestGenerator extends RequestGenerator {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    @Override
+    protected long getExistingUserToFollow() {
+        /*
+         * user identifiers are from 1 to x where x is the number of existing
+         * users
+         */
+        long id;
+        do {
+            id = getUserToFollow();
+        } while (id > _uId - 1);
+        return id;
     }
 
     @Override

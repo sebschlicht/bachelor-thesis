@@ -18,6 +18,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import com.google.gson.Gson;
 
 import de.uniko.sebschlicht.graphity.benchmark.analyse.WikidumpInfo;
+import de.uniko.sebschlicht.graphity.benchmark.client.AsyncClient;
 import de.uniko.sebschlicht.graphity.benchmark.client.bootstrap.BootstrapManager;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.Configuration;
 import de.uniko.sebschlicht.graphity.benchmark.client.config.RequestComposition;
@@ -42,6 +43,8 @@ public class RequestGenerator {
 
     protected long _uId;
 
+    protected long _maxId;
+
     protected int _numSkipsSubscriptionRemoval;
 
     protected Configuration _config;
@@ -56,11 +59,16 @@ public class RequestGenerator {
             Configuration config) throws IOException {
         _state = state;
         _uId = 1;
+        _maxId = _uId;
         _numSkipsSubscriptionRemoval = 0;
         _config = config;
         _requestComposition = config.getRequestComposition();
         _users = new HashMap<>();
         loadWikiDump(pathWikiDump);
+    }
+
+    public void setUserRange(int numUsers) {
+        _maxId = numUsers;
     }
 
     protected void loadWikiDump(String pathWikiDump) throws IOException {
@@ -131,10 +139,12 @@ public class RequestGenerator {
                     /*
                      * let random user post a fixed-length alphanumeric feed
                      */
-                    idUser = getRandomUser();
+                    idUser = getRandomUserId();
                     if (idUser == 0) {
-                        return nextRequest();
+                        System.out.println("POST force user");
+                        return nextRequest(RequestType.USER);
                     }
+                    createUser(idUser);
 
                     int feedLength = _config.getFeedLength();
                     String message =
@@ -146,16 +156,22 @@ public class RequestGenerator {
                      * let random user follow another user according to longtail
                      * distribution
                      */
-                    if (_uId - 1 < 2) {
+                    if (_users.size() < 2) {
+                        System.out.println("FOLLOW force user");
                         return nextRequest(RequestType.USER);
                     }
-                    idUser = getRandomUser();
-                    long idFollowed = getFollowedUserExisting();
+                    // TODO select any user?
+                    long idFollowed = getRandomUserToFollow();
                     int numSkips = 0;
                     do {
-                        idUser = getRandomUser();
+                        idUser = getRandomUserId();
                         user = getUser(idUser);
-                        if (numSkips > 1000) {// we need more users
+                        if (user == null) {
+                            user = createUser(idUser);
+                        }
+
+                        if (numSkips > _maxId) {// we need more users
+                            System.out.println("FOLLOW2 force user");
                             return nextRequest(RequestType.USER);
                         }
                         numSkips += 1;
@@ -194,9 +210,9 @@ public class RequestGenerator {
                     /*
                      * create a user
                      */
-                    _state.addUser(_uId);
-                    _uId += 1;
-                    return new RequestUser(_uId - 1);
+                    //long id = createUser();
+                    //_state.addUser(id);
+                    return new RequestUser(0);
             }
             throw new IllegalStateException("unknown request type");
         } catch (Exception e) {
@@ -215,25 +231,39 @@ public class RequestGenerator {
         _state.mergeRequest(request, false);
     }
 
-    protected long getRandomUser() {
-        if (_uId == 1) {
-            return 0;
-        }
-        return RANDOM.nextInt((int) _uId - 1) + 1;
+    protected User createUser(long id) {
+        User user = new User(id);
+        _users.put(id, user);
+        return user;
     }
 
-    protected long getFollowedUser() {
+    protected long getRandomUserId() {
+        if (_maxId == 0) {
+            return 0;
+        }
+        return RANDOM.nextInt((int) _maxId) + 1;
+    }
+
+    protected long getRandomUserToFollow() {
+        long id;
+        do {
+            id = getUserToFollow();
+        } while (id > _maxId);
+        return id;
+    }
+
+    protected long getUserToFollow() {
         int iBucket = RANDOM.nextInt(_propabilities.lastKey());
         Entry<Integer, List<Long>> entry = _propabilities.ceilingEntry(iBucket);
         List<Long> bucket = entry.getValue();
         return bucket.get(RANDOM.nextInt(bucket.size()));
     }
 
-    protected long getFollowedUserExisting() {
+    protected long getExistingUserToFollow() {
         long id;
         do {
-            id = getFollowedUser();
-        } while (id > _uId - 1);
+            id = getUserToFollow();
+        } while (!_users.containsKey(id));
         return id;
     }
 
@@ -264,10 +294,18 @@ public class RequestGenerator {
 
     protected class User {
 
+        private long _id;
+
         private TreeSet<Long> _subscriptions;
 
-        public User() {
+        public User(
+                long id) {
+            _id = id;
             _subscriptions = new TreeSet<>();
+        }
+
+        public long getId() {
+            return _id;
         }
 
         public boolean addSubscription(long idFollowed) {
@@ -284,6 +322,28 @@ public class RequestGenerator {
 
         public boolean hasSubscription(long idFollowed) {
             return _subscriptions.contains(idFollowed);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        RequestComposition requestComposition =
+                new RequestComposition(0f, 51.5f, 8f, 40f, 0.5f);
+        Configuration config =
+                new Configuration(140, 0, 0, requestComposition, null, null,
+                        null);
+        RequestGenerator gen =
+                new RequestGenerator(AsyncClient.PATH_WIKI_DUMP,
+                        new MutableState(), config);
+        int numUsers = 800000;
+        gen.setUserRange((int) (numUsers * requestComposition.getUser() / 100 * 2));
+
+        int[] req = new int[5];
+        for (int i = 0; i < numUsers; ++i) {
+            Request request = gen.nextRequest();
+            req[request.getType().getId()] += 1;
+        }
+        for (int i : req) {
+            System.out.println(i);
         }
     }
 }

@@ -22,10 +22,10 @@ public class AsyncClient {
 
     public static final Logger LOG = LogManager.getLogger("requests");
 
-    private static final String PATH_CONFIG =
+    public static final String PATH_CONFIG =
             "src/main/resources/client-config.properties";
 
-    private static final String PATH_WIKI_DUMP = "wikidump";
+    public static final String PATH_WIKI_DUMP = "wikidump";
 
     private Object _sync;
 
