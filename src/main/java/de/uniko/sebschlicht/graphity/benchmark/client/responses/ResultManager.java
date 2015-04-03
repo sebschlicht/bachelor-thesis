@@ -40,7 +40,7 @@ public class ResultManager {
                     logMessage.append("\n");
                     logMessage.append(errorMessage);
                     AsyncClient.LOG.info(logMessage);
-                    throw new IllegalStateException(errorMessage);
+                    return;
                 }
                 break;
 
