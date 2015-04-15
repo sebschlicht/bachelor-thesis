@@ -1,19 +1,17 @@
 # request composition
-request_feed=0
-request_follow=45.79
-request_unfollow=21.54
-request_post=32.67
+request_feed=100
+request_follow=0
+request_unfollow=0
+request_post=0
+request_user=0
 # maximum number of requests per second
 maxThroughput=0
 # number of threads
 numThreads=50
 # target cluster
 pathAddresses=src/main/resources/nodes
-targetType=TITAN
-baseNeo4j=:82/neo4j
-baseTitan=:82/titan
-# id range
-id_start=1
-id_end=2175904
+targetType=NEO4J
+baseNeo4j=:7474
+baseTitan=:8182
 # post length
 feed_length=140

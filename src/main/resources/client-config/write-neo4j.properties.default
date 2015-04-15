@@ -1,0 +1,17 @@
+# request composition
+request_feed=0
+request_follow=51.5
+request_unfollow=8
+request_post=40
+request_user=0.5
+# maximum number of requests per second
+maxThroughput=0
+# number of threads
+numThreads=50
+# target cluster
+pathAddresses=src/main/resources/nodes
+targetType=NEO4J
+baseNeo4j=:7474
+baseTitan=:8182
+# post length
+feed_length=140

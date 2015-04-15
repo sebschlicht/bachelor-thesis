@@ -40,9 +40,10 @@
             <!-- <graph-location>/tmp/titan</graph-location> -->
             <graph-read-only>false</graph-read-only>
             <properties>
-            	<cache.db-cache>false</cache.db-cache>
+            	<cache.db-cache>true</cache.db-cache>
             	<cache.db-cache-size>0.3</cache.db-cache-size>
             	<cache.db-cache-time>10000</cache.db-cache-time>
+            	<cache.db-cache-clean-wait>100</cache.db-cache-clean-wait>
                 <cluster.max-partitions>128</cluster.max-partitions>
                 <query.fast-property>true</query.fast-property>
                 <query.force-index>true</query.force-index>
