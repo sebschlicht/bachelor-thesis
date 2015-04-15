@@ -127,7 +127,9 @@ public class AsyncClient {
     public Request nextRequest() {
         synchronized (_sync) {
             Request request = _requestGenerator.nextRequest();
-            if (request.getType() != RequestType.FEED) {
+            if (request.getType() != RequestType.FEED
+                    && request.getType() != RequestType.FOLLOW) {
+                // we can't unfollow twice and posts don't have much effect
                 _requestGenerator.mergeRequest(request);
             }
             return request;
@@ -144,10 +146,12 @@ public class AsyncClient {
         if (request.hasFailed() || request.getType() == RequestType.FEED) {
             return;
         }
-        // we handle state changes onStart
-        //synchronized (_sync) {
-        //_requestGenerator.mergeRequest(request);
-        //}
+        if (request.getType() == RequestType.FOLLOW) {
+            // we can't unfollow from a non-followed user
+            synchronized (_sync) {
+                _requestGenerator.mergeRequest(request);
+            }
+        }
     }
 
     private static void printUsage() {

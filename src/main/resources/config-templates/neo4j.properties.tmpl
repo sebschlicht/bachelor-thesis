@@ -84,6 +84,9 @@ ha.pull_interval=10
 # one transaction at a time.
 #ha.tx_push_strategy=fixed
 
+# Read timeout in seconds, between nodes in the HA cluster.
+ha.read_timeout=60
+
 # Enable this to be able to upgrade a store from an older version.
 #allow_store_upgrade=true
 
